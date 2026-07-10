@@ -9,6 +9,7 @@ The application uses `src` as the single source root. Next.js routing lives in `
 ## Layer Responsibilities
 
 - App layer: route entry points, route-level metadata, and framework wiring.
+- Core layer: application-wide infrastructure that is independent from features and business logic.
 - Feature layer: product capabilities grouped by domain or workflow.
 - Shared UI layer: reusable presentation components that are intentionally cross-feature.
 - Service layer: application-wide service boundaries and integration coordination.
@@ -19,6 +20,7 @@ The application uses `src` as the single source root. Next.js routing lives in `
 ## Folder Responsibilities
 
 - `src/app`: Next.js App Router files only.
+- `src/core`: application-wide infrastructure such as providers, guards, errors, logging, monitoring, analytics, and accessibility.
 - `src/assets`: imported source assets such as fonts, icons, and images.
 - `src/components`: reusable UI, shared, layout, navigation, and feedback components.
 - `src/features`: feature-first modules for product capabilities.
@@ -43,12 +45,38 @@ Shared folders should be used only when code is intentionally reused across mult
 
 Routing should not contain business logic. Components should focus on presentation and interaction. API modules should describe communication boundaries. Stores should manage shared state only when local or feature state is insufficient. Generic utilities should remain pure and framework-agnostic.
 
+Core infrastructure should provide cross-cutting application boundaries without owning product behavior. It may support features, routes, and shared systems, but it must not become a place for feature-specific rules or business workflows.
+
+## Theme Runtime
+
+Theme values flow through three layers:
+
+1. Design Tokens: TypeScript token files in `src/theme` are the compile-time reference for design decisions.
+2. CSS Variables: theme styles in `src/styles` expose semantic runtime variables such as `--color-primary`, `--color-background`, and `--color-border`.
+3. Tailwind: Tailwind consumes those runtime variables through the global theme bridge, so utilities resolve to semantic theme values instead of hardcoded colors.
+
+CSS variables are the browser runtime source of truth. TypeScript tokens should remain aligned with the same semantic system, but runtime theming should happen through CSS variables.
+
 ## Dependency Direction
 
 Dependencies should flow inward from specific to shared:
 
-- `src/app` may depend on features and shared foundation code.
-- `src/features` may depend on shared components, api, services, store, hooks, lib, utils, types, constants, config, styles, and assets.
+- `src/app` may depend on core infrastructure, features, and shared foundation code.
+- `src/core` may depend on foundation code such as config, types, constants, lib, utils, styles, and theme tokens.
+- `src/features` may depend on shared components, core infrastructure, api, services, store, hooks, lib, utils, types, constants, config, styles, theme tokens, and assets.
 - Shared foundation folders must not depend on specific features.
 - Shared components must not depend on feature modules.
+- Core infrastructure must not depend on feature modules or business workflows.
 - Lower-level utilities must not depend on React, Next.js routing, or product features unless they are moved to a more appropriate layer.
+
+## Module Boundary Rules
+
+Future tooling should enforce these boundaries:
+
+- `src/app` may import from `src/features`, `src/core`, and foundation folders.
+- `src/features/*` may import from shared foundation folders and core, but not from sibling features unless an explicit shared contract exists.
+- `src/core` must not import from `src/features` or `src/app`.
+- `src/components` must not import from `src/features`.
+- `src/theme`, `src/config`, `src/constants`, `src/types`, and `src/utils` must remain independent from app routes and features.
+- Cross-folder imports should use the `@/` alias instead of long relative paths.
+- Barrel exports should define public APIs only, not hide internal module structure.

@@ -79,3 +79,11 @@ Decision: Use Zod for schema validation.
 Reason: Zod provides TypeScript-friendly runtime validation and can support forms, API boundaries, and configuration validation.
 
 Alternatives considered: Yup, Valibot, custom validation.
+
+## Core Layer
+
+Decision: Introduce `src/core` for application-wide infrastructure.
+
+Reason: Cross-cutting concerns such as providers, guards, errors, logging, monitoring, analytics, and accessibility need clear ownership outside features and outside generic utilities. Keeping them in a dedicated layer prevents feature modules, shared components, and low-level helpers from becoming infrastructure catch-alls.
+
+Alternatives considered: Placing infrastructure in `src/lib`, distributing infrastructure across features, or keeping separate top-level folders for each concern.

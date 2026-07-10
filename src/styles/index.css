@@ -1,0 +1,6 @@
+/*
+ * Global theme style entry point.
+ */
+@import "./light.css";
+@import "./dark.css";
+@import "./theme.css";
