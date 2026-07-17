@@ -28,6 +28,8 @@ export default function RootLayout({
     <html
       lang={APP_CONFIG.defaultLocale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // The theme init script sets the `dark` class before hydration.
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <AppProvider>{children}</AppProvider>
