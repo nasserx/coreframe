@@ -1,5 +1,10 @@
 /**
  * Centralized environment configuration with fail-fast validation.
+ *
+ * This module is the only place allowed to read `process.env`. Importing it
+ * runs validation immediately, so it is deliberately excluded from the config
+ * barrel — consumers that need environment values import `@/config/env`
+ * directly and accept the fail-fast behavior.
  */
 import { z } from "zod";
 
