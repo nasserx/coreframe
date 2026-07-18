@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import type { Metadata } from "next";
 
 import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page-header";
@@ -9,6 +11,26 @@ import { TypeSpecimen } from "@/features/showcase/components/type-specimen";
 export const metadata: Metadata = {
   title: "Tokens",
 };
+
+/*
+ * Reads the authored token values straight from the source CSS at build time
+ * (this page is statically prerendered, so this runs once per build). The
+ * swatches must show values exactly as written in src/styles — resolving
+ * them in the browser via getComputedStyle yields the computed color space
+ * serialization (lab()/hex), which is unreadable and cannot be copied back
+ * into the token files.
+ */
+async function readAuthoredTokens(file: string): Promise<ReadonlyMap<string, string>> {
+  const css = await readFile(join(process.cwd(), "src", "styles", file), "utf8");
+  const tokens = new Map<string, string>();
+  for (const match of css.matchAll(/--([\w-]+):\s*([^;]+);/g)) {
+    const [, name, value] = match;
+    if (name !== undefined && value !== undefined) {
+      tokens.set(`--${name}`, value.replace(/\s+/g, " ").trim());
+    }
+  }
+  return tokens;
+}
 
 type ColorToken = Readonly<{ name: string; variable: string; swatchClassName: string }>;
 
@@ -173,7 +195,12 @@ const RADIUS_SCALE = [
   { label: "rounded-full", className: "rounded-full" },
 ] as const;
 
-export default function TokensPage() {
+export default async function TokensPage() {
+  const [lightTokens, darkTokens] = await Promise.all([
+    readAuthoredTokens("light.css"),
+    readAuthoredTokens("dark.css"),
+  ]);
+
   return (
     <>
       <ShowcasePageHeader
@@ -182,7 +209,7 @@ export default function TokensPage() {
       />
       <ShowcaseSection
         title="Theme behavior"
-        description="The runtime is system-driven: the ThemeProvider mirrors the OS preference onto the dark class before first paint. Swatch values below update live on theme change."
+        description="Three-state runtime: an explicit choice from the header control persists in localStorage and syncs across tabs; system tracks the OS live via matchMedia. A pre-paint inline script applies the stored choice with zero flash. Swatch values below follow the resolved theme."
       >
         <ThemeStatus />
       </ShowcaseSection>
@@ -190,7 +217,13 @@ export default function TokensPage() {
         <ShowcaseSection key={group} title={`Colors — ${group}`}>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {tokens.map((token) => (
-              <TokenSwatch key={token.name} {...token} />
+              <TokenSwatch
+                key={token.name}
+                name={token.name}
+                swatchClassName={token.swatchClassName}
+                lightValue={lightTokens.get(token.variable) ?? "—"}
+                darkValue={darkTokens.get(token.variable) ?? "—"}
+              />
             ))}
           </div>
         </ShowcaseSection>
