@@ -20,7 +20,15 @@ Import order (`src/styles/index.css`): base → light → dark → theme.
 **Spacing is Tailwind's default scale.** The foundation adds no spacing tokens:
 Tailwind v4's `--spacing`-multiplier scale (0.25rem steps) is the spacing contract.
 The same applies to motion: Tailwind's default `duration-*`/`ease-*` utilities are
-the motion contract until a real product need says otherwise.
+the motion contract until a real product need says otherwise. Vertical rhythm is
+a named five-step scale over that spacing contract, owned by the Stack primitive
+(`docs/LAYOUT.md`) — names, not new tokens.
+
+**Content measure** is tokenized (theme-neutral, in `theme.css` `@theme`):
+`--container-prose: 65ch` (running text) and `--container-form: 28rem`
+(single-column interactive surfaces) generate `max-w-prose` / `max-w-form`.
+Tailwind v4 ships no prose container, so these are foundation decisions — the
+full contract, including when to use no cap at all, is `docs/LAYOUT.md` §2.
 
 **Stacking:** overlay primitives use the shadcn `z-50` convention; the foundation
 defines no z-index tokens.

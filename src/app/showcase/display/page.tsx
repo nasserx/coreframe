@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Stack } from "@/components/ui/stack";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
@@ -156,14 +157,14 @@ export default function DisplayPage() {
         title="Scroll area"
         description="A designed scroll surface with themed overlay scrollbars — distinct from Table's plain overflow container."
       >
-        <ScrollArea className="h-40 max-w-md rounded-lg border">
-          <div className="flex flex-col gap-1 p-3">
+        <ScrollArea className="h-40 max-w-form rounded-lg border">
+          <Stack gap="xs" className="p-3">
             {Array.from({ length: 20 }, (_, index) => (
               <p key={index} className="rounded-md px-2 py-1 text-sm hover:bg-muted">
                 Scrollable row {index + 1}
               </p>
             ))}
-          </div>
+          </Stack>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </ShowcaseSection>

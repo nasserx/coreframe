@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Stack } from "@/components/ui/stack";
 import { Spinner } from "@/components/ui/spinner";
 import { ErrorBoundaryDemo } from "@/features/showcase/components/error-boundary-demo";
 import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page-header";
@@ -26,7 +27,7 @@ export default function FeedbackPage() {
         title="Skeleton composition"
         description="A pending card mirrors the shape of the loaded card so the layout never jumps."
       >
-        <div className="grid max-w-2xl gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Card size="sm" aria-busy="true">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -78,17 +79,17 @@ export default function FeedbackPage() {
         title="Empty state"
         description="Composed from Card, an icon, and a Button — no EmptyState primitive exists, and this is the pattern features should copy."
       >
-        <Card className="max-w-md">
+        <Card className="max-w-form">
           <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
             <div className="flex size-10 items-center justify-center rounded-full bg-muted">
               <InboxIcon className="size-5 text-muted-foreground" aria-hidden="true" />
             </div>
-            <div className="flex flex-col gap-1">
+            <Stack gap="xs">
               <p className="text-sm font-medium">Nothing here yet</p>
               <p className="text-sm text-muted-foreground">
                 Entries appear here once they are created.
               </p>
-            </div>
+            </Stack>
             <Button size="sm" variant="outline">
               Create the first entry
             </Button>

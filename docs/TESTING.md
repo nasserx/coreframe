@@ -79,6 +79,12 @@ browser can falsify.
   theme/direction cells. axe automates roughly the third of WCAG that is
   machine-checkable; treat a clean scan as a floor. False positives must be
   excluded explicitly with an argument in a comment, never silently.
+- `shell.spec.ts` — operability proof for the AppShell's responsive
+  navigation: at a mobile viewport the drawer opens, traps focus, closes on
+  Escape with focus returned to the trigger, and dismisses itself on
+  navigation; at desktop the persistent sidebar navigates and marks the
+  current page, and the skip link is the first focusable element. axe can
+  only attest the markup; these drive the interactions.
 
 Routes are **discovered** (`tests/e2e/routes.ts` walks `src/app` for
 `page.*`), so a new page is covered automatically. Dynamic or parallel

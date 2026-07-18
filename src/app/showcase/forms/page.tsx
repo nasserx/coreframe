@@ -31,7 +31,7 @@ export default function FormsPage() {
         title="Field composition"
         description="Label, control, and description connected with standard HTML attributes."
       >
-        <div className="max-w-md">
+        <div className="max-w-form">
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="display-name">Display name</FieldLabel>
@@ -61,7 +61,7 @@ export default function FormsPage() {
         title="Invalid state"
         description="aria-invalid drives the control styling; data-invalid tints the field; FieldError announces via role=alert."
       >
-        <div className="max-w-md">
+        <div className="max-w-form">
           <Field data-invalid="true">
             <FieldLabel htmlFor="invalid-example">Identifier</FieldLabel>
             <Input
@@ -80,7 +80,7 @@ export default function FormsPage() {
         title="Error lists"
         description="FieldError deduplicates and renders message objects from any source."
       >
-        <div className="max-w-md">
+        <div className="max-w-form">
           <FieldError
             errors={[
               { message: "Must be at least 8 characters." },
@@ -94,7 +94,7 @@ export default function FormsPage() {
         title="Grouped controls"
         description="FieldSet and FieldLegend carry native grouping semantics."
       >
-        <div className="max-w-md">
+        <div className="max-w-form">
           <FieldSet>
             <FieldLegend>Delivery window</FieldLegend>
             <FieldGroup>

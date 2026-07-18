@@ -47,6 +47,8 @@ CSS custom properties are the **single source of truth** (full contract: `docs/D
 
 Entry: `src/app/globals.css` imports `tailwindcss`, `tw-animate-css`, `shadcn/tailwind.css`, then `src/styles/index.css`. Never hardcode colors in components — use semantic Tailwind utilities that resolve through the bridge. Spacing and motion contracts are Tailwind's defaults (no project tokens). Any lightness change to a color token requires re-verifying the WCAG AA pairs in `docs/DESIGN_TOKENS.md` §3.
 
+Layout (`docs/LAYOUT.md`; live demo `/showcase/layout`): content measure is tokenized — `--container-prose: 65ch` / `--container-form: 28rem` in `theme.css` → `max-w-prose`/`max-w-form`; a block is prose-capped, form-capped, or full-width, never ad-hoc `max-w-*`. Vertical rhythm is the five named Stack steps (`xs`…`xl` → gap-1/2/4/8/12, named by sibling relationship) in `src/components/ui/stack.tsx`. Page scaffold: `PageHeader` (+Title/Description). Application chrome: `AppShell` (+Sidebar/SidebarTrigger/Header/Main) — grid shell, document-level scroll, mobile modal drawer built on the Base UI Dialog, built-in `SkipLink`, landmark/focus guarantees, consumes the `sidebar-*` tokens, fully logical-property based. Grids, rows, and one-off alignment stay plain Tailwind — do not add wrapper primitives for them.
+
 Direction & script: `<html lang/dir>` come from `APP_CONFIG` (`src/config/app.ts`) — `APP_LOCALES` supports `en`/`ar`, `LOCALE_INFO` declares per-locale `direction` and `numerals` (Western `latn` default, `arab` opt-in); direction is static per deployment. Font stack: `--font-sans` = Noto Sans Arabic (first, but scoped to Arabic code points via `unicode-range`; self-hosted via `next/font/local` with `size-adjust: 115%` for optical parity) → Geist. Never reorder: Geist's Arial-based metric fallback contains Arabic glyphs and intercepts Arabic if Noto sits after it. `[dir="rtl"]` overrides in `theme.css` loosen ramp line-heights and zero tracking for Arabic. Bidi: `code`/`pre` are forced LTR-isolated in `globals.css`; use `<bdi>` for inline opposite-direction runs, `dir="auto"` for unknown-direction blocks. Full architecture: `docs/DIRECTION_AND_I18N.md`.
 
 Runtime: `ThemeProvider` (`src/core/providers/theme-provider.tsx`) supports `"light" | "dark" | "system"` — localStorage persistence (key `theme`), cross-tab sync via the storage event, live matchMedia tracking for system, and a pre-paint inline script for zero-flash first paint (routes stay statically prerendered; a cookie would force dynamic rendering). Consume via `useTheme()` → `{ theme, resolvedTheme, setTheme }`; never toggle the `dark` class manually. Reusable selector: `src/components/ui/theme-control.tsx`; the sonner Toaster follows `resolvedTheme`. Details: `docs/DESIGN_TOKENS.md` §5.
@@ -58,7 +60,7 @@ Runtime: `ThemeProvider` (`src/core/providers/theme-provider.tsx`) supports `"li
 - Routing composes; components present; utilities stay pure; core never owns product behavior.
 - No new dependencies without documented trade-offs (add to `DECISIONS.md`).
 
-## Design Philosophy (for future primitives — none exist yet)
+## Design Philosophy (for primitives)
 
 Small, accessible, composable primitives in `src/components/ui`; domain-neutral names; token-driven styling; controlled/uncontrolled APIs documented; refs forwarded only when consumers need the DOM node; `asChild` only for element replacement; primitives own UI interaction state only — never server state, auth, or workflows. `DESIGN_SYSTEM.md` has the full checklist — run it before calling a primitive done.
 
@@ -78,11 +80,11 @@ Next.js 16 App Router (**breaking changes vs training data — read `node_module
 
 Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`) / `test` + `test:watch` (Vitest unit/component) / `test:e2e` (Playwright; requires a prior `build`, one-time `npx playwright install chromium`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files; deliberately no tests), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → test → build → test:e2e on PRs and pushes to `main`. Env validation (`src/config/env.ts`) executes at startup via a side-effect import in `next.config.ts`.
 
-Testing (`docs/TESTING.md` for full rationale): Vitest + Testing Library, jsdom, tests colocated as `src/**/*.test.{ts,tsx}` (reference tests: `cn`, Button incl. the render-prop slot contract, ErrorBoundary, theme runtime, token parity); Playwright in `tests/e2e` — console-cleanliness harness over every discovered route × theme × direction (runs against `next dev` because React only reports attribute-level hydration mismatches in development builds), `document.fonts` assertion that Noto Sans Arabic is loaded AND used, and axe WCAG A/AA scans (both against `next start`). Routes are discovered from `src/app` (`tests/e2e/routes.ts`) — never hard-code route lists; dynamic segments throw until discovery is extended.
+Testing (`docs/TESTING.md` for full rationale): Vitest + Testing Library, jsdom, tests colocated as `src/**/*.test.{ts,tsx}` (reference tests: `cn`, Button incl. the render-prop slot contract, ErrorBoundary, theme runtime, token parity); Playwright in `tests/e2e` — console-cleanliness harness over every discovered route × theme × direction (runs against `next dev` because React only reports attribute-level hydration mismatches in development builds), `document.fonts` assertion that Noto Sans Arabic is loaded AND used, axe WCAG A/AA scans, and the app-shell operability tests (`shell.spec.ts`: drawer, focus return, skip link at mobile + desktop widths) — all three against `next start`. Routes are discovered from `src/app` (`tests/e2e/routes.ts`) — never hard-code route lists; dynamic segments throw until discovery is extended.
 
 ## Current Project Status
 
-Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives, the `/showcase` inspection routes, both test layers, strict TS/ESLint setup.
+Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives plus the layout set (Container, Stack, PageHeader, AppShell, SkipLink), the `/showcase` inspection routes (11 pages, wrapped in the AppShell), both test layers, strict TS/ESLint setup.
 
 ## Completed Milestones
 
@@ -90,6 +92,7 @@ Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme tok
 2. Full documentation set (architecture, design system, code style, contributing, decisions).
 3. Theme runtime (tokens → CSS variables → Tailwind bridge) and strict tooling baseline.
 4. Testing baseline: Vitest unit/component layer, Playwright browser layer (console harness, font-loading assertion, axe scans), wired into CI; Noto font ships with its OFL 1.1 license (`src/assets/fonts/OFL.txt`).
+5. Layout vocabulary: measure tokens, Stack rhythm scale, PageHeader scaffold, accessible responsive AppShell (`docs/LAYOUT.md`); showcase migrated onto it; shell keyboard/focus tests in both layers.
 
 ## Upcoming Priorities (in rough order)
 

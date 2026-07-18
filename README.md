@@ -76,7 +76,8 @@ npm run typecheck
 npm test              # unit/component layer (Vitest + Testing Library)
 npm run test:watch    # watch mode
 npm run build && npm run test:e2e   # browser layer (Playwright): console
-                                    # cleanliness, font loading, axe scans
+                                    # cleanliness, font loading, axe scans,
+                                    # app-shell operability
 ```
 
 One-time setup for the browser layer: `npx playwright install chromium`.
@@ -103,6 +104,16 @@ Environment variables are validated fail-fast at startup: `next.config.ts`
 imports `src/config/env.ts`, which throws with the offending variable names
 if the schema does not parse. See the comment in `env.ts` for how to add a
 new variable.
+
+## Layout
+
+A small layout vocabulary makes the common product layouts consistent:
+`Container` (page width), `Stack` (named vertical-rhythm steps), `PageHeader`
+(page scaffold), and `AppShell` (responsive, accessible application chrome
+with sidebar/header/main regions and a built-in skip link). Content measure
+is tokenized (`max-w-prose` / `max-w-form`); dense data surfaces stay
+uncapped. Contracts and rationale: `docs/LAYOUT.md`; live demo:
+`/showcase/layout`.
 
 ## Direction & Internationalization
 
