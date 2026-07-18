@@ -47,6 +47,8 @@ CSS custom properties are the **single source of truth** (full contract: `docs/D
 
 Entry: `src/app/globals.css` imports `tailwindcss`, `tw-animate-css`, `shadcn/tailwind.css`, then `src/styles/index.css`. Never hardcode colors in components — use semantic Tailwind utilities that resolve through the bridge. Spacing and motion contracts are Tailwind's defaults (no project tokens). Any lightness change to a color token requires re-verifying the WCAG AA pairs in `docs/DESIGN_TOKENS.md` §3.
 
+Direction & script: `<html lang/dir>` come from `APP_CONFIG` (`src/config/app.ts`) — `APP_LOCALES` supports `en`/`ar`, `LOCALE_INFO` declares per-locale `direction` and `numerals` (Western `latn` default, `arab` opt-in); direction is static per deployment. Font stack: `--font-sans` = Geist → Noto Sans Arabic (both via `next/font`); `[dir="rtl"]` overrides in `theme.css` loosen ramp line-heights and zero tracking for Arabic. Full architecture: `docs/DIRECTION_AND_I18N.md`.
+
 Runtime: `ThemeProvider` (`src/core/providers/theme-provider.tsx`) supports `"light" | "dark" | "system"` — localStorage persistence (key `theme`), cross-tab sync via the storage event, live matchMedia tracking for system, and a pre-paint inline script for zero-flash first paint (routes stay statically prerendered; a cookie would force dynamic rendering). Consume via `useTheme()` → `{ theme, resolvedTheme, setTheme }`; never toggle the `dark` class manually. Reusable selector: `src/components/ui/theme-control.tsx`; the sonner Toaster follows `resolvedTheme`. Details: `docs/DESIGN_TOKENS.md` §5.
 
 ## Engineering Principles
@@ -68,6 +70,7 @@ Small, accessible, composable primitives in `src/components/ui`; domain-neutral 
 - No `any`; strict tsconfig incl. `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax` — treat these as correctness, not noise.
 - `SCREAMING_SNAKE_CASE` true constants; env vars only through `src/config/env.ts` (Zod-validated, fail-fast) — never `process.env` elsewhere; `NEXT_PUBLIC_` only for browser-safe values.
 - Curly braces always; `eqeqeq`; no long relative paths (`../../../` banned).
+- **Logical CSS properties only** (`ms-`/`me-`, `ps-`/`pe-`, `start-`/`end-`, `text-start`/`text-end`, `rounded-s-`/`rounded-e-`, `border-s`/`border-e`) — physical direction utilities fail lint via `foundation/no-physical-tailwind-classes` (inline rule in `eslint.config.mjs`; escape hatch: eslint-disable with a justification). Directional icons flip individually with `rtl:rotate-180`; centered overlays use `inset-x-0 mx-auto`, not `left-1/2 -translate-x-1/2`. See `docs/DIRECTION_AND_I18N.md`.
 
 ## Tech Stack
 

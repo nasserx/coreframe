@@ -87,6 +87,15 @@ imports `src/config/env.ts`, which throws with the offending variable names
 if the schema does not parse. See the comment in `env.ts` for how to add a
 new variable.
 
+## Direction & Internationalization
+
+The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
+logical properties (lint-enforced), the sans stack falls through from Geist to
+Noto Sans Arabic, and locale/direction/numeral configuration lives in
+`src/config/app.ts`. Message translation is deliberately not included — see
+`docs/DIRECTION_AND_I18N.md` for the architecture and the integration points
+for adding an i18n library.
+
 ## Project Goals
 
 - Keep the foundation minimal and production-ready.

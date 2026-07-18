@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
 import { ThemeControl } from "@/components/ui/theme-control";
+import { DirectionControl } from "@/features/showcase/components/direction-control";
 
 export const metadata: Metadata = {
   title: {
@@ -24,6 +25,7 @@ export default function ShowcaseLayout({ children }: Readonly<{ children: ReactN
             <p className="text-xs text-muted-foreground max-sm:hidden">
               Engineering sandbox — not a product
             </p>
+            <DirectionControl />
             <ThemeControl />
           </div>
         </Container>
