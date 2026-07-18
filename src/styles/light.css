@@ -1,41 +1,61 @@
 /*
  * Light theme semantic variable set.
+ *
+ * Palette identity: one brand hue (oklch hue 262, a restrained indigo-blue)
+ * drives the whole theme. Neutrals carry a trace of the same hue (chroma
+ * 0.002–0.015) so surfaces read as one material; status colors share the
+ * brand's chroma/lightness band so they feel related, not stock.
+ *
+ * Elevation: light mode separates levels by shadow (--elevation-*) on top of
+ * a two-step surface ladder (background → surface). Every foreground/
+ * background pair meets WCAG AA — verified ratios in docs/DESIGN_TOKENS.md.
  */
 :root {
   color-scheme: light;
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-surface: oklch(1 0 0);
-  --color-surface-foreground: oklch(0.145 0 0);
-  --color-primary: oklch(0.205 0 0);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-accent: oklch(0.97 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
-  --color-success: oklch(0.45 0.13 145);
-  --color-success-foreground: oklch(0.985 0 0);
-  --color-warning: oklch(0.82 0.16 85);
-  --color-warning-foreground: oklch(0.145 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-destructive-foreground: oklch(0.985 0 0);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
-  --color-chart-1: oklch(0.87 0 0);
-  --color-chart-2: oklch(0.556 0 0);
-  --color-chart-3: oklch(0.439 0 0);
-  --color-chart-4: oklch(0.371 0 0);
-  --color-chart-5: oklch(0.269 0 0);
-  --color-sidebar: oklch(0.985 0 0);
-  --color-sidebar-foreground: oklch(0.145 0 0);
-  --color-sidebar-primary: oklch(0.205 0 0);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-sidebar-accent: oklch(0.97 0 0);
-  --color-sidebar-accent-foreground: oklch(0.205 0 0);
-  --color-sidebar-border: oklch(0.922 0 0);
-  --color-sidebar-ring: oklch(0.708 0 0);
-  --radius-base: 0.625rem;
+  --color-background: oklch(0.977 0.004 262);
+  --color-foreground: oklch(0.185 0.025 262);
+  --color-surface: oklch(0.995 0.002 262);
+  --color-surface-foreground: oklch(0.185 0.025 262);
+  --color-popover: oklch(0.995 0.002 262);
+  --color-popover-foreground: oklch(0.185 0.025 262);
+  --color-primary: oklch(0.47 0.17 262);
+  --color-primary-foreground: oklch(0.985 0.005 262);
+  --color-secondary: oklch(0.945 0.01 262);
+  --color-secondary-foreground: oklch(0.3 0.05 262);
+  --color-muted: oklch(0.955 0.006 262);
+  --color-muted-foreground: oklch(0.5 0.03 262);
+  --color-accent: oklch(0.945 0.015 262);
+  --color-accent-foreground: oklch(0.3 0.06 262);
+  --color-success: oklch(0.52 0.12 155);
+  --color-success-foreground: oklch(0.985 0.005 155);
+  --color-warning: oklch(0.82 0.14 80);
+  --color-warning-foreground: oklch(0.28 0.05 80);
+  --color-destructive: oklch(0.52 0.17 25);
+  --color-destructive-foreground: oklch(0.985 0.005 25);
+  /* border is a decorative separator; input is a control boundary and holds
+     3:1 against background and surface (WCAG 1.4.11). */
+  --color-border: oklch(0.9 0.008 262);
+  --color-input: oklch(0.62 0.02 262);
+  --color-ring: oklch(0.55 0.15 262);
+  --color-chart-1: oklch(0.55 0.15 262);
+  --color-chart-2: oklch(0.62 0.1 195);
+  --color-chart-3: oklch(0.6 0.12 155);
+  --color-chart-4: oklch(0.75 0.13 85);
+  --color-chart-5: oklch(0.58 0.15 25);
+  --color-sidebar: oklch(0.962 0.006 262);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-primary: var(--color-primary);
+  --color-sidebar-primary-foreground: var(--color-primary-foreground);
+  --color-sidebar-accent: oklch(0.93 0.012 262);
+  --color-sidebar-accent-foreground: oklch(0.3 0.05 262);
+  --color-sidebar-border: var(--color-border);
+  --color-sidebar-ring: var(--color-ring);
+  /* Elevation ladder: soft, hue-tinted key + ambient shadows. */
+  --elevation-xs: 0 1px 2px oklch(0.185 0.025 262 / 0.06);
+  --elevation-sm: 0 1px 2px oklch(0.185 0.025 262 / 0.05), 0 2px 4px oklch(0.185 0.025 262 / 0.05);
+  --elevation-md: 0 2px 4px oklch(0.185 0.025 262 / 0.05), 0 4px 10px oklch(0.185 0.025 262 / 0.07);
+  --elevation-lg:
+    0 4px 8px oklch(0.185 0.025 262 / 0.06), 0 10px 24px oklch(0.185 0.025 262 / 0.09);
+  --elevation-xl:
+    0 8px 16px oklch(0.185 0.025 262 / 0.07), 0 18px 44px oklch(0.185 0.025 262 / 0.12);
 }

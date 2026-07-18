@@ -1,6 +1,8 @@
 /*
- * Global theme style entry point.
+ * Global theme style entry point. Layer order matters:
+ * base (theme-neutral) → light/dark (per-theme) → theme (bridge).
  */
+@import "./base.css";
 @import "./light.css";
 @import "./dark.css";
 @import "./theme.css";

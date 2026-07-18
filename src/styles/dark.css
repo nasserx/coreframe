@@ -1,40 +1,60 @@
 /*
  * Dark theme semantic variable set.
+ *
+ * Same brand hue (oklch hue 262) as light.css; filled status colors invert
+ * to light tones with ink foregrounds so text on them stays AA.
+ *
+ * Elevation: drop shadows are nearly invisible on dark surfaces, so the
+ * primary elevation cue is the surface lightness ladder —
+ * background (0.16) → surface (0.205) → popover (0.25) — with borders as the
+ * secondary cue. The --elevation-* shadows only ground floating layers
+ * against whatever sits behind them; they are deliberately heavier than the
+ * light set because they must read against mid-dark, not white.
  */
 .dark {
   color-scheme: dark;
-  --color-background: oklch(0.145 0 0);
-  --color-foreground: oklch(0.985 0 0);
-  --color-surface: oklch(0.205 0 0);
-  --color-surface-foreground: oklch(0.985 0 0);
-  --color-primary: oklch(0.922 0 0);
-  --color-primary-foreground: oklch(0.205 0 0);
-  --color-secondary: oklch(0.269 0 0);
-  --color-secondary-foreground: oklch(0.985 0 0);
-  --color-muted: oklch(0.269 0 0);
-  --color-muted-foreground: oklch(0.708 0 0);
-  --color-accent: oklch(0.269 0 0);
-  --color-accent-foreground: oklch(0.985 0 0);
-  --color-success: oklch(0.62 0.15 145);
-  --color-success-foreground: oklch(0.145 0 0);
-  --color-warning: oklch(0.78 0.15 85);
-  --color-warning-foreground: oklch(0.145 0 0);
-  --color-destructive: oklch(0.704 0.191 22.216);
-  --color-destructive-foreground: oklch(0.985 0 0);
-  --color-border: oklch(1 0 0 / 10%);
-  --color-input: oklch(1 0 0 / 15%);
-  --color-ring: oklch(0.556 0 0);
-  --color-chart-1: oklch(0.87 0 0);
-  --color-chart-2: oklch(0.556 0 0);
-  --color-chart-3: oklch(0.439 0 0);
-  --color-chart-4: oklch(0.371 0 0);
-  --color-chart-5: oklch(0.269 0 0);
-  --color-sidebar: oklch(0.205 0 0);
-  --color-sidebar-foreground: oklch(0.985 0 0);
-  --color-sidebar-primary: oklch(0.488 0.243 264.376);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-sidebar-accent: oklch(0.269 0 0);
-  --color-sidebar-accent-foreground: oklch(0.985 0 0);
-  --color-sidebar-border: oklch(1 0 0 / 10%);
-  --color-sidebar-ring: oklch(0.556 0 0);
+  --color-background: oklch(0.16 0.015 262);
+  --color-foreground: oklch(0.96 0.005 262);
+  --color-surface: oklch(0.205 0.018 262);
+  --color-surface-foreground: oklch(0.96 0.005 262);
+  --color-popover: oklch(0.25 0.02 262);
+  --color-popover-foreground: oklch(0.96 0.005 262);
+  --color-primary: oklch(0.72 0.13 262);
+  --color-primary-foreground: oklch(0.16 0.015 262);
+  --color-secondary: oklch(0.28 0.03 262);
+  --color-secondary-foreground: oklch(0.96 0.005 262);
+  --color-muted: oklch(0.27 0.02 262);
+  --color-muted-foreground: oklch(0.72 0.02 262);
+  --color-accent: oklch(0.3 0.04 262);
+  --color-accent-foreground: oklch(0.96 0.005 262);
+  --color-success: oklch(0.7 0.13 155);
+  --color-success-foreground: oklch(0.16 0.015 155);
+  --color-warning: oklch(0.8 0.13 80);
+  --color-warning-foreground: oklch(0.16 0.015 80);
+  --color-destructive: oklch(0.64 0.17 25);
+  --color-destructive-foreground: oklch(0.16 0.015 25);
+  /* border is a decorative separator; input is a control boundary and holds
+     3:1 against background and surface (WCAG 1.4.11). */
+  --color-border: oklch(0.31 0.02 262);
+  --color-input: oklch(0.52 0.025 262);
+  --color-ring: oklch(0.68 0.12 262);
+  --color-chart-1: oklch(0.68 0.13 262);
+  --color-chart-2: oklch(0.7 0.11 195);
+  --color-chart-3: oklch(0.72 0.12 155);
+  --color-chart-4: oklch(0.8 0.12 85);
+  --color-chart-5: oklch(0.68 0.14 25);
+  --color-sidebar: oklch(0.185 0.016 262);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-primary: var(--color-primary);
+  --color-sidebar-primary-foreground: var(--color-primary-foreground);
+  --color-sidebar-accent: oklch(0.27 0.03 262);
+  --color-sidebar-accent-foreground: oklch(0.96 0.005 262);
+  --color-sidebar-border: var(--color-border);
+  --color-sidebar-ring: var(--color-ring);
+  /* Grounding shadows only — the lightness ladder above carries elevation. */
+  --elevation-xs: 0 1px 2px oklch(0 0 0 / 0.4);
+  --elevation-sm: 0 1px 2px oklch(0 0 0 / 0.4), 0 2px 4px oklch(0 0 0 / 0.35);
+  --elevation-md: 0 2px 4px oklch(0 0 0 / 0.4), 0 4px 10px oklch(0 0 0 / 0.4);
+  --elevation-lg: 0 4px 10px oklch(0 0 0 / 0.45), 0 10px 24px oklch(0 0 0 / 0.45);
+  --elevation-xl: 0 8px 18px oklch(0 0 0 / 0.5), 0 18px 48px oklch(0 0 0 / 0.5);
 }

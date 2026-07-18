@@ -1,0 +1,8 @@
+/*
+ * Theme-neutral tokens — values that are identical in light and dark.
+ * Per-theme values live in light.css / dark.css; never duplicate a token
+ * between this file and those.
+ */
+:root {
+  --radius-base: 0.625rem;
+}
