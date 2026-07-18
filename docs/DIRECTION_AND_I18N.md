@@ -100,18 +100,36 @@ Two related conventions:
 
 ## Fonts and Arabic metrics
 
-- **Stack:** `--font-sans` is `Geist, Noto Sans Arabic` (bridged in
-  `src/styles/theme.css`). Geist has no Arabic glyphs, so Latin renders in
-  Geist and Arabic falls through to Noto Sans Arabic — mixed content gets
-  both, correctly, with no component involvement.
-- **Why Noto Sans Arabic:** comprehensive glyph and diacritic coverage, a
-  variable weight axis matching the ramp's 400–700 usage, neutral design
-  that harmonizes with a grotesque Latin sans, and availability through
-  `next/font/google` — no new dependency.
-- **Performance:** `next/font` self-hosts and preloads the subsetted files
-  and generates metric-adjusted fallbacks, so the addition is neither
-  render-blocking nor a layout-shift source. Subsets: `latin` for Geist,
-  `arabic` for Noto Sans Arabic.
+- **Stack:** `--font-sans` is `Noto Sans Arabic, Geist` (bridged in
+  `src/styles/theme.css`) — Arabic-first, but the Noto face is scoped to
+  Arabic code points by a `unicode-range` descriptor, so Latin skips it and
+  renders in Geist. Mixed content gets both faces, correctly, with no
+  component involvement.
+- **Why the order matters (fallback interception):** `next/font` generates a
+  metric-adjusted fallback face for Geist from local Arial — and Arial
+  _contains Arabic glyphs_. If Noto were listed after Geist, `"Geist
+Fallback"` would silently intercept every Arabic character and Noto would
+  never render (this exact defect shipped once; the loaded-face check in the
+  browser's `document.fonts` is the way to catch it). Arabic-first plus
+  `unicode-range` makes interception impossible in either direction; the
+  Noto face's own Arial fallback is disabled (`adjustFontFallback: false`)
+  for the same reason.
+- **Optical size:** Arabic renders visibly smaller than Latin at equal em,
+  and loosening line-height does not fix perceived size. The Arabic face
+  carries **`size-adjust: 115%`** (calibrated visually against Geist at
+  body, small, and heading steps). `size-adjust` scales only glyphs rendered
+  _by that face_, so Latin rendering and mixed-direction layout metrics are
+  untouched, and Arabic embedded in LTR pages benefits equally. The
+  alternative — direction-scoped `--text-*` font-size overrides — was
+  rejected: it inflates the em box for _everything_ inside an RTL subtree,
+  including embedded Latin, and leaves Arabic-in-LTR unfixed.
+- **Loading:** Noto Sans Arabic is self-hosted from
+  `src/assets/fonts/noto-sans-arabic-variable.woff2` via `next/font/local`
+  (the google loader cannot emit `size-adjust`/`unicode-range` descriptors).
+  Still no runtime dependency; the file is the Google-served Arabic-subset
+  variable font (~162 KB), preloaded so Arabic never paints in a fallback.
+  A Latin-only product can set `preload: false` to defer the download until
+  Arabic text appears.
 - **Vertical metrics:** a Latin-tuned ramp renders Arabic cramped. The type
   ramp compensates **through the token layer**: `[dir="rtl"]` overrides in
   `src/styles/theme.css` loosen every step's line-height (e.g. display
@@ -119,11 +137,52 @@ Two related conventions:
   positive or negative, visually breaks the connected Arabic script. The
   generated `text-*` utilities read these custom properties at runtime, so
   the overrides apply to any `dir="rtl"` subtree with no extra classes.
-  Font sizes are unchanged: Noto Sans Arabic's loop height holds its own at
-  the Latin sizes, and per-direction sizes would make mixed-direction
-  layouts unpredictable.
 - `--font-mono` stays Latin-only: code is Latin-script by convention; Arabic
   inside code blocks falls back to system fonts.
+
+## Bidi isolation
+
+Direction handles _layout_; the Unicode bidi algorithm handles _inline
+text_ — and opposite-direction runs inside prose need explicit isolation or
+their adjacent punctuation migrates (the classic
+`.docs/DIRECTION_AND_I18N.md` symptom). The foundation's rules:
+
+1. **Code is LTR, always.** A base rule in `src/app/globals.css` gives
+   `code`, `kbd`, `samp`, and `pre` `direction: ltr; unicode-bidi: isolate`,
+   so identifiers, paths, and snippets render correctly inside RTL prose
+   with no markup effort. Mark up identifiers as `<code>` and this is
+   automatic.
+2. **Inline opposite-direction runs use `<bdi>`.** Latin brand names,
+   product names, or phrases inside Arabic prose (and vice versa) are
+   wrapped in native `<bdi>` — first-strong isolation, no CSS, no
+   component. See the mixed-content section of `/showcase/direction`.
+3. **Blocks of unknown or opposite direction use `dir="auto"`.** Prose whose
+   language isn't statically known (user content, CMS strings, the showcase's
+   English descriptions under the RTL toggle) gets `dir="auto"` on the block:
+   first-strong detection sets both direction and alignment per element.
+
+No primitive was added for this: HTML already ships the right tools
+(`<bdi>`, `dir="auto"`), a wrapper component would add nothing but
+indirection, and the only rule that benefits from central enforcement —
+code-is-LTR — lives in the base stylesheet.
+
+## Breadcrumb (and mirrored chrome) in RTL
+
+A mirrored breadcrumb is **correct**: established RTL interfaces (Windows
+Explorer in Arabic, Arabic storefronts, Material/Fluent RTL guidance) run
+the trail from the inline-start — root at the _right_, separators pointing
+_left_ toward the descendant, current page leftmost. Reading right-to-left
+yields ancestor → child order. The primitive does this by default (flex
+follows `dir`; the separator chevron flips via `rtl:rotate-180`) — callers
+never reorder items. Note the perception trap: a trail with _English_ labels
+inspected under RTL reads "backwards" to an LTR reader; that is the reader's
+direction, not a component defect (verified by geometry: root at
+inline-start in both directions).
+
+One deliberate exception to mirroring: the showcase header pins `dir="ltr"`.
+It is the inspection instrument panel — its controls must not jump to the
+other side of the screen when the direction toggle they host is pressed, and
+its copy is English-only sandbox chrome. Product headers should mirror.
 
 ## Numerals
 

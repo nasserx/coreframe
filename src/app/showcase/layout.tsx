@@ -16,7 +16,14 @@ export const metadata: Metadata = {
 export default function ShowcaseLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="border-b">
+      {/*
+        The header is the showcase's instrument panel, not part of the
+        inspected canvas: it stays physically fixed (dir="ltr") so the
+        direction and theme controls never jump to the other side of the
+        screen when the very toggle they host is used. Its copy is
+        English-only sandbox chrome; the page below it is what mirrors.
+      */}
+      <header dir="ltr" className="border-b">
         <Container className="flex h-12 items-center justify-between gap-4">
           <Link href="/showcase" className="text-sm font-medium">
             Foundation Showcase

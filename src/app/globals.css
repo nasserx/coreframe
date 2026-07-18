@@ -13,4 +13,17 @@
   html {
     @apply font-sans;
   }
+  /*
+   * Code is LTR content categorically: identifiers, paths, and snippets must
+   * render left-to-right and bidi-isolated even inside RTL prose, so their
+   * punctuation never migrates into the surrounding run
+   * (docs/DIRECTION_AND_I18N.md — bidi isolation).
+   */
+  code,
+  kbd,
+  samp,
+  pre {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
 }

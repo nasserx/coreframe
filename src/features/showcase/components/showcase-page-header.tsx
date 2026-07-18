@@ -30,7 +30,10 @@ export function ShowcasePageHeader({ title, description }: ShowcasePageHeaderPro
       </Breadcrumb>
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
+        {/* dir="auto": see docs/DIRECTION_AND_I18N.md — bidi isolation. */}
+        <p dir="auto" className="max-w-2xl text-sm text-muted-foreground">
+          {description}
+        </p>
       </div>
     </header>
   );
