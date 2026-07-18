@@ -28,6 +28,9 @@ const geistMono = Geist_Mono({
  * and mixed-direction layout metrics stay untouched (docs/DIRECTION_AND_I18N.md).
  * Leading compensation lives in the ramp's [dir="rtl"] overrides
  * (src/styles/theme.css).
+ *
+ * License: SIL Open Font License 1.1 — src/assets/fonts/OFL.txt must ship
+ * alongside the font file.
  */
 const notoSansArabic = localFont({
   src: "../assets/fonts/noto-sans-arabic-variable.woff2",

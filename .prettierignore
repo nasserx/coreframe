@@ -7,3 +7,7 @@ coverage
 # Generated files
 package-lock.json
 next-env.d.ts
+
+# Playwright artifacts
+test-results
+playwright-report

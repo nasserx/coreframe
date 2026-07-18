@@ -87,3 +87,19 @@ Decision: Introduce `src/core` for application-wide infrastructure.
 Reason: Cross-cutting concerns such as providers, guards, errors, logging, monitoring, analytics, and accessibility need clear ownership outside features and outside generic utilities. Keeping them in a dedicated layer prevents feature modules, shared components, and low-level helpers from becoming infrastructure catch-alls.
 
 Alternatives considered: Placing infrastructure in `src/lib`, distributing infrastructure across features, or keeping separate top-level folders for each concern.
+
+## Vitest (unit/component test runner)
+
+Decision: Use Vitest with Testing Library and jsdom for the unit/component layer; tests are colocated as `src/**/*.test.{ts,tsx}`.
+
+Reason: Vitest consumes the repo's strict tsconfig (including `verbatimModuleSyntax`) and the `@/` alias with a one-line config mirror and no transformer chain, so a cloning team inherits near-zero test-runner configuration. Testing Library enforces querying by role/accessible name, which doubles as an accessibility check.
+
+Alternatives considered: Jest (requires SWC/Babel transforms, separate ESM handling, and duplicated module mapping under this tsconfig), node:test (no component/DOM story).
+
+## Playwright (browser test layer)
+
+Decision: Use Playwright with Chromium and `@axe-core/playwright` for browser-level regression tests (console cleanliness across the route × theme × direction matrix, `document.fonts` assertions, accessibility scans).
+
+Reason: The two defects that shipped past a green lint/typecheck/build (a hydration mismatch and a silently intercepted webfont) are only observable in a running browser. Playwright provides console capture, `page.evaluate`, managed web servers, and a maintained axe integration natively. The console harness runs against `next dev` because React reports attribute-level hydration mismatches only in development builds; fonts and accessibility run against `next start`.
+
+Alternatives considered: Raw CDP scripting (the original throwaway harness — no assertions, reporting, or CI story), Cypress (heavier, no first-class multi-server support), adding a visual-regression tool (no shipped defect justifies screenshot baselines yet).

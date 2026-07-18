@@ -31,7 +31,10 @@
   --color-success-foreground: oklch(0.16 0.015 155);
   --color-warning: oklch(0.8 0.13 80);
   --color-warning-foreground: oklch(0.16 0.015 80);
-  --color-destructive: oklch(0.64 0.17 25);
+  /* 0.70 lightness (not the light theme's 0.52 inverse-equivalent): dark-mode
+     destructive text also renders over destructive/20 tints and the input
+     fill, and those composites need 4.5:1 (docs/DESIGN_TOKENS.md §3). */
+  --color-destructive: oklch(0.7 0.17 25);
   --color-destructive-foreground: oklch(0.16 0.015 25);
   /* border is a decorative separator; input is a control boundary and holds
      3:1 against background and surface (WCAG 1.4.11). */

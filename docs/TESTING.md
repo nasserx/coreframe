@@ -1,0 +1,141 @@
+# Testing
+
+Two layers, two runners, chosen for the two failure classes this foundation
+has actually shipped. Both defects that motivated this baseline — a React
+hydration mismatch in Pagination and an Arabic webfont silently intercepted
+by a metric fallback — passed a fully green `format:check → lint → typecheck
+→ build`. Static analysis cannot see either class; only executing the app in
+a browser can.
+
+## The stack and why
+
+| Layer          | Runner                           | Config                 |
+| -------------- | -------------------------------- | ---------------------- |
+| Unit/component | Vitest + Testing Library + jsdom | `vitest.config.ts`     |
+| Browser        | Playwright (Chromium) + axe-core | `playwright.config.ts` |
+
+**Vitest** because it runs this repo's exact TypeScript configuration
+(strict flags, `verbatimModuleSyntax`, the `@/` alias) with zero transform
+setup — the alias mirror in `vitest.config.ts` is the entire integration.
+_Rejected: Jest_ — needs a transformer chain (SWC/Babel), separate ESM
+handling, and its own module-mapper duplication of the alias; a cloning team
+would inherit configuration surface that Vitest simply doesn't have.
+
+**Playwright** because the browser layer's job is exactly what it provides
+natively: console message capture, `page.evaluate` against real
+`document.fonts`, a maintained axe integration (`@axe-core/playwright`),
+and managed web servers. _Rejected: raw CDP scripts_ — that was the
+throwaway harness that found the hydration bug; it worked once but had no
+assertion framework, reporting, parallelism, or CI story. _Rejected:
+Cypress_ — heavier runtime, no first-class multi-server setup, and nothing
+it adds over Playwright for these suites. No visual-regression tool was
+added: no shipped defect justifies one yet, and screenshot baselines rot
+fast in a template repo.
+
+## What each layer is responsible for
+
+**Unit/component (`src/**/*.test.{ts,tsx}`, colocated with the code):**
+behavioral contracts of primitives and infrastructure. The reference tests
+are meant to be copied:
+
+- `src/lib/utils.test.ts` — pure utility testing (`cn`), no DOM.
+- `src/components/ui/button.test.tsx` — a primitive's API: roles, accessible
+  name, disabled semantics, variant classes, and the render-prop slot
+  contract that caused the hydration defect.
+- `src/core/errors/error-boundary.test.tsx` — catch/fallback/reset cycle,
+  including the React 19 caveat that a throwing child must throw
+  consistently (concurrent rendering retries once before the boundary
+  engages).
+- `src/core/providers/theme-provider.test.tsx` — module-singleton state
+  (`vi.resetModules()` + dynamic import per test), a controllable
+  `matchMedia` stub, storage failure, and cross-tab sync.
+- `src/styles/token-parity.test.ts` — source-level contract checking where
+  jsdom's missing CSS cascade doesn't matter.
+
+Accessibility at this layer: query by role and accessible name
+(`getByRole("button", { name: … })`), assert state through ARIA-visible
+semantics (`toBeDisabled`, `role="alert"`). If a test can only find its
+element by test id or class, the component probably has an accessibility
+problem.
+
+**Browser (`tests/e2e/*.spec.ts`):** the regression net for what only a real
+browser can falsify.
+
+- `console-clean.spec.ts` — every route × {light, dark} × {ltr, rtl} must
+  produce zero console errors, warnings, uncaught exceptions, or failed
+  requests. Runs against `next dev` deliberately: React reports hydration
+  mismatches only in development builds — production silently ignores
+  attribute-level mismatches (verified by reintroducing the Pagination
+  defect: prod stayed green, dev failed with the exact diff). There is no
+  message allowlist; a benign message must be filtered by a reviewed code
+  change with a comment.
+- `fonts.spec.ts` — asserts the Arabic face is **loaded** (`document.fonts`)
+  and **used** (an Arabic string measured through the page's font stack is
+  pixel-identical to the Noto face and differs from the Arial fallback —
+  `size-adjust: 115%` makes interception measurable). "The page shows
+  Arabic" is not evidence; the original defect rendered plausible fallback
+  text.
+- `a11y.spec.ts` — axe-core (WCAG 2.x A/AA) over every route in all four
+  theme/direction cells. axe automates roughly the third of WCAG that is
+  machine-checkable; treat a clean scan as a floor. False positives must be
+  excluded explicitly with an argument in a comment, never silently.
+
+Routes are **discovered** (`tests/e2e/routes.ts` walks `src/app` for
+`page.*`), so a new page is covered automatically. Dynamic or parallel
+segments throw until discovery is extended — coverage is never silently
+lost.
+
+## Deliberately not tested
+
+- **Showcase page content** — the showcase is an inspection surface, not a
+  product; the browser matrix already executes every page.
+- **shadcn/Base UI internals** (focus traps, dismissal, positioning) —
+  upstream-tested; re-testing them couples this repo to vendored internals.
+- **Visual appearance** — no screenshot baselines (see stack rationale).
+- **Anything requiring a backend** — nothing in the foundation has one;
+  `query-demo` simulates its fetch and is exercised by the browser matrix.
+- **Coverage targets** — none are configured on purpose. The reference
+  tests establish patterns; a percentage gate on a template repo rewards
+  test bulk, not defect detection.
+
+## Running locally
+
+```bash
+npm test              # unit/component (Vitest), ~2 s
+npm run test:watch    # Vitest watch mode
+npm run build         # required once before the browser layer (prod server)
+npm run test:e2e      # browser layer (Playwright), ~30 s warm
+```
+
+One-time setup: `npx playwright install chromium`. The browser layer starts
+two servers itself: `next start` on port 3100 (fonts, a11y — tests what
+ships) and `next dev` on port 3000 (console harness — reuses an already
+running `npm run dev`, since Next allows one dev server per directory).
+
+## Extending (for a product team)
+
+- New utility/hook/primitive → colocate `*.test.{ts,tsx}` next to it, copy
+  the closest reference test's shape.
+- New page → nothing to do; discovery covers it in all three browser suites.
+- New dynamic route (`[param]`) → extend `discoverRoutes()` with concrete
+  sample URLs; it throws until you do.
+- New locale/direction/theme states → extend the matrix constants in
+  `tests/e2e/routes.ts`.
+- A flow worth testing end-to-end (auth, checkout) → new spec under
+  `tests/e2e`; keep the console listener pattern from `console-clean.spec.ts`
+  so flows also fail on console noise.
+- Judging an axe finding a false positive → exclude it in `a11y.spec.ts`
+  with a comment arguing why; never lower the tag set.
+
+## CI
+
+`.github/workflows/ci.yml` runs `format:check → lint → typecheck → unit
+tests → build → browser tests` in one job. The browser step downloads
+Chromium only on a Playwright version change (cached otherwise) and adds
+roughly 2–3 minutes to the previous ~2-minute pipeline.
+
+Pre-commit stays lint-staged only — no tests. Rationale: pre-commit exists
+to keep diffs clean, not to prove correctness; even the 2-second unit run
+grows linearly with the suite, and the browser layer (a build plus two
+servers) is minutes. Correctness gating belongs to CI, which runs the full
+matrix on every push and PR.
