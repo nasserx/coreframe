@@ -1,10 +1,21 @@
 /**
  * Centralized environment configuration with fail-fast validation.
  *
- * This module is the only place allowed to read `process.env`. Importing it
- * runs validation immediately, so it is deliberately excluded from the config
- * barrel — consumers that need environment values import `@/config/env`
- * directly and accept the fail-fast behavior.
+ * This module is the only place allowed to read `process.env`. It is imported
+ * for its side effect by `next.config.ts`, which guarantees validation runs
+ * once at startup in every mode (`next dev`, `next build`, `next start`).
+ * It is deliberately excluded from the config barrel — consumers that need
+ * environment values import `@/config/env` directly and accept the fail-fast
+ * behavior.
+ *
+ * Adding a new environment variable:
+ * 1. Add it to `envSchema` below (use `NEXT_PUBLIC_` only for browser-safe
+ *    values; everything else stays server-only).
+ * 2. Add it to the object passed to `safeParse` — Next.js inlines
+ *    `process.env.X` at build time, so each variable must be referenced
+ *    explicitly; spreading `process.env` does not work in the browser bundle.
+ * 3. Document it in `.env.example` if one exists, and read it everywhere else
+ *    via `ENV_CONFIG`, never `process.env`.
  */
 import { z } from "zod";
 
@@ -17,7 +28,9 @@ const parsedEnv = envSchema.safeParse({
 });
 
 if (!parsedEnv.success) {
-  throw new Error(`Invalid environment configuration: ${z.treeifyError(parsedEnv.error)}`);
+  // `z.prettifyError` renders one line per issue with the offending variable
+  // name, so the thrown message names exactly what is missing or invalid.
+  throw new Error(`Invalid environment configuration:\n${z.prettifyError(parsedEnv.error)}`);
 }
 
 export const ENV_CONFIG = parsedEnv.data;
