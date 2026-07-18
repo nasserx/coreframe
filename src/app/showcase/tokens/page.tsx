@@ -4,36 +4,164 @@ import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page
 import { ShowcaseSection } from "@/features/showcase/components/showcase-section";
 import { ThemeStatus } from "@/features/showcase/components/theme-status";
 import { TokenSwatch } from "@/features/showcase/components/token-swatch";
+import { TypeSpecimen } from "@/features/showcase/components/type-specimen";
 
 export const metadata: Metadata = {
   title: "Tokens",
 };
 
-const COLOR_TOKENS = [
-  { name: "background", swatchClassName: "bg-background" },
-  { name: "foreground", swatchClassName: "bg-foreground" },
-  { name: "card", swatchClassName: "bg-card" },
-  { name: "popover", swatchClassName: "bg-popover" },
-  { name: "primary", swatchClassName: "bg-primary" },
-  { name: "secondary", swatchClassName: "bg-secondary" },
-  { name: "muted", swatchClassName: "bg-muted" },
-  { name: "accent", swatchClassName: "bg-accent" },
-  { name: "destructive", swatchClassName: "bg-destructive" },
-  { name: "success", swatchClassName: "bg-success" },
-  { name: "warning", swatchClassName: "bg-warning" },
-  { name: "border", swatchClassName: "bg-border" },
-  { name: "input", swatchClassName: "bg-input" },
-  { name: "ring", swatchClassName: "bg-ring" },
+type ColorToken = Readonly<{ name: string; variable: string; swatchClassName: string }>;
+
+const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly ColorToken[] }>> = [
+  {
+    group: "Surfaces & text",
+    tokens: [
+      { name: "background", variable: "--color-background", swatchClassName: "bg-background" },
+      { name: "foreground", variable: "--color-foreground", swatchClassName: "bg-foreground" },
+      { name: "surface", variable: "--color-surface", swatchClassName: "bg-card" },
+      {
+        name: "surface-foreground",
+        variable: "--color-surface-foreground",
+        swatchClassName: "bg-card-foreground",
+      },
+      { name: "popover", variable: "--color-popover", swatchClassName: "bg-popover" },
+      {
+        name: "popover-foreground",
+        variable: "--color-popover-foreground",
+        swatchClassName: "bg-popover-foreground",
+      },
+    ],
+  },
+  {
+    group: "Interactive",
+    tokens: [
+      { name: "primary", variable: "--color-primary", swatchClassName: "bg-primary" },
+      {
+        name: "primary-foreground",
+        variable: "--color-primary-foreground",
+        swatchClassName: "bg-primary-foreground",
+      },
+      { name: "secondary", variable: "--color-secondary", swatchClassName: "bg-secondary" },
+      {
+        name: "secondary-foreground",
+        variable: "--color-secondary-foreground",
+        swatchClassName: "bg-secondary-foreground",
+      },
+      { name: "accent", variable: "--color-accent", swatchClassName: "bg-accent" },
+      {
+        name: "accent-foreground",
+        variable: "--color-accent-foreground",
+        swatchClassName: "bg-accent-foreground",
+      },
+      { name: "muted", variable: "--color-muted", swatchClassName: "bg-muted" },
+      {
+        name: "muted-foreground",
+        variable: "--color-muted-foreground",
+        swatchClassName: "bg-muted-foreground",
+      },
+    ],
+  },
+  {
+    group: "Status",
+    tokens: [
+      { name: "success", variable: "--color-success", swatchClassName: "bg-success" },
+      {
+        name: "success-foreground",
+        variable: "--color-success-foreground",
+        swatchClassName: "bg-success-foreground",
+      },
+      { name: "warning", variable: "--color-warning", swatchClassName: "bg-warning" },
+      {
+        name: "warning-foreground",
+        variable: "--color-warning-foreground",
+        swatchClassName: "bg-warning-foreground",
+      },
+      { name: "destructive", variable: "--color-destructive", swatchClassName: "bg-destructive" },
+      {
+        name: "destructive-foreground",
+        variable: "--color-destructive-foreground",
+        swatchClassName: "bg-destructive-foreground",
+      },
+    ],
+  },
+  {
+    group: "Boundaries",
+    tokens: [
+      { name: "border", variable: "--color-border", swatchClassName: "bg-border" },
+      { name: "input", variable: "--color-input", swatchClassName: "bg-input" },
+      { name: "ring", variable: "--color-ring", swatchClassName: "bg-ring" },
+    ],
+  },
+  {
+    group: "Charts",
+    tokens: [
+      { name: "chart-1", variable: "--color-chart-1", swatchClassName: "bg-chart-1" },
+      { name: "chart-2", variable: "--color-chart-2", swatchClassName: "bg-chart-2" },
+      { name: "chart-3", variable: "--color-chart-3", swatchClassName: "bg-chart-3" },
+      { name: "chart-4", variable: "--color-chart-4", swatchClassName: "bg-chart-4" },
+      { name: "chart-5", variable: "--color-chart-5", swatchClassName: "bg-chart-5" },
+    ],
+  },
+  {
+    group: "Sidebar",
+    tokens: [
+      { name: "sidebar", variable: "--color-sidebar", swatchClassName: "bg-sidebar" },
+      {
+        name: "sidebar-foreground",
+        variable: "--color-sidebar-foreground",
+        swatchClassName: "bg-sidebar-foreground",
+      },
+      {
+        name: "sidebar-primary",
+        variable: "--color-sidebar-primary",
+        swatchClassName: "bg-sidebar-primary",
+      },
+      {
+        name: "sidebar-primary-foreground",
+        variable: "--color-sidebar-primary-foreground",
+        swatchClassName: "bg-sidebar-primary-foreground",
+      },
+      {
+        name: "sidebar-accent",
+        variable: "--color-sidebar-accent",
+        swatchClassName: "bg-sidebar-accent",
+      },
+      {
+        name: "sidebar-accent-foreground",
+        variable: "--color-sidebar-accent-foreground",
+        swatchClassName: "bg-sidebar-accent-foreground",
+      },
+      {
+        name: "sidebar-border",
+        variable: "--color-sidebar-border",
+        swatchClassName: "bg-sidebar-border",
+      },
+      {
+        name: "sidebar-ring",
+        variable: "--color-sidebar-ring",
+        swatchClassName: "bg-sidebar-ring",
+      },
+    ],
+  },
+];
+
+const TYPE_RAMP = [
+  { label: "text-display", className: "text-display" },
+  { label: "text-title", className: "text-title" },
+  { label: "text-heading", className: "text-heading" },
+  { label: "text-subheading", className: "text-subheading" },
+  { label: "text-body-lg", className: "text-body-lg" },
+  { label: "text-body", className: "text-body" },
+  { label: "text-small", className: "text-small" },
+  { label: "text-caption", className: "text-caption" },
 ] as const;
 
-const TYPE_SCALE = [
-  { label: "text-xs", className: "text-xs" },
-  { label: "text-sm", className: "text-sm" },
-  { label: "text-base", className: "text-base" },
-  { label: "text-lg", className: "text-lg" },
-  { label: "text-xl", className: "text-xl" },
-  { label: "text-2xl", className: "text-2xl" },
-  { label: "text-3xl", className: "text-3xl" },
+const ELEVATION_SCALE = [
+  { label: "shadow-xs", token: "--elevation-xs", className: "shadow-xs" },
+  { label: "shadow-sm", token: "--elevation-sm", className: "shadow-sm" },
+  { label: "shadow-md", token: "--elevation-md", className: "shadow-md" },
+  { label: "shadow-lg", token: "--elevation-lg", className: "shadow-lg" },
+  { label: "shadow-xl", token: "--elevation-xl", className: "shadow-xl" },
 ] as const;
 
 const RADIUS_SCALE = [
@@ -41,6 +169,7 @@ const RADIUS_SCALE = [
   { label: "rounded-md", className: "rounded-md" },
   { label: "rounded-lg", className: "rounded-lg" },
   { label: "rounded-xl", className: "rounded-xl" },
+  { label: "rounded-2xl", className: "rounded-2xl" },
   { label: "rounded-full", className: "rounded-full" },
 ] as const;
 
@@ -49,43 +178,63 @@ export default function TokensPage() {
     <>
       <ShowcasePageHeader
         title="Tokens"
-        description="Every color below resolves through the semantic CSS variable bridge — nothing on this page names a literal color."
+        description="The complete token contract: every color, type step, elevation level, and radius resolves through the semantic CSS variable bridge — nothing on this page names a literal value. Reference and rebranding guide: docs/DESIGN_TOKENS.md."
       />
       <ShowcaseSection
         title="Theme behavior"
-        description="The runtime is system-driven: the ThemeProvider mirrors the OS preference onto the dark class before first paint."
+        description="The runtime is system-driven: the ThemeProvider mirrors the OS preference onto the dark class before first paint. Swatch values below update live on theme change."
       >
         <ThemeStatus />
       </ShowcaseSection>
-      <ShowcaseSection title="Semantic colors">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {COLOR_TOKENS.map((token) => (
-            <TokenSwatch key={token.name} {...token} />
+      {COLOR_GROUPS.map(({ group, tokens }) => (
+        <ShowcaseSection key={group} title={`Colors — ${group}`}>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {tokens.map((token) => (
+              <TokenSwatch key={token.name} {...token} />
+            ))}
+          </div>
+        </ShowcaseSection>
+      ))}
+      <ShowcaseSection
+        title="Type ramp"
+        description="The foundation's typographic voice: headings differ from body by weight and negative tracking, not typeface. Metrics are measured from the rendered element, so they cannot drift from the tokens."
+      >
+        <div className="flex flex-col rounded-lg border px-4">
+          {TYPE_RAMP.map((step) => (
+            <TypeSpecimen key={step.label} label={step.label} className={step.className}>
+              The quick brown fox jumps over the lazy dog.
+            </TypeSpecimen>
+          ))}
+        </div>
+        <code className="mt-2 block font-mono text-small text-muted-foreground">
+          font-mono — const answer = 42;
+        </code>
+      </ShowcaseSection>
+      <ShowcaseSection
+        title="Elevation"
+        description="shadow-xs through shadow-xl resolve through the per-theme --elevation-* tokens. In dark mode the surface lightness ladder (background → surface → popover) carries elevation; shadows only ground floating layers."
+      >
+        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {ELEVATION_SCALE.map((level) => (
+            <div key={level.label} className="flex flex-col items-center gap-2">
+              <div className={`h-20 w-full rounded-lg border bg-card ${level.className}`} />
+              <div className="flex flex-col items-center">
+                <code className="font-mono text-caption">{level.label}</code>
+                <code className="font-mono text-caption text-muted-foreground">{level.token}</code>
+              </div>
+            </div>
           ))}
         </div>
       </ShowcaseSection>
       <ShowcaseSection
-        title="Typography"
-        description="Geist Sans through the font-sans bridge; Geist Mono for code."
+        title="Radius"
+        description="Every step derives from the single --radius-base token in src/styles/base.css."
       >
-        <div className="flex flex-col gap-2 rounded-lg border p-4">
-          {TYPE_SCALE.map((step) => (
-            <p key={step.label} className={step.className}>
-              <span className="text-muted-foreground">{step.label} — </span>
-              The quick brown fox jumps over the lazy dog.
-            </p>
-          ))}
-          <code className="mt-2 block font-mono text-sm text-muted-foreground">
-            font-mono — const answer = 42;
-          </code>
-        </div>
-      </ShowcaseSection>
-      <ShowcaseSection title="Radius">
         <div className="flex flex-wrap gap-4">
           {RADIUS_SCALE.map((step) => (
             <div key={step.label} className="flex flex-col items-center gap-2">
               <div className={`size-16 border bg-muted ${step.className}`} />
-              <code className="font-mono text-xs text-muted-foreground">{step.label}</code>
+              <code className="font-mono text-caption text-muted-foreground">{step.label}</code>
             </div>
           ))}
         </div>

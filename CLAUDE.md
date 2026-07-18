@@ -38,13 +38,14 @@ Specific → shared, never the reverse:
 
 ## Theme Runtime
 
-Three layers; **CSS variables are the runtime source of truth**:
+CSS custom properties are the **single source of truth** (full contract: `docs/DESIGN_TOKENS.md`):
 
-1. `src/theme/*.ts` — compile-time token reference (colors, spacing, radius, shadows, typography, transitions, z-index, breakpoints).
-2. `src/styles/light.css` / `dark.css` — semantic `--color-*` variables per theme (`.dark` class toggles; `@custom-variant dark` in `theme.css`).
-3. `src/styles/theme.css` — bridge mapping semantic variables into Tailwind v4 `@theme inline` and shadcn/ui variable names (`--primary`, `--card`, `--sidebar-*`, `--chart-*`, …).
+1. `src/styles/base.css` — theme-neutral tokens (`--radius-base`).
+2. `src/styles/light.css` / `dark.css` — semantic `--color-*` and `--elevation-*` variables per theme, full parity required (`.dark` class toggles; `@custom-variant dark` in `theme.css`). Brand hue: oklch 262 (indigo-blue).
+3. `src/styles/theme.css` — bridge mapping semantic variables into Tailwind v4 `@theme inline` and shadcn/ui variable names (`--primary`, `--card`, `--sidebar-*`, `--shadow-*`, …), plus the theme-neutral type ramp (`--text-display` … `--text-caption` → `text-*` utilities). No `--font-heading` — headings differ by weight/tracking only.
+4. `src/theme/breakpoints.ts` — the only TS token file (matchMedia can't read CSS variables); must mirror Tailwind's default screens. Never add a TS mirror of a CSS token.
 
-Entry: `src/app/globals.css` imports `tailwindcss`, `tw-animate-css`, `shadcn/tailwind.css`, then `src/styles/index.css`. Never hardcode colors in components — use semantic Tailwind utilities that resolve through the bridge. Keep `src/theme` TS tokens aligned with the CSS when either changes (manual sync; drift is a known risk — TS tokens currently encode light values only).
+Entry: `src/app/globals.css` imports `tailwindcss`, `tw-animate-css`, `shadcn/tailwind.css`, then `src/styles/index.css`. Never hardcode colors in components — use semantic Tailwind utilities that resolve through the bridge. Spacing and motion contracts are Tailwind's defaults (no project tokens). Any lightness change to a color token requires re-verifying the WCAG AA pairs in `docs/DESIGN_TOKENS.md` §3.
 
 ## Engineering Principles
 
