@@ -187,5 +187,74 @@ Everything below is token-value editing only — no component changes.
    any OKLCH-aware contrast tool works) and fix values until they pass, then
    update the table. Hue-only changes at fixed L barely move ratios but check
    the filled status pairs anyway.
-8. Open `/showcase/tokens` in both themes — every swatch shows its resolved
-   value, and the ramp/elevation/radius sections reflect your edits live.
+8. Open `/showcase/tokens` in both themes (the header control switches
+   them) — every swatch shows its authored value exactly as written in
+   `src/styles`, and the ramp/elevation/radius sections reflect your edits
+   live.
+
+## 5. Theme runtime
+
+The tokens are applied by the theme runtime in
+`src/core/providers/theme-provider.tsx` (mounted app-wide by `AppProvider`).
+
+### States
+
+Three states: `"light" | "dark" | "system"`. `"system"` tracks the OS
+preference live via `matchMedia`; the other two are explicit user overrides.
+The runtime applies the result as the `dark` class on `<html>`, which is what
+switches the semantic variable set.
+
+### Persistence: localStorage (not a cookie)
+
+An explicit choice persists in `localStorage` under the key `theme` and syncs
+across tabs through the `storage` event. **Tradeoff accepted:** a cookie would
+let the server render the correct theme class, but reading it forces every
+route into dynamic rendering — this foundation prerenders all routes
+statically and keeps it that way. The costs of localStorage are (a) the server
+never knows the theme, and (b) a pre-paint script is required — which is
+needed for `"system"` anyway, since no server can know the OS preference at
+static-generation time. If storage is unavailable (private mode, blocked), the
+choice still applies in-memory for the session; only persistence is lost.
+
+### Anti-flash mechanism
+
+The provider renders a tiny inline script _ahead of the app tree_ (no network
+round trip). Before first paint it reads the stored preference and sets the
+`dark` class: `dark` if stored `"dark"`, `light` if stored `"light"`,
+otherwise the `matchMedia` result. This makes first paint correct in all three
+states, including a stored preference that disagrees with the OS. The root
+`<html>` sets `suppressHydrationWarning` because the server renders no theme
+class.
+
+### Hook contract
+
+```ts
+const { theme, resolvedTheme, setTheme } = useTheme();
+// theme:         "light" | "dark" | "system"  — the stored preference
+// resolvedTheme: "light" | "dark"             — what is actually applied
+// setTheme:      (theme: ThemePreference) => void
+```
+
+The two values are deliberately distinct: render _selection_ UI from `theme`
+(so "System" shows as selected) and theme-dependent visuals from
+`resolvedTheme`. The hook throws with an actionable message outside the
+provider.
+
+### Hydration-safe consumption
+
+The runtime reads both the stored preference and the OS preference through
+`useSyncExternalStore` with server snapshots of `"system"` / light. Server
+markup and the first client render therefore always agree — there is no
+divergence to guard against; values settle to the real preference immediately
+after hydration. The document class itself is always correct before first
+paint via the inline script, so token-driven styling never flashes. Only if a
+consumer renders the _values as text_ (as `/showcase/tokens` does) can the
+brief post-hydration settle be observed; gate on a `mounted` flag if even that
+is unacceptable.
+
+### UI control
+
+`src/components/ui/theme-control.tsx` is the reusable three-state selector
+(Base UI ToggleGroup: group role, roving arrow-key focus, `aria-pressed`
+toggle buttons, ring-token focus styling). The Toaster follows
+`resolvedTheme`, so toasts always match the applied theme.
