@@ -3,11 +3,7 @@ import { InboxIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -66,10 +62,7 @@ export default function FeedbackPage() {
           </Card>
         </div>
       </ShowcaseSection>
-      <ShowcaseSection
-        title="Spinner"
-        description="Inherits currentColor; sized via className."
-      >
+      <ShowcaseSection title="Spinner" description="Inherits currentColor; sized via className.">
         <div className="flex items-center gap-6">
           <Spinner />
           <Spinner className="size-6" />

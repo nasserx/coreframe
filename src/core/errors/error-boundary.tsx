@@ -63,8 +63,7 @@ function DefaultFallback({ reset }: { reset: () => void }) {
     >
       <h2 className="text-base font-medium text-foreground">Something went wrong.</h2>
       <p className="max-w-sm text-sm text-muted-foreground">
-        An unexpected error occurred. Try again, or reload the page if the
-        problem persists.
+        An unexpected error occurred. Try again, or reload the page if the problem persists.
       </p>
       <button
         type="button"

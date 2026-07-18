@@ -9,24 +9,24 @@ All paths are repo-relative; line numbers refer to the audited state.
 
 ### 1.1 Directory contents under `src/`
 
-| Directory | Status | Contents |
-|---|---|---|
-| `src/app` | Real code | `layout.tsx`, `page.tsx`, `globals.css`, `showcase/` (layout + 9 pages: index, actions, data, display, feedback, forms, navigation, overlays, tokens) |
-| `src/api` | Empty placeholder | `README.md` only |
-| `src/assets` | Empty placeholder | `README.md` only |
-| `src/components` | Real code | `README.md`; `ui/` with 20 primitives: alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button, card, container, dialog, field, input, label, pagination, scroll-area, separator, skeleton, spinner, table, tabs, textarea |
-| `src/config` | Real code | `app.ts`, `env.ts`, `features.ts`, `index.ts`, `routes.ts`, `README.md` |
-| `src/constants` | Empty placeholder | `README.md` only |
-| `src/core` | Partially real | `providers/` (`app-provider.tsx`, `query-provider.tsx`, `theme-provider.tsx`, `toaster.tsx`, `index.ts`), `errors/error-boundary.tsx`; `accessibility/`, `analytics/`, `guards/`, `logger/`, `monitoring/` are README-only placeholders |
-| `src/features` | Real code | `README.md`; `showcase/components/` with 7 files: error-boundary-demo, query-demo, showcase-page-header, showcase-section, theme-status, toast-demo, token-swatch |
-| `src/hooks` | Empty placeholder | `README.md` only |
-| `src/lib` | Real code | `utils.ts` (`cn()`), `README.md` |
-| `src/services` | Empty placeholder | `README.md` only |
-| `src/store` | Empty placeholder | `README.md` only |
-| `src/styles` | Real code | `index.css`, `light.css`, `dark.css`, `theme.css`, `README.md` |
-| `src/theme` | Real code | `breakpoints.ts`, `colors.ts`, `transitions.ts`, `typography.ts`, `zIndex.ts`, `index.ts` |
-| `src/types` | Empty placeholder | `README.md` only |
-| `src/utils` | Empty placeholder | `README.md` only |
+| Directory        | Status            | Contents                                                                                                                                                                                                                                |
+| ---------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app`        | Real code         | `layout.tsx`, `page.tsx`, `globals.css`, `showcase/` (layout + 9 pages: index, actions, data, display, feedback, forms, navigation, overlays, tokens)                                                                                   |
+| `src/api`        | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/assets`     | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/components` | Real code         | `README.md`; `ui/` with 20 primitives: alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button, card, container, dialog, field, input, label, pagination, scroll-area, separator, skeleton, spinner, table, tabs, textarea        |
+| `src/config`     | Real code         | `app.ts`, `env.ts`, `features.ts`, `index.ts`, `routes.ts`, `README.md`                                                                                                                                                                 |
+| `src/constants`  | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/core`       | Partially real    | `providers/` (`app-provider.tsx`, `query-provider.tsx`, `theme-provider.tsx`, `toaster.tsx`, `index.ts`), `errors/error-boundary.tsx`; `accessibility/`, `analytics/`, `guards/`, `logger/`, `monitoring/` are README-only placeholders |
+| `src/features`   | Real code         | `README.md`; `showcase/components/` with 7 files: error-boundary-demo, query-demo, showcase-page-header, showcase-section, theme-status, toast-demo, token-swatch                                                                       |
+| `src/hooks`      | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/lib`        | Real code         | `utils.ts` (`cn()`), `README.md`                                                                                                                                                                                                        |
+| `src/services`   | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/store`      | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/styles`     | Real code         | `index.css`, `light.css`, `dark.css`, `theme.css`, `README.md`                                                                                                                                                                          |
+| `src/theme`      | Real code         | `breakpoints.ts`, `colors.ts`, `transitions.ts`, `typography.ts`, `zIndex.ts`, `index.ts`                                                                                                                                               |
+| `src/types`      | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
+| `src/utils`      | Empty placeholder | `README.md` only                                                                                                                                                                                                                        |
 
 `public/` is empty. `docs/` contains only `UI_LIBRARY.md`. `FOUNDATION_REVIEW.md` sits at repo root.
 
@@ -82,7 +82,7 @@ No hard-coded literals were found in `src/app`, `src/features`, or `src/core` (t
 
 ### 2.4 Typography scale
 
-There is no project-defined typography scale. `src/theme/typography.ts:1-14` defines font *families* only and explicitly states sizes/weights/line-heights are "owned by the Tailwind default theme". The showcase renders the Tailwind defaults `text-xs`…`text-3xl` (`src/app/showcase/tokens/page.tsx:29-37`). Fonts are Geist Sans/Mono via `next/font` in `src/app/layout.tsx:7-15`, bridged through `--font-sans`/`--font-mono`/`--font-heading` in `src/styles/theme.css:13-15` (`--font-heading` aliases the sans variable; no distinct heading face).
+There is no project-defined typography scale. `src/theme/typography.ts:1-14` defines font _families_ only and explicitly states sizes/weights/line-heights are "owned by the Tailwind default theme". The showcase renders the Tailwind defaults `text-xs`…`text-3xl` (`src/app/showcase/tokens/page.tsx:29-37`). Fonts are Geist Sans/Mono via `next/font` in `src/app/layout.tsx:7-15`, bridged through `--font-sans`/`--font-mono`/`--font-heading` in `src/styles/theme.css:13-15` (`--font-heading` aliases the sans variable; no distinct heading face).
 
 ### 2.5 ThemeProvider
 
@@ -194,15 +194,15 @@ Flat config, `eslint.config.mjs` (226 lines): `eslint-config-next/core-web-vital
 
 ### 6.3 Presence/absence
 
-| Tool | Status |
-|---|---|
-| Prettier | **Absent** (no config, not in devDependencies; formatting consistency is manual per `docs/UI_LIBRARY.md` §3) |
-| Husky / git hooks | **Absent** (no `.husky/`, no `prepare` script) |
-| lint-staged | **Absent** |
-| commitlint | **Absent** |
-| CI workflows | **Absent** (no `.github/` directory at all) |
-| Test runner | **Absent** (no jest/vitest/playwright config or dependency; no `test` script in `package.json:5-10`) |
-| Test files | **Absent** (zero `*.test.*` / `*.spec.*` under `src`) |
+| Tool              | Status                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| Prettier          | **Absent** (no config, not in devDependencies; formatting consistency is manual per `docs/UI_LIBRARY.md` §3) |
+| Husky / git hooks | **Absent** (no `.husky/`, no `prepare` script)                                                               |
+| lint-staged       | **Absent**                                                                                                   |
+| commitlint        | **Absent**                                                                                                   |
+| CI workflows      | **Absent** (no `.github/` directory at all)                                                                  |
+| Test runner       | **Absent** (no jest/vitest/playwright config or dependency; no `test` script in `package.json:5-10`)         |
+| Test files        | **Absent** (zero `*.test.*` / `*.spec.*` under `src`)                                                        |
 
 ### 6.4 `any` / suppressions
 

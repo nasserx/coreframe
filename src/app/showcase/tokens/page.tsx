@@ -85,9 +85,7 @@ export default function TokensPage() {
           {RADIUS_SCALE.map((step) => (
             <div key={step.label} className="flex flex-col items-center gap-2">
               <div className={`size-16 border bg-muted ${step.className}`} />
-              <code className="font-mono text-xs text-muted-foreground">
-                {step.label}
-              </code>
+              <code className="font-mono text-xs text-muted-foreground">{step.label}</code>
             </div>
           ))}
         </div>

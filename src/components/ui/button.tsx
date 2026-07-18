@@ -53,7 +53,12 @@ export type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVari
  * Constraints: UI-only — no loading/async ownership, no business logic.
  * Variants and sizes are the official shadcn set; do not extend per-product.
  */
-export function Button({ className, variant = "default", size = "default", ...props }: ButtonProps) {
+export function Button({
+  className,
+  variant = "default",
+  size = "default",
+  ...props
+}: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"

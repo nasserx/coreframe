@@ -62,9 +62,7 @@ export default function NavigationPage() {
               <TabsTrigger value="second">Second</TabsTrigger>
             </TabsList>
             <TabsContent value="first">
-              <p className="text-muted-foreground">
-                Line variant with an underline indicator.
-              </p>
+              <p className="text-muted-foreground">Line variant with an underline indicator.</p>
             </TabsContent>
             <TabsContent value="second">
               <p className="text-muted-foreground">Second panel.</p>

@@ -34,14 +34,7 @@ export type BreadcrumbEllipsisProps = ComponentProps<"span">;
  * link (e.g. `next/link`).
  */
 export function Breadcrumb({ className, ...props }: BreadcrumbProps) {
-  return (
-    <nav
-      aria-label="breadcrumb"
-      data-slot="breadcrumb"
-      className={className}
-      {...props}
-    />
-  );
+  return <nav aria-label="breadcrumb" data-slot="breadcrumb" className={className} {...props} />;
 }
 
 export function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
@@ -67,11 +60,7 @@ export function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
   );
 }
 
-export function BreadcrumbLink({
-  className,
-  render,
-  ...props
-}: BreadcrumbLinkProps) {
+export function BreadcrumbLink({ className, render, ...props }: BreadcrumbLinkProps) {
   return useRender({
     defaultTagName: "a",
     props: mergeProps<"a">(
@@ -100,11 +89,7 @@ export function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
   );
 }
 
-export function BreadcrumbSeparator({
-  children,
-  className,
-  ...props
-}: BreadcrumbSeparatorProps) {
+export function BreadcrumbSeparator({ children, className, ...props }: BreadcrumbSeparatorProps) {
   return (
     <li
       data-slot="breadcrumb-separator"
@@ -118,19 +103,13 @@ export function BreadcrumbSeparator({
   );
 }
 
-export function BreadcrumbEllipsis({
-  className,
-  ...props
-}: BreadcrumbEllipsisProps) {
+export function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisProps) {
   return (
     <span
       data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn(
-        "flex size-5 items-center justify-center [&>svg]:size-4",
-        className,
-      )}
+      className={cn("flex size-5 items-center justify-center [&>svg]:size-4", className)}
       {...props}
     >
       <MoreHorizontalIcon />

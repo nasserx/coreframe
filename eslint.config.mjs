@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import prettierConfig from "eslint-config-prettier/flat";
 
 /*
  * Restricted import patterns used to enforce the dependency direction
@@ -15,12 +16,14 @@ const deepRelativeImports = {
 
 const appLayerImports = {
   group: ["@/app", "@/app/*"],
-  message: "src/app is the routing entry point; other layers must not import from it (ARCHITECTURE.md).",
+  message:
+    "src/app is the routing entry point; other layers must not import from it (ARCHITECTURE.md).",
 };
 
 const featureImports = {
   group: ["@/features", "@/features/*"],
-  message: "Only src/app may import features. Inside a feature, use relative imports; across features, promote a shared contract to a shared folder (ARCHITECTURE.md).",
+  message:
+    "Only src/app may import features. Inside a feature, use relative imports; across features, promote a shared contract to a shared folder (ARCHITECTURE.md).",
 };
 
 const componentImports = {
@@ -35,7 +38,8 @@ const coreImports = {
 
 const reactAndNextImports = {
   group: ["react", "react-dom", "react-dom/*", "next", "next/*"],
-  message: "src/utils must stay framework-agnostic. Move React- or Next.js-aware code to hooks, components, or core (ARCHITECTURE.md).",
+  message:
+    "src/utils must stay framework-agnostic. Move React- or Next.js-aware code to hooks, components, or core (ARCHITECTURE.md).",
 };
 
 const eslintConfig = defineConfig([
@@ -62,8 +66,8 @@ const eslintConfig = defineConfig([
           varsIgnorePattern: "^_",
         },
       ],
-      "curly": ["error", "all"],
-      "eqeqeq": ["error", "always"],
+      curly: ["error", "all"],
+      eqeqeq: ["error", "always"],
       "no-duplicate-imports": [
         "error",
         {
@@ -98,7 +102,8 @@ const eslintConfig = defineConfig([
         "error",
         {
           selector: "ExportDefaultDeclaration",
-          message: "Use named exports. Default exports are reserved for framework and tool configuration files.",
+          message:
+            "Use named exports. Default exports are reserved for framework and tool configuration files.",
         },
       ],
       "prefer-const": "error",
@@ -142,13 +147,7 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: [
-      "src/hooks/**",
-      "src/lib/**",
-      "src/services/**",
-      "src/api/**",
-      "src/store/**",
-    ],
+    files: ["src/hooks/**", "src/lib/**", "src/services/**", "src/api/**", "src/store/**"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -157,13 +156,7 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: [
-      "src/theme/**",
-      "src/config/**",
-      "src/constants/**",
-      "src/types/**",
-      "src/styles/**",
-    ],
+    files: ["src/theme/**", "src/config/**", "src/constants/**", "src/types/**", "src/styles/**"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -199,6 +192,7 @@ const eslintConfig = defineConfig([
   },
   {
     files: [
+      "commitlint.config.mjs",
       "eslint.config.mjs",
       "next.config.ts",
       "postcss.config.mjs",
@@ -215,6 +209,9 @@ const eslintConfig = defineConfig([
       "no-restricted-syntax": "off",
     },
   },
+  // Disables stylistic rules that would conflict with Prettier; must stay last
+  // so it wins over any formatting rules the presets above enable.
+  prettierConfig,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

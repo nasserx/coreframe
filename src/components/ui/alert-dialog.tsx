@@ -53,21 +53,14 @@ export function AlertDialog(props: AlertDialogProps) {
 }
 
 export function AlertDialogTrigger(props: AlertDialogTriggerProps) {
-  return (
-    <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" {...props} />
-  );
+  return <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" {...props} />;
 }
 
 export function AlertDialogPortal(props: AlertDialogPortalProps) {
-  return (
-    <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
-  );
+  return <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />;
 }
 
-export function AlertDialogOverlay({
-  className,
-  ...props
-}: AlertDialogOverlayProps) {
+export function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
   return (
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
@@ -101,10 +94,7 @@ export function AlertDialogContent({
   );
 }
 
-export function AlertDialogHeader({
-  className,
-  ...props
-}: AlertDialogHeaderProps) {
+export function AlertDialogHeader({ className, ...props }: AlertDialogHeaderProps) {
   return (
     <div
       data-slot="alert-dialog-header"
@@ -117,10 +107,7 @@ export function AlertDialogHeader({
   );
 }
 
-export function AlertDialogFooter({
-  className,
-  ...props
-}: AlertDialogFooterProps) {
+export function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
   return (
     <div
       data-slot="alert-dialog-footer"
@@ -133,10 +120,7 @@ export function AlertDialogFooter({
   );
 }
 
-export function AlertDialogMedia({
-  className,
-  ...props
-}: AlertDialogMediaProps) {
+export function AlertDialogMedia({ className, ...props }: AlertDialogMediaProps) {
   return (
     <div
       data-slot="alert-dialog-media"
@@ -149,10 +133,7 @@ export function AlertDialogMedia({
   );
 }
 
-export function AlertDialogTitle({
-  className,
-  ...props
-}: AlertDialogTitleProps) {
+export function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
@@ -165,10 +146,7 @@ export function AlertDialogTitle({
   );
 }
 
-export function AlertDialogDescription({
-  className,
-  ...props
-}: AlertDialogDescriptionProps) {
+export function AlertDialogDescription({ className, ...props }: AlertDialogDescriptionProps) {
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"

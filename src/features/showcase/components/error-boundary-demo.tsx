@@ -3,13 +3,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/core/errors/error-boundary";
 
 function ThrowOnDemand() {
@@ -50,9 +44,8 @@ export function ErrorBoundaryDemo() {
     >
       <div className="flex flex-col gap-3 rounded-lg border p-4">
         <p className="text-sm text-muted-foreground">
-          The button below throws during render. The surrounding
-          ErrorBoundary catches it and swaps in the fallback; resetting
-          re-renders the children.
+          The button below throws during render. The surrounding ErrorBoundary catches it and swaps
+          in the fallback; resetting re-renders the children.
         </p>
         <div>
           <ThrowOnDemand />

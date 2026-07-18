@@ -11,9 +11,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ShowcaseLayout({
-  children,
-}: Readonly<{ children: ReactNode }>) {
+export default function ShowcaseLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="border-b">
@@ -21,9 +19,7 @@ export default function ShowcaseLayout({
           <Link href="/showcase" className="text-sm font-medium">
             Foundation Showcase
           </Link>
-          <p className="text-xs text-muted-foreground">
-            Engineering sandbox — not a product
-          </p>
+          <p className="text-xs text-muted-foreground">Engineering sandbox — not a product</p>
         </Container>
       </header>
       <main className="flex-1 py-10">

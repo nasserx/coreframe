@@ -57,6 +57,36 @@ npm run build
 npm run lint
 ```
 
+## Format
+
+```bash
+npm run format        # rewrite files with Prettier
+npm run format:check  # verify only (used in CI)
+```
+
+## Typecheck
+
+```bash
+npm run typecheck
+```
+
+## Quality Gates
+
+Two layers keep the baseline enforced instead of advisory:
+
+- **On commit** (Husky): `pre-commit` runs lint-staged — `eslint --fix` and
+  `prettier --write` on staged files only, so commits stay fast. `commit-msg`
+  runs commitlint with the Conventional Commits rules (allowed types are
+  documented in `commitlint.config.mjs`).
+- **In CI** (`.github/workflows/ci.yml`, on pull requests and pushes to
+  `main`): `npm ci`, then `format:check`, `lint`, `typecheck`, and `build`,
+  in order, failing fast. The Node version comes from `.nvmrc`.
+
+Environment variables are validated fail-fast at startup: `next.config.ts`
+imports `src/config/env.ts`, which throws with the offending variable names
+if the schema does not parse. See the comment in `env.ts` for how to add a
+new variable.
+
 ## Project Goals
 
 - Keep the foundation minimal and production-ready.

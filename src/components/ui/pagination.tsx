@@ -47,10 +47,7 @@ export function Pagination({ className, ...props }: PaginationProps) {
   );
 }
 
-export function PaginationContent({
-  className,
-  ...props
-}: PaginationContentProps) {
+export function PaginationContent({ className, ...props }: PaginationContentProps) {
   return (
     <ul
       data-slot="pagination-content"
@@ -106,11 +103,7 @@ export function PaginationPrevious({
   );
 }
 
-export function PaginationNext({
-  className,
-  text = "Next",
-  ...props
-}: PaginationNextProps) {
+export function PaginationNext({ className, text = "Next", ...props }: PaginationNextProps) {
   return (
     <PaginationLink
       aria-label="Go to next page"
@@ -124,10 +117,7 @@ export function PaginationNext({
   );
 }
 
-export function PaginationEllipsis({
-  className,
-  ...props
-}: PaginationEllipsisProps) {
+export function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {
   return (
     <span
       aria-hidden

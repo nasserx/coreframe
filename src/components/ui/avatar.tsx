@@ -49,10 +49,7 @@ export function AvatarImage({ className, ...props }: AvatarImageProps) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn(
-        "aspect-square size-full rounded-full object-cover",
-        className,
-      )}
+      className={cn("aspect-square size-full rounded-full object-cover", className)}
       {...props}
     />
   );
@@ -100,10 +97,7 @@ export function AvatarGroup({ className, ...props }: AvatarGroupProps) {
   );
 }
 
-export function AvatarGroupCount({
-  className,
-  ...props
-}: AvatarGroupCountProps) {
+export function AvatarGroupCount({ className, ...props }: AvatarGroupCountProps) {
   return (
     <div
       data-slot="avatar-group-count"
