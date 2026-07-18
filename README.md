@@ -19,7 +19,7 @@ Frontend Foundation is a reusable Next.js application base for future web produc
 ## Folder Overview
 
 - `src/app`: Next.js App Router entry point.
-- `src/assets`: Source-controlled fonts, icons, and images.
+- `src/assets`: Source-controlled fonts, icons, and images. Bundled third-party assets ship with their licenses (Noto Sans Arabic: SIL OFL 1.1, `src/assets/fonts/OFL.txt`).
 - `src/components`: Future shared presentation components.
 - `src/features`: Feature-first product modules.
 - `src/services`: Application service boundaries.
@@ -70,6 +70,19 @@ npm run format:check  # verify only (used in CI)
 npm run typecheck
 ```
 
+## Test
+
+```bash
+npm test              # unit/component layer (Vitest + Testing Library)
+npm run test:watch    # watch mode
+npm run build && npm run test:e2e   # browser layer (Playwright): console
+                                    # cleanliness, font loading, axe scans
+```
+
+One-time setup for the browser layer: `npx playwright install chromium`.
+Stack rationale, layer responsibilities, and extension guidance:
+`docs/TESTING.md`.
+
 ## Quality Gates
 
 Two layers keep the baseline enforced instead of advisory:
@@ -79,8 +92,12 @@ Two layers keep the baseline enforced instead of advisory:
   runs commitlint with the Conventional Commits rules (allowed types are
   documented in `commitlint.config.mjs`).
 - **In CI** (`.github/workflows/ci.yml`, on pull requests and pushes to
-  `main`): `npm ci`, then `format:check`, `lint`, `typecheck`, and `build`,
-  in order, failing fast. The Node version comes from `.nvmrc`.
+  `main`): `npm ci`, then `format:check`, `lint`, `typecheck`, unit tests,
+  `build`, and the Playwright browser suites (console cleanliness across the
+  route × theme × direction matrix, Arabic font loading, axe accessibility
+  scans), in order, failing fast. The Node version comes from `.nvmrc`.
+  Pre-commit deliberately runs no tests — correctness gating lives in CI
+  (`docs/TESTING.md`).
 
 Environment variables are validated fail-fast at startup: `next.config.ts`
 imports `src/config/env.ts`, which throws with the offending variable names

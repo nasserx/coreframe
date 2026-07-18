@@ -76,17 +76,20 @@ Small, accessible, composable primitives in `src/components/ui`; domain-neutral 
 
 Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state), Zustand (shared client state), React Hook Form + Zod v4 (note: `z.treeifyError`-era API), Axios, sonner (toasts).
 
-Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → build on PRs and pushes to `main`. Env validation (`src/config/env.ts`) executes at startup via a side-effect import in `next.config.ts`.
+Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`) / `test` + `test:watch` (Vitest unit/component) / `test:e2e` (Playwright; requires a prior `build`, one-time `npx playwright install chromium`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files; deliberately no tests), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → test → build → test:e2e on PRs and pushes to `main`. Env validation (`src/config/env.ts`) executes at startup via a side-effect import in `next.config.ts`.
+
+Testing (`docs/TESTING.md` for full rationale): Vitest + Testing Library, jsdom, tests colocated as `src/**/*.test.{ts,tsx}` (reference tests: `cn`, Button incl. the render-prop slot contract, ErrorBoundary, theme runtime, token parity); Playwright in `tests/e2e` — console-cleanliness harness over every discovered route × theme × direction (runs against `next dev` because React only reports attribute-level hydration mismatches in development builds), `document.fonts` assertion that Noto Sans Arabic is loaded AND used, and axe WCAG A/AA scans (both against `next start`). Routes are discovered from `src/app` (`tests/e2e/routes.ts`) — never hard-code route lists; dynamic segments throw until discovery is extended.
 
 ## Current Project Status
 
-Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `navigation`, `permissions`, `roles`, `routes`), pass-through `AppProvider`, strict TS/ESLint setup. `src/app/page.tsx` and root metadata are still unmodified create-next-app starter content.
+Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives, the `/showcase` inspection routes, both test layers, strict TS/ESLint setup.
 
 ## Completed Milestones
 
 1. Repo initialized from create-next-app; `src`-rooted structure established.
 2. Full documentation set (architecture, design system, code style, contributing, decisions).
 3. Theme runtime (tokens → CSS variables → Tailwind bridge) and strict tooling baseline.
+4. Testing baseline: Vitest unit/component layer, Playwright browser layer (console harness, font-loading assertion, axe scans), wired into CI; Noto font ships with its OFL 1.1 license (`src/assets/fonts/OFL.txt`).
 
 ## Upcoming Priorities (in rough order)
 

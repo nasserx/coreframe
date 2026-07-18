@@ -53,7 +53,7 @@ share the brand's chroma/lightness band so they read as one system.
 | `--color-success-foreground`         | `oklch(0.985 0.005 155)`          | `oklch(0.16 0.015 155)`           |
 | `--color-warning`                    | `oklch(0.82 0.14 80)`             | `oklch(0.8 0.13 80)`              |
 | `--color-warning-foreground`         | `oklch(0.28 0.05 80)`             | `oklch(0.16 0.015 80)`            |
-| `--color-destructive`                | `oklch(0.52 0.17 25)`             | `oklch(0.64 0.17 25)`             |
+| `--color-destructive`                | `oklch(0.52 0.17 25)`             | `oklch(0.7 0.17 25)`              |
 | `--color-destructive-foreground`     | `oklch(0.985 0.005 25)`           | `oklch(0.16 0.015 25)`            |
 | `--color-border`                     | `oklch(0.9 0.008 262)`            | `oklch(0.31 0.02 262)`            |
 | `--color-input`                      | `oklch(0.62 0.02 262)`            | `oklch(0.52 0.025 262)`           |
@@ -130,33 +130,44 @@ Computed via OKLCH → linear sRGB → relative luminance (WCAG 2.1 formula).
 Requirement: 4.5:1 for text pairs, 3:1 for UI boundaries/focus. All pairs pass in
 both themes.
 
-| Pair                                       | Requirement | Light | Dark  |
-| ------------------------------------------ | ----------- | ----- | ----- |
-| foreground / background                    | 4.5         | 17.45 | 17.28 |
-| foreground / surface                       | 4.5         | 18.38 | 15.95 |
-| foreground / popover                       | 4.5         | 18.38 | 14.25 |
-| foreground / muted                         | 4.5         | 16.36 | 13.42 |
-| foreground / secondary                     | 4.5         | 15.88 | 13.00 |
-| foreground / accent                        | 4.5         | 15.88 | 12.16 |
-| muted-foreground / background              | 4.5         | 5.62  | 7.83  |
-| muted-foreground / surface                 | 4.5         | 5.92  | 7.22  |
-| muted-foreground / popover                 | 4.5         | 5.92  | 6.45  |
-| muted-foreground / muted                   | 4.5         | 5.26  | 6.08  |
-| primary-foreground / primary               | 4.5         | 6.75  | 7.76  |
-| secondary-foreground / secondary           | 4.5         | 11.64 | 13.00 |
-| accent-foreground / accent                 | 4.5         | 11.66 | 12.16 |
-| success-foreground / success               | 4.5         | 4.99  | 7.66  |
-| warning-foreground / warning               | 4.5         | 8.29  | 10.27 |
-| destructive-foreground / destructive       | 4.5         | 5.75  | 5.34  |
-| destructive / background (error text)      | 4.5         | 5.63  | 5.33  |
-| destructive / surface (error text)         | 4.5         | 5.93  | 4.92  |
-| foreground / sidebar                       | 4.5         | 16.70 | 16.60 |
-| sidebar-accent-foreground / sidebar-accent | 4.5         | 11.13 | 13.43 |
-| ring / background                          | 3.0         | 4.63  | 6.68  |
-| ring / surface                             | 3.0         | 4.88  | 6.17  |
-| input / background                         | 3.0         | 3.41  | 3.52  |
-| input / surface                            | 3.0         | 3.59  | 3.25  |
-| primary / background                       | 3.0         | 6.60  | 7.76  |
+| Pair                                               | Requirement | Light | Dark  |
+| -------------------------------------------------- | ----------- | ----- | ----- |
+| foreground / background                            | 4.5         | 17.45 | 17.28 |
+| foreground / surface                               | 4.5         | 18.38 | 15.95 |
+| foreground / popover                               | 4.5         | 18.38 | 14.25 |
+| foreground / muted                                 | 4.5         | 16.36 | 13.42 |
+| foreground / secondary                             | 4.5         | 15.88 | 13.00 |
+| foreground / accent                                | 4.5         | 15.88 | 12.16 |
+| muted-foreground / background                      | 4.5         | 5.62  | 7.83  |
+| muted-foreground / surface                         | 4.5         | 5.92  | 7.22  |
+| muted-foreground / popover                         | 4.5         | 5.92  | 6.45  |
+| muted-foreground / muted                           | 4.5         | 5.26  | 6.08  |
+| primary-foreground / primary                       | 4.5         | 6.75  | 7.76  |
+| secondary-foreground / secondary                   | 4.5         | 11.64 | 13.00 |
+| accent-foreground / accent                         | 4.5         | 11.66 | 12.16 |
+| success-foreground / success                       | 4.5         | 4.99  | 7.66  |
+| warning-foreground / warning                       | 4.5         | 8.29  | 10.27 |
+| destructive-foreground / destructive               | 4.5         | 5.75  | 6.75  |
+| destructive / background (error text)              | 4.5         | 5.63  | 6.74  |
+| destructive / surface (error text)                 | 4.5         | 5.93  | 6.22  |
+| destructive / destructive-tint over surface[^tint] | 4.5         | 5.08  | 4.65  |
+| destructive / input fill over surface[^tint]       | 4.5         | 5.93  | 4.61  |
+| foreground / sidebar                               | 4.5         | 16.70 | 16.60 |
+| sidebar-accent-foreground / sidebar-accent         | 4.5         | 11.13 | 13.43 |
+| ring / background                                  | 3.0         | 4.63  | 6.68  |
+| ring / surface                                     | 3.0         | 4.88  | 6.17  |
+| input / background                                 | 3.0         | 3.41  | 3.52  |
+| input / surface                                    | 3.0         | 3.59  | 3.25  |
+| primary / background                               | 3.0         | 6.60  | 7.76  |
+
+[^tint]:
+    Composite pairs, added after an axe scan caught dark-mode failures the
+    plain pairs missed: destructive text also renders over its own translucent
+    tint (`bg-destructive/10`, dark `/20` — Button/Badge destructive variants)
+    and over the dark input fill (`--color-input` at 30% over surface; an
+    invalid Field cascades `text-destructive` onto the input value). Alpha
+    composited in sRGB space before the luminance computation. These pairs are
+    why dark `--color-destructive` sits at 0.7 lightness.
 
 `--color-border` is excluded by design: it is a decorative separator, not a
 component boundary, so WCAG 1.4.11 does not apply to it. Anything that must be

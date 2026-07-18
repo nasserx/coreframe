@@ -130,6 +130,10 @@ Fallback"` would silently intercept every Arabic character and Noto would
   variable font (~162 KB), preloaded so Arabic never paints in a fallback.
   A Latin-only product can set `preload: false` to defer the download until
   Arabic text appears.
+- **License:** Noto Sans Arabic is licensed under the SIL Open Font License,
+  Version 1.1; the license accompanies the font at
+  `src/assets/fonts/OFL.txt`, as the OFL requires, and must stay next to the
+  file in any clone or redistribution of this template.
 - **Vertical metrics:** a Latin-tuned ramp renders Arabic cramped. The type
   ramp compensates **through the token layer**: `[dir="rtl"]` overrides in
   `src/styles/theme.css` loosen every step's line-height (e.g. display
