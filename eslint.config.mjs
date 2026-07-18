@@ -42,9 +42,70 @@ const reactAndNextImports = {
     "src/utils must stay framework-agnostic. Move React- or Next.js-aware code to hooks, components, or core (ARCHITECTURE.md).",
 };
 
+/*
+ * Physical Tailwind direction utilities (ml-, pr-, left-, text-left,
+ * rounded-l-, border-l, …) break rendering under RTL, which this foundation
+ * must support (docs/DIRECTION_AND_I18N.md). The custom rule below fails the
+ * lint when one appears in any string or template chunk in src/. Escape
+ * hatch for the rare genuinely-physical case:
+ *   // eslint-disable-next-line foundation/no-physical-tailwind-classes -- <why physical is correct>
+ * `translate-x-*` is deliberately not banned: translation is used for
+ * direction-neutral centering and motion, not for start/end alignment.
+ */
+const PHYSICAL_CLASS_PATTERN =
+  /(?:^|[^a-zA-Z0-9])-?(?:m[lr]-|p[lr]-|(?:left|right)-(?:\d|\[|full|px|auto)|text-left(?![a-zA-Z-])|text-right(?![a-zA-Z-])|rounded-(?:t[lr]|b[lr]|[lr])(?![a-zA-Z])|border-[lr](?![a-zA-Z]))/;
+
+const foundationPlugin = {
+  rules: {
+    "no-physical-tailwind-classes": {
+      meta: {
+        type: "problem",
+        docs: {
+          description:
+            "Disallow physical direction utilities in favor of logical ones so components render correctly under RTL.",
+        },
+        schema: [],
+        messages: {
+          physical:
+            'Physical direction utility "{{match}}" breaks RTL. Use the logical equivalent (ms-/me-, ps-/pe-, start-/end-, text-start/text-end, rounded-s-/rounded-e-, border-s/border-e). If physical direction is genuinely intended, disable this rule for the line with a justification (docs/DIRECTION_AND_I18N.md).',
+        },
+      },
+      create(context) {
+        const checkText = (node, text) => {
+          if (typeof text !== "string") {
+            return;
+          }
+          const match = PHYSICAL_CLASS_PATTERN.exec(text);
+          if (match !== null) {
+            context.report({
+              node,
+              messageId: "physical",
+              data: { match: match[0].replace(/^[^a-zA-Z-]+/, "") },
+            });
+          }
+        };
+        return {
+          Literal(node) {
+            checkText(node, node.value);
+          },
+          TemplateElement(node) {
+            checkText(node, node.value.raw);
+          },
+        };
+      },
+    },
+  },
+};
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Direction safety: logical properties only (see foundationPlugin above).
+  {
+    files: ["src/**"],
+    plugins: { foundation: foundationPlugin },
+    rules: { "foundation/no-physical-tailwind-classes": "error" },
+  },
   {
     rules: {
       "@typescript-eslint/consistent-type-imports": [

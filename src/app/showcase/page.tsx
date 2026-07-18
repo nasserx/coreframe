@@ -9,6 +9,11 @@ const SHOWCASE_SECTIONS = [
     description: "Semantic colors, typography, radius, and theme behavior.",
   },
   {
+    href: "/showcase/direction",
+    title: "Direction & Arabic",
+    description: "RTL behavior, Arabic type ramp, numerals, and bidi content.",
+  },
+  {
     href: "/showcase/actions",
     title: "Actions",
     description: "Buttons and badges across every variant and size.",

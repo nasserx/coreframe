@@ -102,7 +102,7 @@ export default function DisplayPage() {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Label</TableHead>
-              <TableHead className="text-right">Count</TableHead>
+              <TableHead className="text-end">Count</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -110,14 +110,14 @@ export default function DisplayPage() {
               <TableRow key={row.id} data-state={index === 1 ? "selected" : undefined}>
                 <TableCell className="font-mono text-xs">{row.id}</TableCell>
                 <TableCell>{row.label}</TableCell>
-                <TableCell className="text-right">{row.count}</TableCell>
+                <TableCell className="text-end">{row.count}</TableCell>
               </TableRow>
             ))}
           </TableBody>
           <TableFooter>
             <TableRow>
               <TableCell colSpan={2}>Total</TableCell>
-              <TableCell className="text-right">50</TableCell>
+              <TableCell className="text-end">50</TableCell>
             </TableRow>
           </TableFooter>
         </Table>
