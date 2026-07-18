@@ -52,6 +52,14 @@ export type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVari
  *
  * Constraints: UI-only — no loading/async ownership, no business logic.
  * Variants and sizes are the official shadcn set; do not extend per-product.
+ *
+ * Slot contract: `data-slot="button"` labels the default `<button>` element
+ * only. When `render` replaces the element, slot identity belongs to the
+ * caller's render element, so Button deliberately stamps nothing — setting
+ * it on both sides is a hydration hazard: props of a render element that
+ * crossed a server→client boundary arrive as a React lazy element on the
+ * client and are dropped from Base UI's prop merge, so any key set on both
+ * sides resolves differently on server and client (docs/UI_LIBRARY.md §7).
  */
 export function Button({
   className,
@@ -61,7 +69,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <ButtonPrimitive
-      data-slot="button"
+      data-slot={props.render === undefined ? "button" : undefined}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

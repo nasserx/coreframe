@@ -95,12 +95,12 @@ export default function DirectionPage() {
       </ShowcaseSection>
       <ShowcaseSection
         title="Mixed content"
-        description="Arabic prose with embedded Latin names and numerals — the bidi algorithm handles runs; no component involvement is needed."
+        description="Arabic prose with embedded Latin names and numerals. Each Latin run is wrapped in <bdi> so its internal order and adjacent punctuation cannot leak into the Arabic flow — the documented convention for opposite-direction runs (docs/DIRECTION_AND_I18N.md)."
       >
         <p dir="rtl" lang="ar" className="max-w-2xl rounded-lg border p-4 text-body">
-          أُطلق الإصدار 16 من إطار Next.js مع دعم كامل لخاصية React Server Components، وحقّق تحسّنًا
-          في الأداء بنسبة 40٪ مقارنة بالإصدار السابق. تعتمد هذه المنصة على TypeScript و Tailwind
-          CSS.
+          أُطلق الإصدار 16 من إطار <bdi>Next.js</bdi> مع دعم كامل لخاصية{" "}
+          <bdi>React Server Components</bdi>، وحقّق تحسّنًا في الأداء بنسبة 40٪ مقارنة بالإصدار
+          السابق. تعتمد هذه المنصة على <bdi>TypeScript</bdi> و <bdi>Tailwind CSS</bdi>.
         </p>
       </ShowcaseSection>
       <ShowcaseSection
