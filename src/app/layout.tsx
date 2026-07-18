@@ -31,7 +31,7 @@ export default function RootLayout({
       // The theme init script sets the `dark` class before hydration.
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <AppProvider>{children}</AppProvider>
       </body>
     </html>

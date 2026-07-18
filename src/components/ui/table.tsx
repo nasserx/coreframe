@@ -44,13 +44,7 @@ export function Table({ className, ...props }: TableProps) {
 }
 
 export function TableHeader({ className, ...props }: TableHeaderProps) {
-  return (
-    <thead
-      data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
-      {...props}
-    />
-  );
+  return <thead data-slot="table-header" className={cn("[&_tr]:border-b", className)} {...props} />;
 }
 
 export function TableBody({ className, ...props }: TableBodyProps) {
@@ -67,10 +61,7 @@ export function TableFooter({ className, ...props }: TableFooterProps) {
   return (
     <tfoot
       data-slot="table-footer"
-      className={cn(
-        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-        className,
-      )}
+      className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
       {...props}
     />
   );
@@ -106,10 +97,7 @@ export function TableCell({ className, ...props }: TableCellProps) {
   return (
     <td
       data-slot="table-cell"
-      className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
-        className,
-      )}
+      className={cn("p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0", className)}
       {...props}
     />
   );

@@ -14,8 +14,7 @@ export type FieldLegendProps = ComponentProps<"legend"> & {
 
 export type FieldGroupProps = ComponentProps<"div">;
 
-export type FieldProps = ComponentProps<"div"> &
-  VariantProps<typeof fieldVariants>;
+export type FieldProps = ComponentProps<"div"> & VariantProps<typeof fieldVariants>;
 
 export type FieldContentProps = ComponentProps<"div">;
 
@@ -92,11 +91,7 @@ export function FieldSet({ className, ...props }: FieldSetProps) {
   );
 }
 
-export function FieldLegend({
-  className,
-  variant = "legend",
-  ...props
-}: FieldLegendProps) {
+export function FieldLegend({ className, variant = "legend", ...props }: FieldLegendProps) {
   return (
     <legend
       data-slot="field-legend"
@@ -127,10 +122,7 @@ export function FieldContent({ className, ...props }: FieldContentProps) {
   return (
     <div
       data-slot="field-content"
-      className={cn(
-        "group/field-content flex flex-1 flex-col gap-0.5 leading-snug",
-        className,
-      )}
+      className={cn("group/field-content flex flex-1 flex-col gap-0.5 leading-snug", className)}
       {...props}
     />
   );
@@ -178,11 +170,7 @@ export function FieldDescription({ className, ...props }: FieldDescriptionProps)
   );
 }
 
-export function FieldSeparator({
-  children,
-  className,
-  ...props
-}: FieldSeparatorProps) {
+export function FieldSeparator({ children, className, ...props }: FieldSeparatorProps) {
   return (
     <div
       data-slot="field-separator"
@@ -206,10 +194,7 @@ export function FieldSeparator({
   );
 }
 
-function renderErrorContent(
-  children: ReactNode,
-  errors: FieldErrorProps["errors"],
-): ReactNode {
+function renderErrorContent(children: ReactNode, errors: FieldErrorProps["errors"]): ReactNode {
   if (children) {
     return children;
   }
@@ -218,9 +203,7 @@ function renderErrorContent(
     return null;
   }
 
-  const uniqueErrors = [
-    ...new Map(errors.map((error) => [error?.message, error])).values(),
-  ];
+  const uniqueErrors = [...new Map(errors.map((error) => [error?.message, error])).values()];
 
   if (uniqueErrors.length === 1) {
     return uniqueErrors[0]?.message;
@@ -228,20 +211,12 @@ function renderErrorContent(
 
   return (
     <ul className="ml-4 flex list-disc flex-col gap-1">
-      {uniqueErrors.map(
-        (error, index) =>
-          error?.message && <li key={index}>{error.message}</li>,
-      )}
+      {uniqueErrors.map((error, index) => error?.message && <li key={index}>{error.message}</li>)}
     </ul>
   );
 }
 
-export function FieldError({
-  className,
-  children,
-  errors,
-  ...props
-}: FieldErrorProps) {
+export function FieldError({ className, children, errors, ...props }: FieldErrorProps) {
   const content = renderErrorContent(children, errors);
 
   if (!content) {

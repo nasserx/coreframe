@@ -45,15 +45,11 @@ export default function OverlaysPage() {
         description="Focus trapping, Escape, scroll locking, and labelling wiring come from the primitive. This one embeds a Field composition."
       >
         <Dialog>
-          <DialogTrigger render={<Button variant="outline" />}>
-            Open dialog
-          </DialogTrigger>
+          <DialogTrigger render={<Button variant="outline" />}>Open dialog</DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Rename entry</DialogTitle>
-              <DialogDescription>
-                A dialog composing the form primitives.
-              </DialogDescription>
+              <DialogDescription>A dialog composing the form primitives.</DialogDescription>
             </DialogHeader>
             <Field>
               <FieldLabel htmlFor="dialog-name">Name</FieldLabel>
@@ -79,9 +75,7 @@ export default function OverlaysPage() {
                 <TriangleAlertIcon />
               </AlertDialogMedia>
               <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone.
-              </AlertDialogDescription>
+              <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>

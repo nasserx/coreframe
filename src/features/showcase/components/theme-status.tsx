@@ -34,8 +34,8 @@ export function ThemeStatus() {
         {prefersDark ? "dark" : "light"}
       </Badge>
       <p className="text-sm text-muted-foreground">
-        Resolved from the operating system preference. Change the OS theme to
-        watch every token on this page update without a reload.
+        Resolved from the operating system preference. Change the OS theme to watch every token on
+        this page update without a reload.
       </p>
     </div>
   );

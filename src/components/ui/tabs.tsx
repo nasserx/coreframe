@@ -5,8 +5,7 @@ import { cn } from "@/lib/utils";
 
 export type TabsProps = TabsPrimitive.Root.Props;
 
-export type TabsListProps = TabsPrimitive.List.Props &
-  VariantProps<typeof tabsListVariants>;
+export type TabsListProps = TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>;
 
 export type TabsTriggerProps = TabsPrimitive.Tab.Props;
 

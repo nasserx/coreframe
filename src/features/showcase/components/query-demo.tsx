@@ -50,8 +50,8 @@ export function QueryDemo() {
           Refetch
         </Button>
         <p className="text-xs text-muted-foreground">
-          Foundation defaults: 60s stale time, no automatic retries. Refetch
-          resolves after ~1.2s of simulated latency.
+          Foundation defaults: 60s stale time, no automatic retries. Refetch resolves after ~1.2s of
+          simulated latency.
         </p>
       </div>
       {isPending ? (

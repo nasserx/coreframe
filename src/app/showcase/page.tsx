@@ -1,11 +1,6 @@
 import Link from "next/link";
 
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const SHOWCASE_SECTIONS = [
   {
@@ -54,14 +49,11 @@ export default function ShowcaseIndexPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Foundation Showcase
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Foundation Showcase</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          An integration test for the reusable foundation: every page composes
-          the real primitives, providers, and tokens exactly as a future
-          product would. If something here feels awkward, the foundation — not
-          the showcase — needs attention.
+          An integration test for the reusable foundation: every page composes the real primitives,
+          providers, and tokens exactly as a future product would. If something here feels awkward,
+          the foundation — not the showcase — needs attention.
         </p>
       </header>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

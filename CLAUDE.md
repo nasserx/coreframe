@@ -6,7 +6,7 @@ Persistent context for Claude Code sessions. Detailed rationale lives in `README
 
 ## Project Mission
 
-A reusable, domain-neutral Next.js (App Router) foundation for future web products. It provides tooling, folder boundaries, theming, and standards — not features, pages, or business logic. The current phase is *foundation only*: most folders intentionally contain just a README describing what will belong there.
+A reusable, domain-neutral Next.js (App Router) foundation for future web products. It provides tooling, folder boundaries, theming, and standards — not features, pages, or business logic. The current phase is _foundation only_: most folders intentionally contain just a README describing what will belong there.
 
 ## Long-Term Vision
 
@@ -49,7 +49,7 @@ Entry: `src/app/globals.css` imports `tailwindcss`, `tw-animate-css`, `shadcn/ta
 ## Engineering Principles
 
 - Stay simple; add specificity only when a product need justifies it.
-- Feature code lives with its feature; promote to shared folders only after reuse is *real*, never speculatively.
+- Feature code lives with its feature; promote to shared folders only after reuse is _real_, never speculatively.
 - Routing composes; components present; utilities stay pure; core never owns product behavior.
 - No new dependencies without documented trade-offs (add to `DECISIONS.md`).
 
@@ -70,7 +70,7 @@ Small, accessible, composable primitives in `src/components/ui`; domain-neutral 
 
 Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state), Zustand (shared client state), React Hook Form + Zod v4 (note: `z.treeifyError`-era API), Axios, sonner (toasts).
 
-Commands: `npm run dev` / `build` / `lint` (flat ESLint config).
+Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → build on PRs and pushes to `main`. Env validation (`src/config/env.ts`) executes at startup via a side-effect import in `next.config.ts`.
 
 ## Current Project Status
 

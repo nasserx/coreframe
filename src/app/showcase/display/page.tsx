@@ -59,17 +59,15 @@ export default function DisplayPage() {
           <Card>
             <CardHeader>
               <CardTitle>Default card</CardTitle>
-              <CardDescription>
-                A surface with header, content, and footer.
-              </CardDescription>
+              <CardDescription>A surface with header, content, and footer.</CardDescription>
               <CardAction>
                 <Badge variant="secondary">slot</Badge>
               </CardAction>
             </CardHeader>
             <CardContent>
               <p>
-                The footer below picks up its divider and background from the
-                card footer slot — no per-use styling.
+                The footer below picks up its divider and background from the card footer slot — no
+                per-use styling.
               </p>
             </CardContent>
             <CardFooter className="gap-2">
@@ -91,9 +89,7 @@ export default function DisplayPage() {
                 ratio={16 / 9}
                 className="flex items-center justify-center rounded-lg border bg-muted"
               >
-                <code className="font-mono text-xs text-muted-foreground">
-                  AspectRatio 16 / 9
-                </code>
+                <code className="font-mono text-xs text-muted-foreground">AspectRatio 16 / 9</code>
               </AspectRatio>
             </CardContent>
           </Card>

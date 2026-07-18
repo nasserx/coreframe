@@ -13,22 +13,13 @@ function simulateWork(): Promise<void> {
 export function ToastDemo() {
   return (
     <div className="flex flex-wrap gap-2">
-      <Button
-        variant="outline"
-        onClick={() => toast("A neutral notification.")}
-      >
+      <Button variant="outline" onClick={() => toast("A neutral notification.")}>
         Default
       </Button>
-      <Button
-        variant="outline"
-        onClick={() => toast.success("The operation completed.")}
-      >
+      <Button variant="outline" onClick={() => toast.success("The operation completed.")}>
         Success
       </Button>
-      <Button
-        variant="outline"
-        onClick={() => toast.error("The operation failed.")}
-      >
+      <Button variant="outline" onClick={() => toast.error("The operation failed.")}>
         Error
       </Button>
       <Button

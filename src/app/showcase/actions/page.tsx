@@ -20,14 +20,7 @@ const BUTTON_VARIANTS = [
   "link",
 ] as const;
 
-const BADGE_VARIANTS = [
-  "default",
-  "secondary",
-  "destructive",
-  "outline",
-  "ghost",
-  "link",
-] as const;
+const BADGE_VARIANTS = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
 
 export default function ActionsPage() {
   return (
