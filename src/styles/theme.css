@@ -80,6 +80,16 @@
  * deliberately no --font-heading — see docs/DESIGN_TOKENS.md).
  */
 @theme {
+  /*
+   * Content measure — the two width decisions a page is allowed to make
+   * (docs/LAYOUT.md). Running text reads best at 45–75 characters per line;
+   * `ch` keeps the measure character-based, so it tracks the element's own
+   * font size and works identically in LTR and RTL (max-width is a logical
+   * constraint). Dense data surfaces (tables, card grids) take the full
+   * Container width and must not be capped.
+   */
+  --container-prose: 65ch;
+  --container-form: 28rem;
   --text-display: 2.75rem;
   --text-display--line-height: 1.1;
   --text-display--letter-spacing: -0.02em;

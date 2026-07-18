@@ -1,10 +1,18 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import {
+  AppShell,
+  AppShellHeader,
+  AppShellMain,
+  AppShellSidebar,
+  AppShellSidebarTrigger,
+} from "@/components/ui/app-shell";
 import { Container } from "@/components/ui/container";
+import { Stack } from "@/components/ui/stack";
 import { ThemeControl } from "@/components/ui/theme-control";
 import { DirectionControl } from "@/features/showcase/components/direction-control";
+import { ShowcaseNav } from "@/features/showcase/components/showcase-nav";
 
 export const metadata: Metadata = {
   title: {
@@ -15,7 +23,10 @@ export const metadata: Metadata = {
 
 export default function ShowcaseLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <AppShell>
+      <AppShellSidebar label="Showcase sections">
+        <ShowcaseNav />
+      </AppShellSidebar>
       {/*
         The header is the showcase's instrument panel, not part of the
         inspected canvas: it stays physically fixed (dir="ltr") so the
@@ -23,23 +34,21 @@ export default function ShowcaseLayout({ children }: Readonly<{ children: ReactN
         screen when the very toggle they host is used. Its copy is
         English-only sandbox chrome; the page below it is what mirrors.
       */}
-      <header dir="ltr" className="border-b">
-        <Container className="flex h-12 items-center justify-between gap-4">
-          <Link href="/showcase" className="text-sm font-medium">
-            Foundation Showcase
-          </Link>
-          <div className="flex items-center gap-3">
-            <p className="text-xs text-muted-foreground max-sm:hidden">
-              Engineering sandbox — not a product
-            </p>
-            <DirectionControl />
-            <ThemeControl />
-          </div>
+      <AppShellHeader dir="ltr" className="justify-between">
+        <AppShellSidebarTrigger />
+        <div className="flex items-center gap-3">
+          <p className="text-caption text-muted-foreground max-sm:hidden">
+            Engineering sandbox — not a product
+          </p>
+          <DirectionControl />
+          <ThemeControl />
+        </div>
+      </AppShellHeader>
+      <AppShellMain>
+        <Container className="py-10">
+          <Stack gap="xl">{children}</Stack>
         </Container>
-      </header>
-      <main className="flex-1 py-10">
-        <Container className="flex flex-col gap-12">{children}</Container>
-      </main>
-    </div>
+      </AppShellMain>
+    </AppShell>
   );
 }

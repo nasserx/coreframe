@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Stack } from "@/components/ui/stack";
 import {
   Pagination,
   PaginationContent,
@@ -84,12 +85,12 @@ export default function DirectionPage() {
       >
         <div dir="rtl" lang="ar" className="flex flex-col rounded-lg border px-4">
           {TYPE_RAMP.map((step) => (
-            <div key={step.label} className="flex flex-col gap-1 border-b py-3 last:border-b-0">
+            <Stack key={step.label} gap="xs" className="border-b py-3 last:border-b-0">
               <code dir="ltr" className="self-start font-mono text-caption text-muted-foreground">
                 {step.label}
               </code>
               <p className={step.className}>{ARABIC_SAMPLE}</p>
-            </div>
+            </Stack>
           ))}
         </div>
       </ShowcaseSection>
@@ -97,7 +98,7 @@ export default function DirectionPage() {
         title="Mixed content"
         description="Arabic prose with embedded Latin names and numerals. Each Latin run is wrapped in <bdi> so its internal order and adjacent punctuation cannot leak into the Arabic flow — the documented convention for opposite-direction runs (docs/DIRECTION_AND_I18N.md)."
       >
-        <p dir="rtl" lang="ar" className="max-w-2xl rounded-lg border p-4 text-body">
+        <p dir="rtl" lang="ar" className="max-w-prose rounded-lg border p-4 text-body">
           أُطلق الإصدار 16 من إطار <bdi>Next.js</bdi> مع دعم كامل لخاصية{" "}
           <bdi>React Server Components</bdi>، وحقّق تحسّنًا في الأداء بنسبة 40٪ مقارنة بالإصدار
           السابق. تعتمد هذه المنصة على <bdi>TypeScript</bdi> و <bdi>Tailwind CSS</bdi>.
@@ -107,7 +108,7 @@ export default function DirectionPage() {
         title="Numerals"
         description={`Western (latn) is the foundation default — the prevailing convention in modern Arabic product UIs. A product switches to Eastern Arabic-Indic (arab) by changing one value in LOCALE_INFO (src/config/app.ts). Configured default: ${APP_CONFIG.numerals}.`}
       >
-        <div className="flex max-w-md flex-col gap-2 rounded-lg border p-4" dir="rtl" lang="ar">
+        <Stack gap="sm" className="max-w-form rounded-lg border p-4" dir="rtl" lang="ar">
           <div className="flex items-center justify-between gap-4">
             <code dir="ltr" className="font-mono text-caption text-muted-foreground">
               nu-latn (default)
@@ -120,13 +121,13 @@ export default function DirectionPage() {
             </code>
             <span className="text-body-lg">{easternNumerals}</span>
           </div>
-        </div>
+        </Stack>
       </ShowcaseSection>
       <ShowcaseSection
         title="Primitives under RTL"
         description="The primitives most likely to break in RTL, rendered in a right-to-left Arabic island: table alignment, pagination chevrons (flipped via rtl:rotate-180), breadcrumb separators, dialog close placement, field error wiring, icon badges, and tabs."
       >
-        <div dir="rtl" lang="ar" className="flex flex-col gap-8">
+        <Stack gap="lg" dir="rtl" lang="ar">
           <Table>
             <TableHeader>
               <TableRow>
@@ -201,7 +202,7 @@ export default function DirectionPage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <div className="w-full max-w-sm">
+            <div className="w-full max-w-form">
               <Field data-invalid="true">
                 <FieldLabel htmlFor="rtl-invalid-example">اسم المستخدم</FieldLabel>
                 <Input
@@ -230,7 +231,7 @@ export default function DirectionPage() {
               <p className="text-muted-foreground">لوحة التفاصيل.</p>
             </TabsContent>
           </Tabs>
-        </div>
+        </Stack>
       </ShowcaseSection>
     </>
   );

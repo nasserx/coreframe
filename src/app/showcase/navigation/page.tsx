@@ -19,6 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Stack } from "@/components/ui/stack";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page-header";
 import { ShowcaseSection } from "@/features/showcase/components/showcase-section";
@@ -38,7 +39,7 @@ export default function NavigationPage() {
         title="Tabs"
         description="Default and line variants; keyboard navigation comes from the underlying primitive."
       >
-        <div className="flex flex-col gap-8">
+        <Stack gap="lg">
           <Tabs defaultValue="first">
             <TabsList>
               <TabsTrigger value="first">First</TabsTrigger>
@@ -68,7 +69,7 @@ export default function NavigationPage() {
               <p className="text-muted-foreground">Second panel.</p>
             </TabsContent>
           </Tabs>
-        </div>
+        </Stack>
       </ShowcaseSection>
       <ShowcaseSection
         title="Breadcrumb"
