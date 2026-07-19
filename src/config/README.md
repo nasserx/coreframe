@@ -1,6 +1,8 @@
 # Config
 
-Purpose: Contains future application configuration modules.
+Purpose: Application configuration modules.
+
+Current contents: `app.ts` (identity, locales, direction), `env.ts` (Zod-validated environment access — the only file allowed to read `process.env`), `features.ts` (build-time feature flags), `routes.ts` (route constants), `index.ts` (public barrel; deliberately excludes `env.ts`).
 
 Belongs here: environment-derived settings, typed configuration boundaries, and app-level configuration defaults.
 

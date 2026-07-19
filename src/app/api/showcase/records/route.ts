@@ -1,3 +1,4 @@
+import { ENV_CONFIG } from "@/config/env";
 import { DEMO_RECORDS } from "@/features/showcase/api";
 
 /*
@@ -9,5 +10,10 @@ import { DEMO_RECORDS } from "@/features/showcase/api";
 export const dynamic = "force-static";
 
 export function GET(): Response {
+  // Mirrors the /showcase route gate (docs/CLONING.md): with the flag off,
+  // the endpoint prerenders as a static 404 alongside the pages it serves.
+  if (!ENV_CONFIG.NEXT_PUBLIC_ENABLE_SHOWCASE) {
+    return new Response(null, { status: 404 });
+  }
   return Response.json(DEMO_RECORDS);
 }

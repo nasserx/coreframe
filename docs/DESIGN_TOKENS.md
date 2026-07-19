@@ -185,6 +185,18 @@ perceived — input borders, focus rings — uses `input`/`ring`, which meet 3:1
 
 Everything below is token-value editing only — no component changes.
 
+**Empirically verified (2026-07):** a full identity swap — brand hue
+262 → 330, `--radius-base` 0.625rem → 0.375rem, and a heavier display-weight
+type ramp — was executed by editing exactly three token files
+(`light.css`/`dark.css`, `base.css`, `theme.css`), with nothing touched
+outside token values. Unit tests (44), the production build, and the full
+axe WCAG A/AA matrix (48 scans: every route × theme × direction, including
+color-contrast checks) all passed afterwards, well inside the 15-minute
+budget. The caveat is step 7: that result holds for **hue-only changes at
+the existing L/C values** — changing a token's _lightness_ adds the §3
+contrast recomputation, which is the step that can push a rebrand past 15
+minutes.
+
 1. **Pick the brand hue** (an OKLCH hue angle, 0–360). Current: `262`.
 2. **In `src/styles/light.css` and `dark.css`**, replace the hue component
    (`262`) in every `oklch(L C H)` value with your hue. Keep the L/C values —

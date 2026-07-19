@@ -66,11 +66,11 @@ Alternatives considered: React Context only, Redux Toolkit, keeping the dependen
 
 ## React Hook Form
 
-Decision: Use React Hook Form for form state.
+Decision (revised 2026-07): Removed from dependencies until the reference form wiring is built; it remains the chosen form library for that moment.
 
-Reason: It provides efficient form state management with strong ecosystem support and works well with schema validation.
+Reason: It was declared with zero imports for the entire foundation phase — the same unused-dependency state that led to removing axios and zustand, and a foundation must apply its own rule to itself. The `Field` primitive documents form-library integration as the consumer's job, and `docs/ROADMAP.md` records the RHF + Zod reference wiring as the top-priority addition; reinstall `react-hook-form` + `@hookform/resolvers` when building it.
 
-Alternatives considered: Controlled form state with React, Formik.
+Alternatives considered: Controlled form state with React, Formik, keeping the dependency preinstalled (rejected: a foundation must not ship unused dependencies).
 
 ## Zod
 
@@ -95,6 +95,22 @@ Decision: Introduce `src/core` for application-wide infrastructure.
 Reason: Cross-cutting concerns such as providers, guards, errors, logging, monitoring, analytics, and accessibility need clear ownership outside features and outside generic utilities. Keeping them in a dedicated layer prevents feature modules, shared components, and low-level helpers from becoming infrastructure catch-alls.
 
 Alternatives considered: Placing infrastructure in `src/lib`, distributing infrastructure across features, or keeping separate top-level folders for each concern.
+
+## shadcn/ui runtime pieces (Base UI, sonner, Tailwind v4 CSS-first, shadcn as a dependency)
+
+Decision (backfilled 2026-07): The primitive runtime is `@base-ui/react` (the shadcn `base-nova` style's runtime), toasts are `sonner`, Tailwind v4 runs CSS-first (no `tailwind.config`), and the `shadcn` package is a regular dependency because `globals.css` imports `shadcn/tailwind.css` — the current shadcn v4 pattern makes the registry package part of the styling pipeline.
+
+Reason: These all follow from the shadcn/ui decision above — they are the stack that style ships with, and diverging from it would break the documented generation workflow (`docs/UI_LIBRARY.md`). Recorded explicitly because each is a real dependency someone will question later.
+
+Alternatives considered: Radix-based shadcn styles (older runtime), a custom toast implementation, Tailwind config-file mode (v4 deprecates it as the primary path).
+
+## Showcase gating (build-time environment flag)
+
+Decision (2026-07): `/showcase` and its `/api/showcase/records` endpoint are gated by `NEXT_PUBLIC_ENABLE_SHOWCASE` (default `"true"`). With the flag `"false"` at build time, the showcase layout calls `notFound()` during prerender, so every showcase route ships as a static 404.
+
+Reason: The showcase is the foundation's living integration test — a product must keep it runnable during development but must not ship it. A build-time flag keeps one code path for both: no deletion, no route-table difference in dev, and every route stays statically prerendered (a runtime or cookie-driven gate would force dynamic rendering). The e2e suite runs with the default flag value, so CI is unaffected.
+
+Alternatives considered: documented-delete-only (loses the living test the day the product ships), a route group excluded from production builds (Next.js has no per-build route exclusion), a runtime flag (forces dynamic rendering). Permanent deletion remains the documented end state (`docs/CLONING.md`).
 
 ## Vitest (unit/component test runner)
 

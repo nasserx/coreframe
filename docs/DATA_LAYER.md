@@ -255,5 +255,6 @@ shell was verified manually as described above.
 3. Auth: extend the marked block in `src/api/client.ts`.
 4. Error UX: consume `ApiError.kind` in query error states (reference:
    `query-demo.tsx`); leave transport details out of components.
-5. Delete the showcase endpoint (`src/app/api/showcase/records/route.ts`)
-   with the rest of the showcase when it has served its purpose.
+5. The showcase endpoint (`src/app/api/showcase/records/route.ts`) is gated
+   with the rest of the showcase by `NEXT_PUBLIC_ENABLE_SHOWCASE`; delete it
+   with the showcase when it has served its purpose (`docs/CLONING.md`).

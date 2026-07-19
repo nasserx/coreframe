@@ -1,5 +1,7 @@
 # Foundation Review
 
+> **Historical snapshot** — see `docs/audit/README.md`. This review describes the repository as it was at the reviewed commit; its findings have since been addressed and the code has moved on.
+
 Formal architecture review of the Frontend Foundation prior to the foundation freeze.
 Reviewed at commit `19237e6` on branch `feature/project-analysis`. Review only — no code was modified.
 

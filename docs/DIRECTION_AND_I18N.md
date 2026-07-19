@@ -23,10 +23,13 @@ integration points a product uses to add it:
   a locale-routed app moves this to the `[locale]` segment layout and sets
   both per request (this is the point where prerendering strategy becomes the
   product's decision).
-- Primitive strings — the primitives carry almost no text; what exists is
-  prop-overridable and must be localized at the call site:
-  `PaginationPrevious`/`PaginationNext` (`text`, `aria-label`),
-  `DialogFooter`'s close button label, and any `aria-label` you pass.
+- Primitive strings — the primitives carry almost no text; localize what
+  exists at the call site: `PaginationPrevious`/`PaginationNext` (`text`,
+  `aria-label`), the AppShell defaults (`skipLinkLabel`, `label`,
+  `closeLabel`, the trigger's `aria-label` — all props), and any
+  `aria-label` you pass. `DialogContent`'s built-in close button has a
+  hardcoded English `sr-only` label ("Close"); a localized product hides it
+  (`showCloseButton={false}`) and composes its own `DialogClose`.
 - `src/core/providers/app-provider.tsx` — the documented slot for a
   localization provider (see its TODO).
 
@@ -148,8 +151,9 @@ Fallback"` would silently intercept every Arabic character and Noto would
 
 Direction handles _layout_; the Unicode bidi algorithm handles _inline
 text_ — and opposite-direction runs inside prose need explicit isolation or
-their adjacent punctuation migrates (the classic
-`.docs/DIRECTION_AND_I18N.md` symptom). The foundation's rules:
+their adjacent punctuation migrates (the classic symptom: a trailing period
+or parenthesis of an embedded Latin run jumping to its other end inside
+Arabic prose). The foundation's rules:
 
 1. **Code is LTR, always.** A base rule in `src/app/globals.css` gives
    `code`, `kbd`, `samp`, and `pre` `direction: ltr; unicode-bidi: isolate`,
