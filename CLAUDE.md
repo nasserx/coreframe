@@ -53,6 +53,8 @@ Direction & script: `<html lang/dir>` come from `APP_CONFIG` (`src/config/app.ts
 
 Runtime: `ThemeProvider` (`src/core/providers/theme-provider.tsx`) supports `"light" | "dark" | "system"` — localStorage persistence (key `theme`), cross-tab sync via the storage event, live matchMedia tracking for system, and a pre-paint inline script for zero-flash first paint (routes stay statically prerendered; a cookie would force dynamic rendering). Consume via `useTheme()` → `{ theme, resolvedTheme, setTheme }`; never toggle the `dark` class manually. Reusable selector: `src/components/ui/theme-control.tsx`; the sonner Toaster follows `resolvedTheme`. Details: `docs/DESIGN_TOKENS.md` §5.
 
+Data layer (`docs/DATA_LAYER.md`; live demo `/showcase/data`): all HTTP goes through `apiFetch` (`src/api/client.ts`) — native fetch, base URL from `NEXT_PUBLIC_API_BASE_URL` (validated in `env.ts`, empty = same-origin), 10s default timeout, React Query's `signal` passed through, opt-in Zod validation via `schema` (no schema ⇒ `unknown` return, casts are deliberate). Every failure is one typed `ApiError` (`kind: network | timeout | http | parse`; caller aborts rethrown untouched); auth is a marked extension point in `client.ts`. Query keys come from per-feature typed factories (reference: `src/features/showcase/api.ts`) — no string keys at call sites; invalidate by factory prefix. Route-level error handling: `error.tsx` (uses Next 16 `unstable_retry`), `global-error.tsx` (rebuilds document shell: fonts from `src/app/fonts.ts`, `THEME_INIT_SCRIPT` + `applyStoredTheme()` for theme, APP_CONFIG lang/dir), `not-found.tsx` — all composing `src/core/errors/error-fallback.tsx`, the same UI the client `ErrorBoundary` uses. The showcase data demo fetches this repo's own route handler (`src/app/api/showcase/records/route.ts`, `force-static` so the route table stays fully prerendered).
+
 ## Engineering Principles
 
 - Stay simple; add specificity only when a product need justifies it.
@@ -76,7 +78,7 @@ Small, accessible, composable primitives in `src/components/ui`; domain-neutral 
 
 ## Tech Stack
 
-Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state), Zustand (shared client state), React Hook Form + Zod v4 (note: `z.treeifyError`-era API), Axios, sonner (toasts).
+Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state; contract in `docs/DATA_LAYER.md`), React Hook Form + Zod v4 (note: `z.prettifyError`-era API), sonner (toasts). HTTP is native fetch via `apiFetch` (`src/api`) — axios and zustand were deliberately removed as unused (`DECISIONS.md`); do not reintroduce a store library without a product need.
 
 Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`) / `test` + `test:watch` (Vitest unit/component) / `test:e2e` (Playwright; requires a prior `build`, one-time `npx playwright install chromium`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files; deliberately no tests), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → test → build → test:e2e on PRs and pushes to `main`. Env validation (`src/config/env.ts`) executes at startup via a side-effect import in `next.config.ts`.
 
@@ -84,7 +86,7 @@ Testing (`docs/TESTING.md` for full rationale): Vitest + Testing Library, jsdom,
 
 ## Current Project Status
 
-Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives plus the layout set (Container, Stack, PageHeader, AppShell, SkipLink), the `/showcase` inspection routes (11 pages, wrapped in the AppShell), both test layers, strict TS/ESLint setup.
+Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives plus the layout set (Container, Stack, PageHeader, AppShell, SkipLink), the `/showcase` inspection routes (wrapped in the AppShell), the data layer (`apiFetch` + `ApiError` in `src/api`, query key contract, route-level `error`/`global-error`/`not-found` files, showcase route handler), both test layers, strict TS/ESLint setup, `.gitattributes` line-ending normalization.
 
 ## Completed Milestones
 
@@ -93,13 +95,13 @@ Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme tok
 3. Theme runtime (tokens → CSS variables → Tailwind bridge) and strict tooling baseline.
 4. Testing baseline: Vitest unit/component layer, Playwright browser layer (console harness, font-loading assertion, axe scans), wired into CI; Noto font ships with its OFL 1.1 license (`src/assets/fonts/OFL.txt`).
 5. Layout vocabulary: measure tokens, Stack rhythm scale, PageHeader scaffold, accessible responsive AppShell (`docs/LAYOUT.md`); showcase migrated onto it; shell keyboard/focus tests in both layers.
+6. Data layer contract: fetch-based `apiFetch` with the typed `ApiError` shape, query key/caching contract (`docs/DATA_LAYER.md`), route-level error/not-found handling verified against a production build, axios and zustand removed as unused.
 
 ## Upcoming Priorities (in rough order)
 
-1. Implement `AppProvider` composition (Theme, React Query, Error Boundary, Toast) as concrete needs arrive.
-2. Replace starter `page.tsx` / metadata (wire `APP_CONFIG` into root metadata).
-3. Add first shadcn/ui primitives via the shadcn workflow into `src/components/ui`.
-4. Introduce boundary-enforcement lint tooling for the dependency rules above.
+1. Reference React Hook Form + Zod form wiring (the remaining declared-but-unwired stack piece).
+2. Localization/auth providers in `AppProvider` as concrete needs arrive (TODO slots reserved).
+3. Extend `src/core` placeholders (logger, monitoring) when the first product needs them — error reporting hooks are marked in `error.tsx` and `ErrorBoundary`.
 
 ## Architectural Constraints
 

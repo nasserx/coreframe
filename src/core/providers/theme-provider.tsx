@@ -31,8 +31,33 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
  * states — including a stored preference that disagrees with the OS. The
  * storage read has its own try/catch so blocked storage still falls back to
  * the system preference. Must stay in sync with the resolution logic below.
+ *
+ * Exported for exactly one other consumer: `src/app/global-error.tsx`
+ * replaces the root layout (and with it this provider), so it inlines the
+ * same script to keep the stored/system theme correct on the error page.
  */
-const THEME_INIT_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("${THEME_STORAGE_KEY}")}catch(e){}try{document.documentElement.classList.toggle("dark",t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))}catch(e){}})();`;
+export const THEME_INIT_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("${THEME_STORAGE_KEY}")}catch(e){}try{document.documentElement.classList.toggle("dark",t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))}catch(e){}})();`;
+
+/**
+ * Runtime equivalent of THEME_INIT_SCRIPT, for the one place the script
+ * cannot run: `global-error.tsx` swapped in by a CLIENT-side render error.
+ * A script element injected through dangerouslySetInnerHTML executes only
+ * when server-rendered, and React recreates `<html>` during the swap,
+ * discarding the `dark` class the original document carried — so the error
+ * page re-applies the stored/system theme from an effect.
+ */
+export function applyStoredTheme(): void {
+  const stored = readStoredTheme();
+  try {
+    document.documentElement.classList.toggle(
+      "dark",
+      stored === "dark" ||
+        (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches),
+    );
+  } catch {
+    // matchMedia unavailable: leave the server-rendered (light) default.
+  }
+}
 
 function isThemePreference(value: string | null): value is ThemePreference {
   return value === "light" || value === "dark" || value === "system";

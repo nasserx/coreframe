@@ -208,11 +208,15 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    // These layers are consumed BY components/features and must never
+    // render UI themselves — componentImports added deliberately when
+    // src/api gained real code, so a transport or state module can never
+    // grow a dependency on the presentation layer.
     files: ["src/hooks/**", "src/lib/**", "src/services/**", "src/api/**", "src/store/**"],
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [deepRelativeImports, appLayerImports, featureImports] },
+        { patterns: [deepRelativeImports, appLayerImports, featureImports, componentImports] },
       ],
     },
   },

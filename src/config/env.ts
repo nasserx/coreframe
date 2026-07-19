@@ -19,12 +19,40 @@
  */
 import { z } from "zod";
 
+declare global {
+  // Augmenting NodeJS.ProcessEnv (a namespace-declared interface in
+  // @types/node) is only possible with namespace syntax.
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface ProcessEnv {
+      /*
+       * Declared so the schema input below can use dotted property access:
+       * Next.js inlines only the exact `process.env.NEXT_PUBLIC_X` form
+       * into browser bundles — bracket access (what
+       * noPropertyAccessFromIndexSignature would otherwise force) is not
+       * replaced and would silently read undefined in the client.
+       */
+      NEXT_PUBLIC_API_BASE_URL?: string | undefined;
+    }
+  }
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
+  /**
+   * Base URL prefixed to every `apiFetch` path (src/api/client.ts). Empty
+   * (the default) means same-origin — correct for this repo's own route
+   * handlers and for products deployed behind one origin. A product
+   * pointing at a separate backend sets an absolute URL here; server-side
+   * callers always need the absolute form (relative fetch has no origin in
+   * Node). Browser-safe by definition, hence NEXT_PUBLIC_.
+   */
+  NEXT_PUBLIC_API_BASE_URL: z.string().default(""),
 });
 
 const parsedEnv = envSchema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
+  NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
 });
 
 if (!parsedEnv.success) {

@@ -1,0 +1,18 @@
+# All text files are LF in the repository AND in the working tree,
+# regardless of each machine's core.autocrlf setting. eol=lf (not just
+# text=auto) because Prettier enforces its default endOfLine: "lf" — with
+# CRLF working trees every `npm run format` on Windows rewrites files to LF
+# and recreates the "modified but empty diff" stat noise this file removes.
+* text=auto eol=lf
+
+# Binary assets: never subject to text normalization or diffing.
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary

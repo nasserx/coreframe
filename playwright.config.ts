@@ -42,7 +42,7 @@ export default defineConfig({
     },
     {
       name: "chromium-prod",
-      testMatch: /(fonts|a11y|shell)\.spec\.ts/,
+      testMatch: /(fonts|a11y|shell|errors)\.spec\.ts/,
       use: { baseURL: `http://localhost:${PROD_PORT}` },
     },
   ],
