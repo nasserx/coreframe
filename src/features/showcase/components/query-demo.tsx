@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { isApiError } from "@/api/errors";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,32 +16,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type DemoRecord = Readonly<{
-  id: number;
-  name: string;
-  state: "ready" | "pending";
-}>;
+import { fetchDemoRecords, showcaseKeys } from "../api";
 
 /*
- * Simulated latency instead of a real endpoint: the showcase validates the
- * provider wiring, not a backend.
+ * Reference consumer of the data layer (docs/DATA_LAYER.md): typed key from
+ * the feature's key factory, fetcher through apiFetch (real HTTP round trip
+ * to this repo's own route handler), React Query's signal passed through
+ * for cancellation, and the error state rendered from the normalized
+ * ApiError shape with a retry path.
  */
-async function fetchDemoRecords(): Promise<DemoRecord[]> {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 1200);
-  });
-  return [
-    { id: 1, name: "Alpha", state: "ready" },
-    { id: 2, name: "Beta", state: "pending" },
-    { id: 3, name: "Gamma", state: "ready" },
-  ];
-}
-
 export function QueryDemo() {
-  const { data, isPending, isFetching, refetch } = useQuery({
-    queryKey: ["showcase", "records"],
-    queryFn: fetchDemoRecords,
+  const { data, error, isPending, isError, isFetching, refetch } = useQuery({
+    queryKey: showcaseKeys.records(),
+    queryFn: ({ signal }) => fetchDemoRecords(signal),
   });
+
+  if (isError) {
+    return (
+      <div role="alert" className="flex flex-col gap-3 rounded-lg border border-destructive/40 p-4">
+        <p className="text-sm font-medium text-foreground">Couldn&apos;t load records.</p>
+        <p className="text-sm text-muted-foreground">
+          {isApiError(error)
+            ? `${error.message} (${error.kind}${error.status === null ? "" : ` ${error.status}`})`
+            : error.message}
+        </p>
+        <div>
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? <Spinner data-icon="inline-start" /> : null}
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -50,8 +58,8 @@ export function QueryDemo() {
           Refetch
         </Button>
         <p className="text-xs text-muted-foreground">
-          Foundation defaults: 60s stale time, no automatic retries. Refetch resolves after ~1.2s of
-          simulated latency.
+          Fetched from this app&apos;s own route handler (/api/showcase/records) through apiFetch
+          with Zod validation. Foundation defaults: 60s stale time, no automatic retries.
         </p>
       </div>
       {isPending ? (
@@ -70,7 +78,7 @@ export function QueryDemo() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((record) => (
+            {data.map((record) => (
               <TableRow key={record.id}>
                 <TableCell>{record.id}</TableCell>
                 <TableCell>{record.name}</TableCell>

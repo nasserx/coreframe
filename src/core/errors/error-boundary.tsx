@@ -2,6 +2,8 @@
 
 import { Component, type ReactNode } from "react";
 
+import { ErrorFallback } from "./error-fallback";
+
 export type ErrorBoundaryFallbackProps = Readonly<{
   error: Error;
   reset: () => void;
@@ -51,27 +53,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return this.props.fallback({ error, reset: this.reset });
     }
 
-    return <DefaultFallback reset={this.reset} />;
+    return <ErrorFallback onAction={this.reset} />;
   }
-}
-
-function DefaultFallback({ reset }: { reset: () => void }) {
-  return (
-    <div
-      role="alert"
-      className="flex min-h-dvh flex-col items-center justify-center gap-3 p-6 text-center"
-    >
-      <h2 className="text-base font-medium text-foreground">Something went wrong.</h2>
-      <p className="max-w-sm text-sm text-muted-foreground">
-        An unexpected error occurred. Try again, or reload the page if the problem persists.
-      </p>
-      <button
-        type="button"
-        onClick={reset}
-        className="mt-1 inline-flex h-8 items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground outline-none hover:bg-primary/80 focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        Try again
-      </button>
-    </div>
-  );
 }

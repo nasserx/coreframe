@@ -1,0 +1,144 @@
+/**
+ * The foundation's HTTP client: native `fetch` behind one function that
+ * adds the three things raw fetch lacks — a configured base URL, a default
+ * timeout, and normalization of every failure into `ApiError` (see
+ * `./errors.ts`). Native fetch (not axios) because it is what Next.js
+ * extends for caching/revalidation, it costs zero bundle bytes, and the
+ * one thing axios would add — interceptors — is replaced by this single
+ * choke point (docs/DATA_LAYER.md, DECISIONS.md).
+ *
+ * Response validation is opt-in via `schema` and the types make skipping
+ * it explicit: with a schema the promise resolves to the schema's output
+ * type; without one it resolves to `unknown`, so an unvalidated consumer
+ * must cast deliberately at the call site.
+ *
+ * AUTH EXTENSION POINT: this function is the single place every request
+ * passes through. A product adds authentication by attaching credentials
+ * here (e.g. an `Authorization` header read from its auth state, or
+ * `credentials: "include"` for cookie sessions) — never per call site.
+ * See docs/DATA_LAYER.md § Authentication.
+ */
+import { z } from "zod";
+
+import { ENV_CONFIG } from "@/config/env";
+
+import { ApiError } from "./errors";
+
+const DEFAULT_TIMEOUT_MS = 10_000;
+
+export type ApiFetchOptions = Readonly<{
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  /** JSON-serialized into the request body; sets `content-type: application/json`. */
+  body?: unknown;
+  headers?: HeadersInit;
+  /**
+   * Caller cancellation (pass React Query's `signal` through). Combined
+   * with the timeout signal; an abort from here is rethrown as-is, not
+   * wrapped in ApiError.
+   */
+  signal?: AbortSignal | undefined;
+  timeoutMs?: number;
+}>;
+
+export async function apiFetch<T>(
+  path: string,
+  options: ApiFetchOptions & { schema: z.ZodType<T> },
+): Promise<T>;
+export async function apiFetch(path: string, options?: ApiFetchOptions): Promise<unknown>;
+export async function apiFetch<T>(
+  path: string,
+  options: ApiFetchOptions & { schema?: z.ZodType<T> } = {},
+): Promise<unknown> {
+  // Empty base URL (the default) means same-origin paths — correct for the
+  // browser and for this repo's own route handlers. Server-side callers
+  // need an absolute NEXT_PUBLIC_API_BASE_URL (docs/DATA_LAYER.md).
+  const url = `${ENV_CONFIG.NEXT_PUBLIC_API_BASE_URL}${path}`;
+
+  const timeoutSignal = AbortSignal.timeout(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const signal =
+    options.signal === undefined ? timeoutSignal : AbortSignal.any([options.signal, timeoutSignal]);
+
+  const headers = new Headers(options.headers);
+  if (options.body !== undefined && !headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: options.method ?? "GET",
+      headers,
+      signal,
+      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+    });
+  } catch (cause) {
+    // Caller cancellation is not a failure — rethrow untouched so
+    // signal-aware consumers (React Query) see a genuine abort.
+    if (options.signal?.aborted === true) {
+      throw cause;
+    }
+    if (timeoutSignal.aborted) {
+      throw new ApiError({
+        kind: "timeout",
+        message: `Request to ${url} timed out after ${options.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms.`,
+        url,
+        cause,
+      });
+    }
+    throw new ApiError({
+      kind: "network",
+      message: `Request to ${url} failed before a response was received.`,
+      url,
+      cause,
+    });
+  }
+
+  if (!response.ok) {
+    throw new ApiError({
+      kind: "http",
+      message: `Request to ${url} failed with HTTP ${response.status}.`,
+      url,
+      status: response.status,
+      body: await parseJsonBodyOrUndefined(response),
+    });
+  }
+
+  if (response.status === 204) {
+    return undefined;
+  }
+
+  let payload: unknown;
+  try {
+    payload = await response.json();
+  } catch (cause) {
+    throw new ApiError({
+      kind: "parse",
+      message: `Response from ${url} is not valid JSON.`,
+      url,
+      cause,
+    });
+  }
+
+  if (options.schema === undefined) {
+    return payload;
+  }
+  const parsed = options.schema.safeParse(payload);
+  if (!parsed.success) {
+    throw new ApiError({
+      kind: "parse",
+      message: `Response from ${url} does not match the expected schema:\n${z.prettifyError(parsed.error)}`,
+      url,
+      cause: parsed.error,
+    });
+  }
+  return parsed.data;
+}
+
+/** Best-effort read of an error response's JSON payload; never throws. */
+async function parseJsonBodyOrUndefined(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return undefined;
+  }
+}

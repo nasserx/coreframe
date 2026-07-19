@@ -58,11 +58,11 @@ Alternatives considered: Hand-managed request state, Zustand for server state.
 
 ## Zustand
 
-Decision: Use Zustand for shared client-side state.
+Decision (revised 2026-07): Removed from dependencies until a product has state that needs it; it remains the recommended library for that moment.
 
-Reason: It is lightweight, explicit, and suitable for client state that must be shared outside local component boundaries.
+Reason: It was declared with zero imports — an unused dependency every clone would inherit, inviting speculative stores. The client-state / server-cache / URL-state guidance that tells a product when a store is justified lives in `docs/DATA_LAYER.md`. When that point is reached, Zustand is still the pick: lightweight, explicit, suitable for cross-feature client state.
 
-Alternatives considered: React Context only, Redux Toolkit.
+Alternatives considered: React Context only, Redux Toolkit, keeping the dependency preinstalled (rejected: a foundation must not ship unused dependencies).
 
 ## React Hook Form
 
@@ -79,6 +79,14 @@ Decision: Use Zod for schema validation.
 Reason: Zod provides TypeScript-friendly runtime validation and can support forms, API boundaries, and configuration validation.
 
 Alternatives considered: Yup, Valibot, custom validation.
+
+## Native fetch as the HTTP client (axios removed)
+
+Decision: The API boundary (`src/api`) is built on native `fetch`; the declared-but-unused axios dependency was removed.
+
+Reason: Next.js extends `fetch` with its caching/revalidation semantics, so fetch is the only client that keeps server-side data access on one code path; it costs zero bundle bytes (axios is ~35 kB client-side); and the platform now covers axios's ergonomics natively (`AbortSignal.timeout`, `AbortSignal.any`, `Response.json`). Axios's remaining value — interceptors and error normalization — is provided by `apiFetch` being the single choke point every request passes through, with failures normalized into one typed `ApiError`. Full contract: `docs/DATA_LAYER.md`.
+
+Alternatives considered: axios (rejected: parallel caching story to Next, bundle cost, interceptor indirection for what one function does in plain code), ky/ofetch (rejected: same conclusion with fewer reasons — no new dependency earns its place here).
 
 ## Core Layer
 

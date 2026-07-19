@@ -1,0 +1,48 @@
+"use client";
+
+export type ErrorFallbackProps = Readonly<{
+  title?: string;
+  description?: string;
+  actionLabel?: string;
+  /** The recovery action: a boundary reset, Next's retry, or a reload. */
+  onAction: () => void;
+  /** Supplemental reference line, e.g. a server error digest for support. */
+  detail?: string | undefined;
+}>;
+
+/**
+ * The shared error-state presentation used by the core ErrorBoundary's
+ * default fallback and the route-level error files (`src/app/error.tsx`,
+ * `src/app/global-error.tsx`) — one look for "something broke", everywhere.
+ *
+ * Deliberately built from raw elements + semantic tokens: core must not
+ * import `src/components` (enforced boundary), and global-error renders
+ * without the provider tree, so this component may assume nothing beyond
+ * the stylesheet. Richer fallbacks belong at the call site via the
+ * ErrorBoundary `fallback` prop.
+ */
+export function ErrorFallback({
+  title = "Something went wrong.",
+  description = "An unexpected error occurred. Try again, or reload the page if the problem persists.",
+  actionLabel = "Try again",
+  onAction,
+  detail,
+}: ErrorFallbackProps) {
+  return (
+    <div
+      role="alert"
+      className="flex min-h-dvh flex-col items-center justify-center gap-3 p-6 text-center"
+    >
+      <h2 className="text-base font-medium text-foreground">{title}</h2>
+      <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
+      {detail === undefined ? null : <p className="text-xs text-muted-foreground/80">{detail}</p>}
+      <button
+        type="button"
+        onClick={onAction}
+        className="mt-1 inline-flex h-8 items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground outline-none hover:bg-primary/80 focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        {actionLabel}
+      </button>
+    </div>
+  );
+}

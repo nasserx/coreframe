@@ -10,11 +10,13 @@ Frontend Foundation is a reusable Next.js application base for future web produc
 - Tailwind CSS
 - shadcn/ui
 - React Query
-- Zustand
 - React Hook Form
 - Zod
-- Axios
 - ESLint
+
+HTTP goes through the foundation's own `apiFetch` (native fetch + one typed
+error shape, `src/api`) — no axios. Shared client-state libraries are added
+by products when needed, not preinstalled (`docs/DATA_LAYER.md`).
 
 ## Folder Overview
 
@@ -23,8 +25,8 @@ Frontend Foundation is a reusable Next.js application base for future web produc
 - `src/components`: Future shared presentation components.
 - `src/features`: Feature-first product modules.
 - `src/services`: Application service boundaries.
-- `src/api`: API boundary code when API integration is introduced.
-- `src/store`: Shared client-side state.
+- `src/api`: The API boundary — `apiFetch` (native fetch client) and the typed `ApiError` contract (`docs/DATA_LAYER.md`).
+- `src/store`: Shared client-side state (empty by design; see `docs/DATA_LAYER.md` for what belongs in a store vs the query cache vs the URL).
 - `src/hooks`: Shared React hooks.
 - `src/lib`: Library integration and framework-adjacent helpers.
 - `src/utils`: Small framework-agnostic utilities.
@@ -114,6 +116,17 @@ with sidebar/header/main regions and a built-in skip link). Content measure
 is tokenized (`max-w-prose` / `max-w-form`); dense data surfaces stay
 uncapped. Contracts and rationale: `docs/LAYOUT.md`; live demo:
 `/showcase/layout`.
+
+## Data Layer
+
+Server data flows through one boundary: `apiFetch` (`src/api`) — native
+fetch with a validated base URL, timeout, cancellation, opt-in Zod response
+validation, and every failure normalized into a single typed `ApiError`.
+React Query consumes it with per-feature typed key factories. Route-level
+error handling (`error.tsx`, `global-error.tsx`, `not-found.tsx`) shares
+one fallback UI with the client ErrorBoundary. Contracts, patterns, and the
+guidance for pointing a product at its own backend: `docs/DATA_LAYER.md`;
+live demo: `/showcase/data`.
 
 ## Direction & Internationalization
 

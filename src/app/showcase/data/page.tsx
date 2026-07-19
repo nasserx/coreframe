@@ -13,11 +13,11 @@ export default function DataPage() {
     <>
       <ShowcasePageHeader
         title="Data"
-        description="React Query through the AppProvider's QueryProvider: simulated latency, skeleton loading, and the foundation's caching defaults."
+        description="React Query through the AppProvider's QueryProvider: a real fetch through the API boundary, skeleton loading, normalized error handling, and the foundation's caching defaults."
       />
       <ShowcaseSection
         title="Query with loading composition"
-        description="The page itself stays a Server Component; only this demo island is client-side."
+        description="The page itself stays a Server Component; only this demo island is client-side. It fetches from this app's own route handler through apiFetch (docs/DATA_LAYER.md)."
       >
         <QueryDemo />
       </ShowcaseSection>

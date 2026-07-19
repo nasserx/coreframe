@@ -79,6 +79,14 @@ browser can falsify.
   theme/direction cells. axe automates roughly the third of WCAG that is
   machine-checkable; treat a clean scan as a floor. False positives must be
   excluded explicitly with an argument in a comment, never silently.
+- `errors.spec.ts` — the error surfaces that discovery cannot cover: an
+  unmatched URL must return 404 with the branded not-found page (axe-scanned
+  separately, since it is not a `page.*` route) and a working way home, and
+  the ErrorBoundary throw → fallback → reset cycle must work against the
+  production build. `error.tsx`/`global-error.tsx` are deliberately not
+  driven here — that would require shipping a throwing route; their document
+  shell was verified manually (docs/DATA_LAYER.md § Route-level error
+  handling).
 - `shell.spec.ts` — operability proof for the AppShell's responsive
   navigation: at a mobile viewport the drawer opens, traps focus, closes on
   Escape with focus returned to the trigger, and dismisses itself on
@@ -98,8 +106,10 @@ lost.
 - **shadcn/Base UI internals** (focus traps, dismissal, positioning) —
   upstream-tested; re-testing them couples this repo to vendored internals.
 - **Visual appearance** — no screenshot baselines (see stack rationale).
-- **Anything requiring a backend** — nothing in the foundation has one;
-  `query-demo` simulates its fetch and is exercised by the browser matrix.
+- **Anything requiring an external backend** — the only endpoint is this
+  repo's own static route handler (`/api/showcase/records`), so `query-demo`
+  and the whole browser matrix run offline; the transport contract itself is
+  unit-tested against a stubbed fetch (`src/api/client.test.ts`).
 - **Coverage targets** — none are configured on purpose. The reference
   tests establish patterns; a percentage gate on a template repo rewards
   test bulk, not defect detection.
