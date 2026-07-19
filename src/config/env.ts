@@ -33,6 +33,7 @@ declare global {
        * replaced and would silently read undefined in the client.
        */
       NEXT_PUBLIC_API_BASE_URL?: string | undefined;
+      NEXT_PUBLIC_ENABLE_SHOWCASE?: string | undefined;
     }
   }
 }
@@ -48,11 +49,25 @@ const envSchema = z.object({
    * Node). Browser-safe by definition, hence NEXT_PUBLIC_.
    */
   NEXT_PUBLIC_API_BASE_URL: z.string().default(""),
+  /**
+   * Gates the /showcase routes and their backing endpoint. Default "true":
+   * the showcase is the foundation's living integration test and stays
+   * available during development. A product sets "false" in its production
+   * environment to prerender every showcase route as a static 404 at build
+   * time — no dynamic rendering, no code deletion (docs/CLONING.md). The
+   * check is inlined at build time, so flipping the value requires a
+   * rebuild.
+   */
+  NEXT_PUBLIC_ENABLE_SHOWCASE: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((value) => value === "true"),
 });
 
 const parsedEnv = envSchema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
   NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  NEXT_PUBLIC_ENABLE_SHOWCASE: process.env.NEXT_PUBLIC_ENABLE_SHOWCASE,
 });
 
 if (!parsedEnv.success) {

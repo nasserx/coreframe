@@ -25,7 +25,7 @@ Single source root `src/`. Layers:
 
 Each folder has a README stating what belongs / must never be placed there — read it before adding files.
 
-## Dependency Direction (enforce by hand; no tooling yet)
+## Dependency Direction (lint-enforced via folder-scoped `no-restricted-imports` in `eslint.config.mjs`)
 
 Specific → shared, never the reverse:
 
@@ -78,7 +78,7 @@ Small, accessible, composable primitives in `src/components/ui`; domain-neutral 
 
 ## Tech Stack
 
-Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state; contract in `docs/DATA_LAYER.md`), React Hook Form + Zod v4 (note: `z.prettifyError`-era API), sonner (toasts). HTTP is native fetch via `apiFetch` (`src/api`) — axios and zustand were deliberately removed as unused (`DECISIONS.md`); do not reintroduce a store library without a product need.
+Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state; contract in `docs/DATA_LAYER.md`), Zod v4 (note: `z.prettifyError`-era API), sonner (toasts). HTTP is native fetch via `apiFetch` (`src/api`) — axios, zustand, and react-hook-form were deliberately removed as unused (`DECISIONS.md`); RHF is still the chosen form library, reinstalled when the reference form wiring is built; do not reintroduce a store library without a product need.
 
 Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`) / `test` + `test:watch` (Vitest unit/component) / `test:e2e` (Playwright; requires a prior `build`, one-time `npx playwright install chromium`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files; deliberately no tests), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → test → build → test:e2e on PRs and pushes to `main`. Env validation (`src/config/env.ts`) executes at startup via a side-effect import in `next.config.ts`.
 
@@ -86,7 +86,7 @@ Testing (`docs/TESTING.md` for full rationale): Vitest + Testing Library, jsdom,
 
 ## Current Project Status
 
-Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives plus the layout set (Container, Stack, PageHeader, AppShell, SkipLink), the `/showcase` inspection routes (wrapped in the AppShell), the data layer (`apiFetch` + `ApiError` in `src/api`, query key contract, route-level `error`/`global-error`/`not-found` files, showcase route handler), both test layers, strict TS/ESLint setup, `.gitattributes` line-ending normalization.
+Template-ready. The repo is meant to be used as a GitHub template: clone-and-rename procedure and first-run checklist in `docs/CLONING.md`; deliberate omissions and known issues in `docs/ROADMAP.md`; point-in-time reviews archived in `docs/audit/` (never read those as current state). `/showcase` is gated by `NEXT_PUBLIC_ENABLE_SHOWCASE` (default on; `false` at build time prerenders every showcase route and its API endpoint as a static 404 — routes stay static either way). Node contract: `.nvmrc` (20) + `package.json#engines` (>=20). Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Query/ErrorBoundary/Toaster, 20 shadcn/ui primitives plus the layout set (Container, Stack, PageHeader, AppShell, SkipLink), the `/showcase` inspection routes (wrapped in the AppShell), the data layer (`apiFetch` + `ApiError` in `src/api`, query key contract, route-level `error`/`global-error`/`not-found` files, showcase route handler), both test layers, strict TS/ESLint setup, `.gitattributes` line-ending normalization.
 
 ## Completed Milestones
 
@@ -96,10 +96,13 @@ Scaffold + standards phase. Implemented: folder skeleton with READMEs, theme tok
 4. Testing baseline: Vitest unit/component layer, Playwright browser layer (console harness, font-loading assertion, axe scans), wired into CI; Noto font ships with its OFL 1.1 license (`src/assets/fonts/OFL.txt`).
 5. Layout vocabulary: measure tokens, Stack rhythm scale, PageHeader scaffold, accessible responsive AppShell (`docs/LAYOUT.md`); showcase migrated onto it; shell keyboard/focus tests in both layers.
 6. Data layer contract: fetch-based `apiFetch` with the typed `ApiError` shape, query key/caching contract (`docs/DATA_LAYER.md`), route-level error/not-found handling verified against a production build, axios and zustand removed as unused.
+7. Template readiness: documentation reconciled with the code, showcase build gate, `docs/CLONING.md` + `docs/ROADMAP.md`, engines field, rebranding procedure empirically verified (`docs/DESIGN_TOKENS.md` §4), full-matrix-on-PR CI decision recorded with measured numbers (`docs/TESTING.md` §CI).
 
 ## Upcoming Priorities (in rough order)
 
-1. Reference React Hook Form + Zod form wiring (the remaining declared-but-unwired stack piece).
+`docs/ROADMAP.md` is the authoritative list of deliberate omissions, their extension points, and the product signal that triggers each. Headline order:
+
+1. Reference React Hook Form + Zod form wiring (reinstall RHF + resolvers then; the last unbuilt piece of the decided stack).
 2. Localization/auth providers in `AppProvider` as concrete needs arrive (TODO slots reserved).
 3. Extend `src/core` placeholders (logger, monitoring) when the first product needs them — error reporting hooks are marked in `error.tsx` and `ErrorBoundary`.
 

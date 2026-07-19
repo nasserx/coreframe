@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
+import { ENV_CONFIG } from "@/config/env";
 import {
   AppShell,
   AppShellHeader,
@@ -14,14 +16,24 @@ import { ThemeControl } from "@/components/ui/theme-control";
 import { DirectionControl } from "@/features/showcase/components/direction-control";
 import { ShowcaseNav } from "@/features/showcase/components/showcase-nav";
 
-export const metadata: Metadata = {
-  title: {
-    template: "%s — Foundation Showcase",
-    default: "Foundation Showcase",
-  },
-};
+// With the showcase gated off, the segment prerenders the 404 page — the
+// metadata must not brand that 404 with the showcase title template.
+export const metadata: Metadata = ENV_CONFIG.NEXT_PUBLIC_ENABLE_SHOWCASE
+  ? {
+      title: {
+        template: "%s — Foundation Showcase",
+        default: "Foundation Showcase",
+      },
+    }
+  : {};
 
 export default function ShowcaseLayout({ children }: Readonly<{ children: ReactNode }>) {
+  // Build-time gate: NEXT_PUBLIC_ENABLE_SHOWCASE is inlined during `next
+  // build`, so with the flag off every /showcase route prerenders as the
+  // static 404 page — routes stay static either way (docs/CLONING.md).
+  if (!ENV_CONFIG.NEXT_PUBLIC_ENABLE_SHOWCASE) {
+    notFound();
+  }
   return (
     <AppShell>
       <AppShellSidebar label="Showcase sections">

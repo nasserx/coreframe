@@ -1,146 +1,124 @@
 # Frontend Foundation
 
-Frontend Foundation is a reusable Next.js application base for future web products. Its purpose is to provide a clean, scalable starting point with agreed tooling, folder boundaries, and documentation before product-specific implementation begins.
+A reusable, domain-neutral Next.js (App Router) application base for future
+web products: agreed tooling, folder boundaries, a token-driven theme system,
+testing, and standards — no features, pages, or business logic. This README
+is the entry point; every deeper topic links to its owning document.
 
-## Tech Stack
+## Start here
 
-- Next.js App Router
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- React Query
-- React Hook Form
-- Zod
-- ESLint
+1. **Building a product from this repo?** Follow **[`docs/CLONING.md`](docs/CLONING.md)** —
+   the clone-and-rename procedure and a first-run checklist that takes you
+   from clone to your first product page in under 30 minutes.
+2. **Contributing to the foundation itself?** Read `ARCHITECTURE.md`, then
+   `CONTRIBUTING.md` and `CODE_STYLE.md`.
+3. **Wondering why something is missing?** It is probably deliberate — see
+   **[`docs/ROADMAP.md`](docs/ROADMAP.md)** for what is intentionally absent
+   and what signal triggers building it.
 
-HTTP goes through the foundation's own `apiFetch` (native fetch + one typed
-error shape, `src/api`) — no axios. Shared client-state libraries are added
-by products when needed, not preinstalled (`docs/DATA_LAYER.md`).
-
-## Folder Overview
-
-- `src/app`: Next.js App Router entry point.
-- `src/assets`: Source-controlled fonts, icons, and images. Bundled third-party assets ship with their licenses (Noto Sans Arabic: SIL OFL 1.1, `src/assets/fonts/OFL.txt`).
-- `src/components`: Future shared presentation components.
-- `src/features`: Feature-first product modules.
-- `src/services`: Application service boundaries.
-- `src/api`: The API boundary — `apiFetch` (native fetch client) and the typed `ApiError` contract (`docs/DATA_LAYER.md`).
-- `src/store`: Shared client-side state (empty by design; see `docs/DATA_LAYER.md` for what belongs in a store vs the query cache vs the URL).
-- `src/hooks`: Shared React hooks.
-- `src/lib`: Library integration and framework-adjacent helpers.
-- `src/utils`: Small framework-agnostic utilities.
-- `src/types`: Shared TypeScript types.
-- `src/constants`: Shared constants.
-- `src/config`: Application configuration.
-- `src/styles`: Shared styling organization.
-
-## Install
+Requirements: **Node ≥ 20** (`.nvmrc` pins 20; `package.json#engines`
+enforces the floor) and npm.
 
 ```bash
 npm install
+npm run dev        # http://localhost:3000 — /showcase is the living demo
 ```
 
-## Run
+## Documentation map
+
+| Document                     | Owns                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `ARCHITECTURE.md`            | Layers, folder charters, dependency direction, theme runtime overview    |
+| `docs/CLONING.md`            | Using this repo as a template: rename, configure, first-run checklist    |
+| `docs/ROADMAP.md`            | What is deliberately not built yet, and known open issues                |
+| `docs/DESIGN_TOKENS.md`      | The full token contract, verified contrast, rebranding procedure         |
+| `docs/LAYOUT.md`             | Layout vocabulary: measure, rhythm, PageHeader, AppShell                 |
+| `docs/DATA_LAYER.md`         | `apiFetch`, `ApiError`, React Query contract, route-level error handling |
+| `docs/DIRECTION_AND_I18N.md` | RTL/Arabic support, logical properties, i18n integration points          |
+| `docs/TESTING.md`            | Both test layers, what is deliberately untested, CI                      |
+| `docs/UI_LIBRARY.md`         | The shadcn/Base UI adaptation standard for `src/components/ui`           |
+| `DESIGN_SYSTEM.md`           | Primitive design philosophy and completion checklist                     |
+| `CODE_STYLE.md`              | Naming, imports, exports, TypeScript usage                               |
+| `CONTRIBUTING.md`            | Feature placement, shared-code promotion, PR expectations                |
+| `DECISIONS.md`               | The decision log — every stack choice with reasoning                     |
+| `docs/audit/`                | Historical point-in-time reviews (do not read as current state)          |
+
+## Tech stack
+
+Next.js App Router · React · TypeScript (strict) · Tailwind CSS v4
+(CSS-first) · shadcn/ui on the Base UI runtime · React Query · Zod · sonner.
+HTTP goes through the foundation's own `apiFetch` (native fetch + one typed
+error shape, `src/api`) — no axios. Form and client-state libraries (React
+Hook Form, zustand — both already decided in `DECISIONS.md`) are installed
+when a product first needs them, not preinstalled. Every dependency has a
+`DECISIONS.md` entry.
+
+## Folder overview
+
+- `src/app`: App Router files only (routes, layouts, route-level error files).
+- `src/core`: cross-cutting infrastructure — provider composition (theme,
+  query, error boundary, toaster) and shared error UI; logger/monitoring/
+  analytics/guards/accessibility are chartered placeholders.
+- `src/components`: intentionally cross-feature presentation components;
+  primitives in `src/components/ui`.
+- `src/features`: feature-first product modules (currently only `showcase`).
+- `src/api`: the API boundary — `apiFetch` and the typed `ApiError` contract.
+- `src/services`: application service boundaries (chartered placeholder).
+- `src/store`: shared client state (empty by design; see `docs/DATA_LAYER.md`).
+- `src/styles`: the CSS token system — the single source of truth for theming.
+- `src/theme`: the TypeScript breakpoint mirror only (matchMedia cannot read
+  CSS variables).
+- `src/config`: app identity, environment validation, flags, route constants.
+- `src/assets`: source-controlled fonts/icons/images; third-party assets ship
+  with their licenses (Noto Sans Arabic: SIL OFL 1.1, `src/assets/fonts/OFL.txt`).
+- `src/hooks`, `src/lib`, `src/utils`, `src/types`, `src/constants`:
+  foundation folders — each README states what belongs and what must not.
+
+## The showcase
+
+`/showcase` is the foundation's living integration test: every primitive,
+token, layout, and data-layer contract rendered and exercised by the browser
+test matrix. It is **not** product UI.
+
+- **Development:** enabled by default; keep it while building.
+- **Release:** set `NEXT_PUBLIC_ENABLE_SHOWCASE=false` at build time and every
+  `/showcase` route (and its `/api/showcase/records` endpoint) prerenders as a
+  static 404 — no dynamic rendering, no code changes.
+- **Permanently:** delete the three showcase locations (`docs/CLONING.md`).
+
+## Commands
 
 ```bash
-npm run dev
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-## Lint
-
-```bash
-npm run lint
-```
-
-## Format
-
-```bash
-npm run format        # rewrite files with Prettier
-npm run format:check  # verify only (used in CI)
-```
-
-## Typecheck
-
-```bash
-npm run typecheck
-```
-
-## Test
-
-```bash
+npm run dev           # dev server
+npm run build         # production build (all routes statically prerendered)
+npm run lint          # ESLint (includes the dependency-direction and
+                      # logical-properties rules)
+npm run format        # Prettier write; format:check verifies (CI)
+npm run typecheck     # tsc --noEmit
 npm test              # unit/component layer (Vitest + Testing Library)
-npm run test:watch    # watch mode
-npm run build && npm run test:e2e   # browser layer (Playwright): console
-                                    # cleanliness, font loading, axe scans,
-                                    # app-shell operability
+npm run test:e2e      # browser layer (Playwright); needs `npm run build`
+                      # first and a one-time `npx playwright install chromium`
 ```
 
-One-time setup for the browser layer: `npx playwright install chromium`.
-Stack rationale, layer responsibilities, and extension guidance:
-`docs/TESTING.md`.
+## Quality gates
 
-## Quality Gates
-
-Two layers keep the baseline enforced instead of advisory:
-
-- **On commit** (Husky): `pre-commit` runs lint-staged — `eslint --fix` and
-  `prettier --write` on staged files only, so commits stay fast. `commit-msg`
-  runs commitlint with the Conventional Commits rules (allowed types are
-  documented in `commitlint.config.mjs`).
-- **In CI** (`.github/workflows/ci.yml`, on pull requests and pushes to
-  `main`): `npm ci`, then `format:check`, `lint`, `typecheck`, unit tests,
-  `build`, and the Playwright browser suites (console cleanliness across the
-  route × theme × direction matrix, Arabic font loading, axe accessibility
-  scans), in order, failing fast. The Node version comes from `.nvmrc`.
-  Pre-commit deliberately runs no tests — correctness gating lives in CI
-  (`docs/TESTING.md`).
+- **On commit** (Husky): lint-staged (`eslint --fix` + `prettier --write` on
+  staged files); commitlint enforces Conventional Commits.
+- **In CI** (`.github/workflows/ci.yml`, PRs and pushes to `main`): `npm ci`,
+  then `format:check → lint → typecheck → unit tests → build → browser
+tests`, failing fast. Node version comes from `.nvmrc`. The workflow needs
+  no secrets or configuration — it works on day one in a fresh clone/fork.
 
 Environment variables are validated fail-fast at startup: `next.config.ts`
-imports `src/config/env.ts`, which throws with the offending variable names
-if the schema does not parse. See the comment in `env.ts` for how to add a
-new variable.
+imports `src/config/env.ts`, which throws with the offending variable names.
+See the comment in `env.ts` for how to add a variable.
 
-## Layout
-
-A small layout vocabulary makes the common product layouts consistent:
-`Container` (page width), `Stack` (named vertical-rhythm steps), `PageHeader`
-(page scaffold), and `AppShell` (responsive, accessible application chrome
-with sidebar/header/main regions and a built-in skip link). Content measure
-is tokenized (`max-w-prose` / `max-w-form`); dense data surfaces stay
-uncapped. Contracts and rationale: `docs/LAYOUT.md`; live demo:
-`/showcase/layout`.
-
-## Data Layer
-
-Server data flows through one boundary: `apiFetch` (`src/api`) — native
-fetch with a validated base URL, timeout, cancellation, opt-in Zod response
-validation, and every failure normalized into a single typed `ApiError`.
-React Query consumes it with per-feature typed key factories. Route-level
-error handling (`error.tsx`, `global-error.tsx`, `not-found.tsx`) shares
-one fallback UI with the client ErrorBoundary. Contracts, patterns, and the
-guidance for pointing a product at its own backend: `docs/DATA_LAYER.md`;
-live demo: `/showcase/data`.
-
-## Direction & Internationalization
+## Direction & internationalization
 
 The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
-logical properties (lint-enforced), the sans stack falls through from Geist to
-Noto Sans Arabic, and locale/direction/numeral configuration lives in
-`src/config/app.ts`. Message translation is deliberately not included — see
-`docs/DIRECTION_AND_I18N.md` for the architecture and the integration points
-for adding an i18n library.
-
-## Project Goals
-
-- Keep the foundation minimal and production-ready.
-- Use `src` as the single application root.
-- Preserve clear ownership boundaries between app, features, shared code, and infrastructure.
-- Prefer feature-first organization as the product grows.
-- Establish consistent standards before implementation begins.
+logical properties (lint-enforced), and the sans stack lists Noto Sans Arabic
+first — scoped to Arabic code points via `unicode-range`, so Latin renders in
+Geist while Arabic can never be intercepted by a metric fallback.
+Locale/direction/numeral configuration lives in `src/config/app.ts`. Message
+translation is deliberately not included — `docs/DIRECTION_AND_I18N.md` has
+the architecture and the integration points for adding an i18n library.

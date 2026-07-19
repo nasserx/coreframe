@@ -33,7 +33,8 @@ The application uses `src` as the single source root. Next.js routing lives in `
 - `src/types`: shared TypeScript types.
 - `src/constants`: stable shared constants.
 - `src/config`: environment-derived and application configuration.
-- `src/styles`: shared style organization.
+- `src/styles`: the CSS token system and global styles.
+- `src/theme`: the TypeScript breakpoint mirror only (see Theme Runtime below).
 
 ## Feature-First Architecture
 
@@ -49,13 +50,13 @@ Core infrastructure should provide cross-cutting application boundaries without 
 
 ## Theme Runtime
 
-Theme values flow through three layers:
+CSS custom properties in `src/styles` are the single source of truth for every themable design decision (full contract: `docs/DESIGN_TOKENS.md`):
 
-1. Design Tokens: TypeScript token files in `src/theme` are the compile-time reference for design decisions.
-2. CSS Variables: theme styles in `src/styles` expose semantic runtime variables such as `--color-primary`, `--color-background`, and `--color-border`.
-3. Tailwind: Tailwind consumes those runtime variables through the global theme bridge, so utilities resolve to semantic theme values instead of hardcoded colors.
+1. Semantic variables: `src/styles/base.css` (theme-neutral), `light.css`/`dark.css` (per-theme `--color-*` and `--elevation-*` values with full parity).
+2. Bridge: `src/styles/theme.css` maps the semantic variables into Tailwind v4 `@theme inline` and shadcn/ui variable names, and holds the theme-neutral type ramp and measure tokens.
+3. Tailwind utilities resolve through the bridge, so components use semantic classes instead of hardcoded colors.
 
-CSS variables are the browser runtime source of truth. TypeScript tokens should remain aligned with the same semantic system, but runtime theming should happen through CSS variables.
+There is deliberately no TypeScript mirror of any CSS token. The one sanctioned TS token file is `src/theme/breakpoints.ts`, because `matchMedia` cannot read custom properties; its values must equal Tailwind's default screens.
 
 ## Dependency Direction
 
@@ -71,7 +72,7 @@ Dependencies should flow inward from specific to shared:
 
 ## Module Boundary Rules
 
-Future tooling should enforce these boundaries:
+These boundaries are lint-enforced: folder-scoped `no-restricted-imports` rules in `eslint.config.mjs` encode the full dependency-direction matrix, and `npm run lint` fails on a violation.
 
 - `src/app` may import from `src/features`, `src/core`, and foundation folders.
 - `src/features/*` may import from shared foundation folders and core, but not from sibling features unless an explicit shared contract exists.

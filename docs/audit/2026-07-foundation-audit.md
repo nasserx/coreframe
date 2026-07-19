@@ -1,5 +1,7 @@
 # Foundation Audit — July 2026
 
+> **Historical snapshot** — see `docs/audit/README.md`. This audit describes the repository as it was at the audited commit; its findings drove the later phases and no longer reflect the current code.
+
 Read-only audit of `frontend-foundation` at commit `fffe661` (branch `main`, clean tree).
 All paths are repo-relative; line numbers refer to the audited state.
 

@@ -20,9 +20,9 @@ export const geistMono = Geist_Mono({
 /*
  * Arabic companion face (self-hosted variable font, Arabic subset). Geist
  * has no Arabic glyphs, so the sans stack in src/styles/theme.css lists this
- * after Geist: Latin renders in Geist, Arabic falls through to Noto Sans
- * Arabic. next/font self-hosts and preloads — no render blocking, no layout
- * shift.
+ * FIRST, scoped to Arabic code points by the unicode-range below: Latin
+ * skips it and renders in Geist, Arabic renders here. next/font self-hosts
+ * and preloads — no render blocking, no layout shift.
  *
  * Loaded via next/font/local (not google) because the face needs a
  * `size-adjust` descriptor: Arabic renders optically smaller than Latin at
