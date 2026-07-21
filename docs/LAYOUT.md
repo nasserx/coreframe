@@ -212,6 +212,20 @@ rejected list above). The shell consumes the base
 background/border/accent tokens; the `sidebar-*` set belongs to
 application chrome.
 
+**Hierarchy: the brand dominates the bar.** Nav items are secondary
+wayfinding and render on a deliberate three-step ladder (unavailable =
+muted + normal weight; idle link = muted + medium; current page =
+foreground + semibold) — style the brand element at least one type step
+above them (`text-body` bold vs the items' `text-small`, as the demo
+does), never the other way around.
+
+**Actions below the collapse line** are the caller's decision, made by
+measuring (same rule as the breakpoint): if the compact action set fits
+beside the brand at your smallest supported width, keep it in the bar;
+when it does not (the demo's brand + auth pair overflow 320px), move the
+actions into the drawer as plain nav items and hide the bar copy below
+that width — the drawer already carries the navigation there.
+
 ### The collapse breakpoint is a prop — measure, don't assume
 
 Below `collapseBelow` (a Tailwind screen: `sm`/`md`/`lg`/`xl`, default
@@ -235,6 +249,13 @@ a 404. Every new product has unbuilt destinations on day one; this is the
 sanctioned way to show them. Adding `href` later turns the same item into
 a real link with `aria-current` handling. The pattern works in the bar,
 the drawer, and (with padding overridden) footer columns.
+
+The same honesty rule extends to action-shaped affordances: a demo or
+pre-launch "Log in" / "Get started" must not be a dead link, a 404, or a
+no-op `<button>`. The demo renders them as non-focusable `<span>`s
+carrying `buttonVariants` styling, `pointer-events-none`, and the same
+sr-only availability hint — real widths for the collapse measurement,
+no fake interactivity.
 
 ### Accessibility and direction
 

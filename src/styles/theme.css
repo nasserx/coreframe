@@ -54,13 +54,17 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  /* Radius scale, derived from --radius-base (6px). Controls sit at lg
+     (6px, crisp); nested elements step down (md 4.5px, sm 3px) to stay
+     concentric; surfaces step up (xl 9px, 2xl 12px …) so cards and
+     dialogs stay recognisably rounded above the tighter controls. */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.5);
+  --radius-4xl: calc(var(--radius) * 3);
   /* Elevation: shadow-xs..xl resolve through the per-theme --elevation-*
      tokens, so `shadow-sm` etc. adapt to light and dark automatically.
      These five levels are the elevation contract; avoid other shadow

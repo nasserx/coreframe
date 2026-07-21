@@ -68,7 +68,10 @@ export function ThemeControl({ className, optionLabels, ...props }: ThemeControl
           key={value}
           value={value}
           aria-label={optionLabels?.[value] ?? label}
-          className="inline-flex size-6.5 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs [&_svg]:pointer-events-none [&_svg]:size-3.5"
+          // Attached (not offset) focus ring: the toggle is nested inside
+          // the group's own border, so an offset ring would collide with
+          // its siblings (docs/DESIGN_TOKENS.md §2).
+          className="inline-flex size-6.5 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs [&_svg]:pointer-events-none [&_svg]:size-3.5"
         >
           <Icon />
         </Toggle>

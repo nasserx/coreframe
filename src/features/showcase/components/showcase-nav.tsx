@@ -22,7 +22,7 @@ export function ShowcaseNav() {
       <Link
         href="/showcase"
         aria-current={pathname === "/showcase" ? "page" : undefined}
-        className="flex h-9 items-center gap-2 rounded-md px-3 text-small font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        className="flex h-9 items-center gap-2 rounded-md px-3 text-small font-semibold outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
       >
         <BrandMark className="size-4.5" />
         Foundation Showcase
@@ -36,7 +36,7 @@ export function ShowcaseNav() {
                 href={section.href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex h-8 items-center rounded-md px-3 text-small text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  "flex h-8 items-center rounded-md px-3 text-small text-sidebar-foreground/80 outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
                   isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
                 )}
               >

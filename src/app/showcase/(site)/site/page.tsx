@@ -69,7 +69,10 @@ export default function SitePage() {
           Tab through the header: focus moves from the brand through the real links and skips
           &ldquo;Pricing&rdquo; entirely; a screen reader announces it with its availability hint.
           When the destination ships, adding <code>href</code> turns the same item into a link with{" "}
-          <code>aria-current</code> handling.
+          <code>aria-current</code> handling. The &ldquo;Log in&rdquo; and &ldquo;Get started&rdquo;
+          actions are the same pattern in button clothing: the showcase has no authentication, so
+          they render as non-focusable styled text with the availability hint — real widths for the
+          collapse measurement, no dead destinations.
         </p>
       </ShowcaseSection>
       <ShowcaseSection

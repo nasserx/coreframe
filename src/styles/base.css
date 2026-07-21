@@ -4,8 +4,11 @@
  * between this file and those.
  */
 :root {
-  /* 0.625rem = 10px: the flat identity's modest, deliberate radius —
-     rounded, not pill-shaped, not sharp. Confirmed (not inherited by
-     accident) during the 2026-07 flat rebrand. */
-  --radius-base: 0.625rem;
+  /* 0.375rem = 6px: the flat identity's crisp, deliberate radius —
+     rounded enough to read as designed, tight enough to read as flat.
+     Tightened from 0.625rem in the 2026-07 refinement pass: 10px read
+     soft on h-8 controls (most visibly inputs and textareas). Controls
+     consume this directly (rounded-lg); surfaces sit above it through
+     the multiplier scale in theme.css. */
+  --radius-base: 0.375rem;
 }
