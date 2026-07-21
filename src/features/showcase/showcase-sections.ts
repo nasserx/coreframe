@@ -20,6 +20,11 @@ export const SHOWCASE_SECTIONS = [
     description: "Stack, Container, measure tokens, PageHeader, and the AppShell.",
   },
   {
+    href: "/showcase/site",
+    title: "Site shell",
+    description: "SiteShell: top bar, responsive collapse, footer, unavailable destinations.",
+  },
+  {
     href: "/showcase/actions",
     title: "Actions",
     description: "Buttons and badges across every variant and size.",

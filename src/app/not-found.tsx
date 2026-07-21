@@ -12,7 +12,9 @@ export const metadata: Metadata = {
  * unmatched URL app-wide and for explicit `notFound()` calls. Renders
  * inside the root layout, so theme, fonts, and direction apply as on any
  * page; unlike the error files this is a static Server Component, so it
- * may use the UI primitives directly.
+ * may use the UI primitives directly. As a boundary file it renders without
+ * the segment layouts, so it owns the `<main>` landmark itself
+ * (docs/LAYOUT.md § The main landmark).
  */
 export default function NotFound() {
   return (

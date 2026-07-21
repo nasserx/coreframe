@@ -17,8 +17,11 @@ const DEV_PORT = 3000;
  *   historical Pagination data-slot defect: prod console stayed clean, dev
  *   failed loudly). Hydration detection therefore requires the dev server.
  * - `chromium-prod` (next start, requires `npm run build` first): font
- *   loading, accessibility scans, and the app-shell operability tests run
- *   against exactly what ships.
+ *   loading, accessibility scans, the shell operability tests, and the
+ *   horizontal-overflow sweep run against exactly what ships.
+ *
+ * A deleted or renamed spec must also be removed from the testMatch
+ * patterns below — a stale name rots silently (docs/CLONING.md).
  */
 export default defineConfig({
   testDir: "tests/e2e",
@@ -42,7 +45,7 @@ export default defineConfig({
     },
     {
       name: "chromium-prod",
-      testMatch: /(fonts|a11y|shell|errors)\.spec\.ts/,
+      testMatch: /(fonts|a11y|shell|errors|overflow)\.spec\.ts/,
       use: { baseURL: `http://localhost:${PROD_PORT}` },
     },
   ],

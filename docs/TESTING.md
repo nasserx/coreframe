@@ -87,12 +87,22 @@ browser can falsify.
   driven here — that would require shipping a throwing route; their document
   shell was verified manually (docs/DATA_LAYER.md § Route-level error
   handling).
-- `shell.spec.ts` — operability proof for the AppShell's responsive
-  navigation: at a mobile viewport the drawer opens, traps focus, closes on
-  Escape with focus returned to the trigger, and dismisses itself on
-  navigation; at desktop the persistent sidebar navigates and marks the
-  current page, and the skip link is the first focusable element. axe can
-  only attest the markup; these drive the interactions.
+- `shell.spec.ts` — operability proof for both shells' responsive
+  navigation (AppShell on `/showcase`, SiteShell on `/showcase/site`): at a
+  mobile viewport the drawer opens, traps focus, closes on Escape with
+  focus returned to the trigger, and dismisses itself on navigation; at
+  desktop the persistent navigation navigates and marks the current page,
+  SiteShell's unavailable items stay out of the tab order, and the skip
+  link is the first focusable element. axe can only attest the markup;
+  these drive the interactions.
+- `overflow.spec.ts` — horizontal-overflow regression net: every
+  discovered route, swept across the viewport range (320–1536 px) in both
+  directions, must neither scroll the page horizontally nor let a shell
+  bar row overflow its own box. Exists because the first product built on
+  this foundation shipped a top bar that overflowed at every width behind
+  a fully green pipeline — overflow is a runtime layout fact no static
+  gate can see, and a bar can overflow inside `overflow-x: hidden` chrome
+  without moving the page-level scrollWidth.
 
 Routes are **discovered** (`tests/e2e/routes.ts` walks `src/app` for
 `page.*`), so a new page is covered automatically. Dynamic or parallel
@@ -124,8 +134,8 @@ npm run test:e2e      # browser layer (Playwright), ~30 s warm
 ```
 
 One-time setup: `npx playwright install chromium`. The browser layer starts
-two servers itself: `next start` on port 3100 (fonts, a11y — tests what
-ships) and `next dev` on port 3000 (console harness — reuses an already
+two servers itself: `next start` on port 3100 (fonts, a11y, shells,
+overflow — tests what ships) and `next dev` on port 3000 (console harness — reuses an already
 running `npm run dev`, since Next allows one dev server per directory).
 
 ## Extending (for a product team)

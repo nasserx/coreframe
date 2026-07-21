@@ -7,20 +7,33 @@ a whole is the reference composition.
 
 ## 1. The vocabulary — and what is deliberately not in it
 
-Five primitives, all in `src/components/ui`:
+Six primitives, all in `src/components/ui`:
 
-| Primitive                                              | Owns                                                         |
-| ------------------------------------------------------ | ------------------------------------------------------------ |
-| `Container`                                            | Page width and horizontal gutter                             |
-| `Stack`                                                | Vertical rhythm (five named gap steps)                       |
-| `PageHeader` (+Title, +Description)                    | The page scaffold: breadcrumb + title + description          |
-| `AppShell` (+Sidebar, +SidebarTrigger, +Header, +Main) | Application chrome: nav / header / main regions              |
-| `SkipLink`                                             | WCAG 2.4.1 bypass block (rendered by AppShell automatically) |
+| Primitive                                                          | Owns                                                            |
+| ------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `Container`                                                        | Page width and horizontal gutter                                |
+| `Stack`                                                            | Vertical rhythm (five named gap steps)                          |
+| `PageHeader` (+Title, +Description)                                | The page scaffold: breadcrumb + title + description             |
+| `AppShell` (+Sidebar, +SidebarTrigger, +Header, +Main)             | Application chrome: sidebar nav / header / main regions         |
+| `SiteShell` (+Header, +Nav, +NavItem, +NavTrigger, +Main, +Footer) | Public-site chrome: top bar / main / footer regions             |
+| `SkipLink`                                                         | WCAG 2.4.1 bypass block (rendered by both shells automatically) |
 
-Each exists because the showcase repeated the pattern ad hoc before it did:
+Each exists because real use repeated the pattern ad hoc before it did:
 `Container` replaced per-page width/gutter, `Stack` replaced scattered
 `flex flex-col gap-*`, `PageHeader` replaced two hand-rolled header blocks,
-and the shell replaced "there is no shell, every product invents one".
+`AppShell` replaced "there is no shell, every product invents one", and
+`SiteShell` came out of the first product built on this foundation — a
+public site whose top bar, footer, and not-yet-built destinations all had
+to be invented from scratch.
+
+**Choosing a shell:** `AppShell` is application chrome — a persistent
+sidebar for tool-like, navigation-heavy product surfaces (dashboards,
+admin, the showcase itself). `SiteShell` is public-site chrome — a sticky
+top bar and footer for marketing/content pages where a sidebar would be
+wrong. A product with both kinds of surface mounts each shell in its own
+route group's layout (the showcase does exactly this: `(app)` vs
+`(site)`). Pages depend on neither — only on `Container`, `Stack`, and
+`PageHeader` — so surfaces can move between shells.
 
 **Rejected** (do not add without a demonstrated repeated need):
 
@@ -168,11 +181,100 @@ three landmarks, and a focus-managed disclosure for collapsed navigation —
 pages depend only on `Container`, `Stack`, and `PageHeader`, never on the
 shell.
 
-## 6. Testing
+## 6. Site shell
 
-`src/components/ui/app-shell.test.tsx` pins the keyboard/focus contract
-(landmarks, skip link, drawer open/close/focus-return) at the component
-level; `tests/e2e/shell.spec.ts` proves the responsive navigation and skip
-link are operable in a real browser against the production build, at both
-mobile and desktop widths. The console, a11y, and font matrices cover every
-shell-wrapped route automatically via route discovery.
+```tsx
+<SiteShell collapseBelow="md">
+  <SiteShellHeader>
+    {/* brand slot: any element, e.g. <Link href="/">Acme</Link> */}
+    <SiteShellNav label="…">
+      <SiteShellNavItem href="/products">Products</SiteShellNavItem>
+      <SiteShellNavItem>Pricing</SiteShellNavItem> {/* no href yet */}
+    </SiteShellNav>
+    {/* actions slot: typically `ms-auto` cluster + <SiteShellNavTrigger /> */}
+  </SiteShellHeader>
+  <SiteShellMain>{/* page content */}</SiteShellMain>
+  <SiteShellFooter>{/* link columns: plain Tailwind grid */}</SiteShellFooter>
+</SiteShell>
+```
+
+Live demo: `/showcase/site` (`src/app/showcase/(site)/site/layout.tsx` is
+the reference composition).
+
+### Structure and slots
+
+A `min-h-dvh` flex column; the **document itself scrolls**. The header is
+sticky at `z-40` and caps its row with `Container`; its three slots —
+brand, navigation, actions — are ordinary children composed in reading
+order. The footer is a `contentinfo` landmark whose grouped link columns
+stay a plain Tailwind grid at the call site (no Grid wrapper — see the
+rejected list above). The shell consumes the base
+background/border/accent tokens; the `sidebar-*` set belongs to
+application chrome.
+
+### The collapse breakpoint is a prop — measure, don't assume
+
+Below `collapseBelow` (a Tailwind screen: `sm`/`md`/`lg`/`xl`, default
+`md`) the navigation moves into a modal drawer with the same Base UI
+Dialog mechanics and guarantees as the AppShell drawer (focus trap,
+Escape, backdrop, focus return, close on navigation and on crossing the
+breakpoint). The breakpoint is deliberately configurable because **no
+default can be correct**: whether the bar fits depends on how wide _your_
+brand + items + actions render, in every locale you ship — the first
+product built on this foundation shipped a bar that overflowed at every
+width while its build stayed green. Measure your bar's real content and
+pick the smallest screen it fits; the browser suite's overflow sweep
+(`tests/e2e/overflow.spec.ts`) fails when the choice is wrong.
+
+### Unavailable destinations
+
+A `SiteShellNavItem` without `href` renders as non-interactive,
+non-focusable muted text carrying an sr-only availability hint
+(`unavailableLabel`, localize at the call site) — never a dead link, never
+a 404. Every new product has unbuilt destinations on day one; this is the
+sanctioned way to show them. Adding `href` later turns the same item into
+a real link with `aria-current` handling. The pattern works in the bar,
+the drawer, and (with padding overridden) footer columns.
+
+### Accessibility and direction
+
+Same guarantees as the AppShell: a built-in `SkipLink` targeting
+`SiteShellMain` is always the first focusable element; landmarks are
+`banner` / `nav` / `main` / `contentinfo`; all English defaults
+(`skipLinkLabel`, `label`, `closeLabel`, `unavailableLabel`, the trigger's
+`aria-label`) are props; everything is logical-property based, so the
+shell mirrors under `dir="rtl"` with zero conditional logic. Nav children
+render in both the bar and the drawer, so navigation content must not rely
+on unique DOM ids.
+
+## 7. The main landmark
+
+**Layouts own `<main>`; pages never render it.** Exactly one `main` per
+page, and its owner is the layout that provides the chrome:
+
+- Shell-wrapped segments get it from `AppShellMain` / `SiteShellMain` in
+  the segment layout (`src/app/showcase/(app)/layout.tsx`,
+  `src/app/showcase/(site)/site/layout.tsx`).
+- Bare segments get it from a route-group layout — `src/app/(home)/layout.tsx`
+  is the reference.
+- Root boundary files (`not-found.tsx`, `error.tsx`, `global-error.tsx`)
+  are the one sanctioned exception: they render with the segment layouts
+  gone (or replace the document entirely), so each owns its own `<main>`.
+
+The rule exists because without an owner every page reinvents the
+landmark — and a page later moved inside a shell ships a nested duplicate
+`main`, which is an axe failure and a screen-reader trap.
+
+## 8. Testing
+
+`src/components/ui/app-shell.test.tsx` and `site-shell.test.tsx` pin the
+shells' keyboard/focus contracts (landmarks, skip link, drawer
+open/close/focus-return, and for SiteShell the unavailable-item
+non-focusability) at the component level; `tests/e2e/shell.spec.ts` proves
+both shells' responsive navigation and skip links are operable in a real
+browser against the production build, at mobile and desktop widths.
+`tests/e2e/overflow.spec.ts` sweeps every discovered route across the
+viewport range in both directions, failing on page-level horizontal
+scroll or a shell bar overflowing its own box. The console, a11y, and
+font matrices cover every shell-wrapped route automatically via route
+discovery.

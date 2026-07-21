@@ -27,8 +27,11 @@ signal is the failure mode this repo was designed to avoid.
   library.
 - **Extension points:** `APP_LOCALES`/`LOCALE_INFO` (`src/config/app.ts`),
   the localization TODO slot in `AppProvider`, prop-overridable primitive
-  strings, and the full RTL/logical-property groundwork
-  (`docs/DIRECTION_AND_I18N.md`).
+  strings (including `ThemeControl.optionLabels`, `ErrorFallback`'s copy
+  props, and both shells' label props), and the full RTL/logical-property
+  groundwork (`docs/DIRECTION_AND_I18N.md`). The error-route boundary
+  files hardcode English copy by design until then — they are listed as a
+  rename location in `docs/CLONING.md` §2.
 - **Trigger:** a product that must serve two locales at once. A single-locale
   deployment (including Arabic-only) needs zero i18n library — change
   `APP_LOCALES.DEFAULT` and write copy in that language.
@@ -52,6 +55,18 @@ signal is the failure mode this repo was designed to avoid.
 - **Trigger:** state that is client-owned, cross-feature, and not derivable
   from the query cache, the URL, or local state (cart, wizard drafts). Most
   products reach this much later than they expect.
+
+### Multi-level site navigation (dropdowns / mega menu)
+
+- **Missing:** `SiteShellNav` is single-level — no dropdown sections, no
+  mega menu, no nested drawer groups.
+- **Extension points:** `SiteShellNavItem` composes freely with the
+  existing Menu/Popover primitives at the call site; the drawer renders
+  arbitrary children.
+- **Trigger:** the first product whose public navigation genuinely exceeds
+  one level. The first product built on this foundation did not need it —
+  its bar overflowed for width reasons, not depth reasons — so nothing is
+  prebuilt.
 
 ### React Query devtools
 
@@ -106,12 +121,15 @@ Honest defects and frictions, none currently blocking:
    product's screens rather than the showcase.
 2. **`DialogContent`'s close button label is hardcoded English** (`sr-only`
    "Close"). Localized products must hide it (`showCloseButton={false}`)
-   and compose their own `DialogClose`. A `closeLabel` prop (like
-   AppShell's) would be the API-consistent fix, but it changes a frozen
-   primitive API, so it waits for the first localized product.
+   and compose their own `DialogClose`. The first (Arabic-first) product
+   build confirmed the friction — its backport fixed the same defect in
+   `ThemeControl` (`optionLabels`) but left this one: a `closeLabel` prop
+   changes a frozen primitive API, so it still waits for the next
+   localized product to demand it.
 3. **Three e2e specs hard-reference showcase URLs** (`shell`, `fonts`,
    `errors`) and need retargeting when the showcase is deleted
-   (`docs/CLONING.md` §3 lists them precisely).
+   (`docs/CLONING.md` §3 lists them precisely, together with the
+   `playwright.config.ts` `testMatch` cleanup).
 4. **The showcase gate requires a rebuild to flip.**
    `NEXT_PUBLIC_ENABLE_SHOWCASE` is inlined at build time — the price of
    keeping every route statically prerendered. A runtime kill-switch would
