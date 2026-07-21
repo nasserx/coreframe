@@ -20,7 +20,13 @@ const THEME_OPTIONS = [
 export type ThemeControlProps = Omit<
   ToggleGroup.Props<ThemePreference>,
   "value" | "defaultValue" | "onValueChange" | "multiple"
->;
+> & {
+  /**
+   * Accessible names of the three icon-only options; localize at the call
+   * site (the group's own name is overridden via `aria-label`).
+   */
+  optionLabels?: Partial<Record<ThemePreference, string>>;
+};
 
 /**
  * Three-state theme selector (light / dark / system) bound to the theme
@@ -31,12 +37,13 @@ export type ThemeControlProps = Omit<
  * arrow-key focus; each option is a native toggle button exposing
  * `aria-pressed` and an icon-only accessible name. The group's name
  * ("Theme") can be overridden via `aria-label`. Re-pressing the active
- * option is a no-op — the group can never reach an empty selection.
+ * option is a no-op — the group can never reach an empty selection. The
+ * English option names are defaults, overridable via `optionLabels`.
  *
  * Constraints: UI-only; persistence and application of the theme belong to
  * the ThemeProvider, never to this control.
  */
-export function ThemeControl({ className, ...props }: ThemeControlProps) {
+export function ThemeControl({ className, optionLabels, ...props }: ThemeControlProps) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -60,7 +67,7 @@ export function ThemeControl({ className, ...props }: ThemeControlProps) {
         <Toggle
           key={value}
           value={value}
-          aria-label={label}
+          aria-label={optionLabels?.[value] ?? label}
           className="inline-flex size-6.5 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs [&_svg]:pointer-events-none [&_svg]:size-3.5"
         >
           <Icon />

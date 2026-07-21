@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 export type ErrorFallbackProps = Readonly<{
   title?: string;
   description?: string;
@@ -8,6 +10,14 @@ export type ErrorFallbackProps = Readonly<{
   onAction: () => void;
   /** Supplemental reference line, e.g. a server error digest for support. */
   detail?: string | undefined;
+  /**
+   * Overrides the container styling. The default fills the viewport
+   * (`min-h-dvh`), which is correct for the route-level error files; a
+   * fallback rendered inside a shell's main region overrides it (for
+   * example `min-h-full` or a fixed block size) so it fills the region,
+   * not the screen.
+   */
+  className?: string;
 }>;
 
 /**
@@ -27,11 +37,15 @@ export function ErrorFallback({
   actionLabel = "Try again",
   onAction,
   detail,
+  className,
 }: ErrorFallbackProps) {
   return (
     <div
       role="alert"
-      className="flex min-h-dvh flex-col items-center justify-center gap-3 p-6 text-center"
+      className={cn(
+        "flex min-h-dvh flex-col items-center justify-center gap-3 p-6 text-center",
+        className,
+      )}
     >
       <h2 className="text-base font-medium text-foreground">{title}</h2>
       <p className="max-w-sm text-sm text-muted-foreground">{description}</p>

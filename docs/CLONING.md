@@ -17,8 +17,8 @@ prefer the template path for products.
 
 ## 2. Where the foundation's identity lives
 
-The name and description appear in exactly two source locations — this is
-deliberate; everything else derives from them:
+The name and description appear in exactly two source locations —
+everything else derives from them:
 
 | Location            | What to change                                    |
 | ------------------- | ------------------------------------------------- |
@@ -28,6 +28,21 @@ deliberate; everything else derives from them:
 `APP_CONFIG` feeds the root layout's `<title>`/description metadata, the
 error pages, and everything else that displays the app's identity — no
 component references the name directly.
+
+**Non-English products have a third rename location: the error-route
+copy.** The boundary files ship English user-facing text that `APP_CONFIG`
+does not derive — rewrite it in your product's language:
+
+| File                       | English copy to replace                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| `src/app/not-found.tsx`    | The `metadata.title`, 404 heading, body copy, and "Go to the home page" link          |
+| `src/app/error.tsx`        | The fallback description                                                              |
+| `src/app/global-error.tsx` | The fallback description **and** the `<title>` it builds ("Something went wrong — …") |
+
+The shared defaults inside `ErrorFallback`
+(`src/core/errors/error-fallback.tsx`) are prop-overridable, like every
+primitive's English defaults — the boundary files above are where those
+props are (or are not yet) passed.
 
 Also rewrite for your product:
 
@@ -54,14 +69,27 @@ Three options, in order of product maturity:
    discovery expects the pages to exist.)
 3. **Delete it permanently** — remove the three showcase locations:
    `src/app/showcase`, `src/app/api/showcase`, `src/features/showcase`.
-   Route discovery (`tests/e2e/routes.ts`) adjusts automatically, but three
-   specs reference showcase URLs directly and need retargeting at your
-   product's routes: `shell.spec.ts` (drives `/showcase` — point at your
-   shell-wrapped routes, or remove until you mount an AppShell),
-   `fonts.spec.ts` (measures Arabic on `/showcase/direction` — any page with
-   Arabic text works), and `errors.spec.ts` (exercises the ErrorBoundary
-   demo on `/showcase/feedback` — keep the 404 test, retarget or drop the
-   boundary test).
+   Then finish the deletion in four places that reference the showcase:
+   - **The env gate**: `NEXT_PUBLIC_ENABLE_SHOWCASE` becomes dead code once
+     the gated routes are gone. Remove it from `src/config/env.ts` (the
+     schema entry, the `safeParse` input, and the `ProcessEnv` declaration)
+     and from `.env.example`.
+   - **The e2e specs**: route discovery (`tests/e2e/routes.ts`) adjusts
+     automatically, but three specs reference showcase URLs directly and
+     need retargeting at your product's routes: `shell.spec.ts` (drives
+     `/showcase` for the AppShell and `/showcase/site` for the SiteShell —
+     point at your shell-wrapped routes, or remove until you mount a
+     shell), `fonts.spec.ts` (measures Arabic on `/showcase/direction` —
+     any page with Arabic text works), and `errors.spec.ts` (exercises the
+     ErrorBoundary demo on `/showcase/feedback` — keep the 404 test,
+     retarget or drop the boundary test).
+   - **`playwright.config.ts`**: the `testMatch` patterns name the spec
+     files explicitly. If retargeting leads you to delete or rename a spec,
+     remove it from `testMatch` too — a stale name there rots silently (the
+     config keeps matching nothing without failing).
+   - **`src/features/README.md`**: its "Current contents" line describes
+     `showcase/`; update it to describe your product's features (or "none
+     yet").
 
 **Delete** when they stop being useful: `docs/audit/` (this repo's
 historical reviews) and `docs/ROADMAP.md` (or repurpose it as your own).
@@ -91,25 +119,28 @@ Do these in order; each step states what proves it worked.
    tab title and home page now show your product's name.
 5. **Gates** — `npm run lint && npm run typecheck && npm test`. All exit 0
    untouched; you now know the gates are green before your first change.
-6. **First page** — create `src/app/hello/page.tsx`:
+6. **First page** — create `src/app/(home)/hello/page.tsx`:
 
    ```tsx
    import { PageHeader, PageHeaderTitle } from "@/components/ui/page-header";
 
    export default function HelloPage() {
      return (
-       <main className="p-6">
+       <div className="p-6">
          <PageHeader>
            <PageHeaderTitle>Hello</PageHeaderTitle>
          </PageHeader>
-       </main>
+       </div>
      );
    }
    ```
 
-   `/hello` renders with the foundation's type ramp and tokens. (A page
-   using the full chrome composes `AppShell` in a layout — see
-   `src/app/showcase/layout.tsx` for the reference.)
+   `/hello` renders with the foundation's type ramp and tokens. Note that
+   the page renders no `<main>` — the layout owns that landmark
+   (`docs/LAYOUT.md` § The main landmark): here the `(home)` group's bare
+   layout provides it; a page using full chrome composes a shell in its
+   own layout instead — `AppShell` (see `src/app/showcase/(app)/layout.tsx`)
+   or `SiteShell` (see `src/app/showcase/(site)/site/layout.tsx`).
 
 7. **First feature slice** — when the page needs data or components, create
    `src/features/<name>/` and copy the shape of

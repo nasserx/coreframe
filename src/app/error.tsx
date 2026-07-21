@@ -24,10 +24,15 @@ export default function RouteError({
   unstable_retry: () => void;
 }) {
   return (
-    <ErrorFallback
-      description="An unexpected error occurred while loading this page. Try again, or reload if the problem persists."
-      onAction={retry}
-      detail={error.digest === undefined ? undefined : `Reference: ${error.digest}`}
-    />
+    // Boundary files replace the segment layouts, so this file owns the
+    // `<main>` landmark itself (docs/LAYOUT.md § The main landmark).
+    <main className="flex flex-1 flex-col">
+      <ErrorFallback
+        description="An unexpected error occurred while loading this page. Try again, or reload if the problem persists."
+        onAction={retry}
+        detail={error.digest === undefined ? undefined : `Reference: ${error.digest}`}
+        className="min-h-full flex-1"
+      />
+    </main>
   );
 }
