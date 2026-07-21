@@ -265,6 +265,12 @@ export function SiteShellNav({
  * destination" pattern: non-interactive, non-focusable muted text with an
  * sr-only availability hint — for the destinations every new product has
  * not built yet. Works in both the horizontal bar and the drawer column.
+ *
+ * Styling is plain text on purpose (the flat identity): no background, no
+ * pill, no underline — only weight and color distinguish states. The
+ * padding is hit area, not a shape; the radius exists only for the focus
+ * ring. The current page is `text-foreground` + semibold; idle links are
+ * muted and darken on hover.
  */
 export function SiteShellNavItem({
   href,
@@ -296,8 +302,8 @@ export function SiteShellNavItem({
       aria-current={isCurrent ? "page" : undefined}
       className={cn(
         base,
-        "text-foreground/80 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
-        isCurrent && "bg-accent text-accent-foreground",
+        "text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
+        isCurrent && "font-semibold text-foreground",
         className,
       )}
     >

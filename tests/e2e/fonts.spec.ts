@@ -17,45 +17,58 @@ import { expect, test } from "@playwright/test";
  */
 const ARABIC_SAMPLE = "المعرفة أساس التقدم، والتصميم الجيد يخدم الجميع";
 
+/*
+ * Width comparisons use a space-free string: U+0020 sits outside Noto's
+ * unicode-range, so in the page's stack spaces render in the LATIN face —
+ * and the Latin face's space width is not part of this contract (swapping
+ * Geist for Archivo in the 2026-07 rebrand shifted it by ~1.3px per space
+ * and broke the old spaced assertion). Every code point below resolves
+ * through Noto, so stack vs pure-Noto must be pixel-identical.
+ */
+const ARABIC_MEASURE_SAMPLE = "المعرفةأساسالتقدموالتصميمالجيديخدمالجميع";
+
 test("Noto Sans Arabic is loaded and actually renders Arabic glyphs", async ({ page }) => {
   // The face is scoped to Arabic code points; it only loads on a page that
   // renders Arabic, so use the direction showcase.
   await page.goto("/showcase/direction");
   await page.waitForLoadState("networkidle");
 
-  const probe = await page.evaluate(async (sample) => {
-    // next/font generates a hashed family name; the CSS variable is the
-    // stable handle to it.
-    const notoFamily = getComputedStyle(document.documentElement)
-      .getPropertyValue("--font-noto-sans-arabic")
-      .trim();
-    const bodyStack = getComputedStyle(document.body).fontFamily;
+  const probe = await page.evaluate(
+    async ([sample, measureSample]) => {
+      // next/font generates a hashed family name; the CSS variable is the
+      // stable handle to it.
+      const notoFamily = getComputedStyle(document.documentElement)
+        .getPropertyValue("--font-noto-sans-arabic")
+        .trim();
+      const bodyStack = getComputedStyle(document.body).fontFamily;
 
-    await document.fonts.load(`16px ${notoFamily}`, sample);
-    await document.fonts.ready;
+      await document.fonts.load(`16px ${notoFamily}`, sample);
+      await document.fonts.ready;
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    if (context === null) {
-      throw new Error("canvas 2d context unavailable");
-    }
-    const measure = (fontFamily: string): number => {
-      context.font = `32px ${fontFamily}`;
-      return context.measureText(sample).width;
-    };
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (context === null) {
+        throw new Error("canvas 2d context unavailable");
+      }
+      const measure = (fontFamily: string): number => {
+        context.font = `32px ${fontFamily}`;
+        return context.measureText(measureSample).width;
+      };
 
-    return {
-      notoFamily,
-      bodyStack,
-      checkPasses: document.fonts.check(`16px ${notoFamily}`, sample),
-      loadedFaces: Array.from(document.fonts)
-        .filter((face) => face.status === "loaded")
-        .map((face) => face.family),
-      stackWidth: measure(bodyStack),
-      notoWidth: measure(notoFamily),
-      arialWidth: measure("Arial"),
-    };
-  }, ARABIC_SAMPLE);
+      return {
+        notoFamily,
+        bodyStack,
+        checkPasses: document.fonts.check(`16px ${notoFamily}`, sample),
+        loadedFaces: Array.from(document.fonts)
+          .filter((face) => face.status === "loaded")
+          .map((face) => face.family),
+        stackWidth: measure(bodyStack),
+        notoWidth: measure(notoFamily),
+        arialWidth: measure("Arial"),
+      };
+    },
+    [ARABIC_SAMPLE, ARABIC_MEASURE_SAMPLE] as const,
+  );
 
   // The variable must resolve to a family at all.
   expect(probe.notoFamily).not.toBe("");

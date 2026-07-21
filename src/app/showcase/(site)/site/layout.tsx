@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { BrandMark } from "@/components/ui/brand-mark";
 import { Container } from "@/components/ui/container";
 import {
   SiteShell,
@@ -30,8 +31,9 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
       <SiteShellHeader>
         <Link
           href="/showcase"
-          className="rounded-md text-small font-semibold whitespace-nowrap outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="flex items-center gap-2 rounded-md text-small font-semibold whitespace-nowrap outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         >
+          <BrandMark />
           Foundation Showcase
         </Link>
         <SiteShellNav label="Site sections">

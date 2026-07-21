@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { BrandMark } from "@/components/ui/brand-mark";
 import { cn } from "@/lib/utils";
 
 import { SHOWCASE_SECTIONS } from "../showcase-sections";
@@ -21,8 +22,9 @@ export function ShowcaseNav() {
       <Link
         href="/showcase"
         aria-current={pathname === "/showcase" ? "page" : undefined}
-        className="flex h-9 items-center rounded-md px-3 text-small font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        className="flex h-9 items-center gap-2 rounded-md px-3 text-small font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
       >
+        <BrandMark className="size-4.5" />
         Foundation Showcase
       </Link>
       <ul className="flex flex-col gap-1">

@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 /*
@@ -7,21 +7,36 @@ import localFont from "next/font/local";
  * variables itself or error pages would render in the fallback stack.
  */
 
-export const geistSans = Geist({
-  variable: "--font-geist-sans",
+/*
+ * The identity face — one family for headlines AND body, deliberately
+ * (docs/DESIGN_TOKENS.md §2: there is no --font-heading). Archivo is a
+ * grotesque drawn for headline work: a single variable wght axis covers
+ * 100–900, so the ramp's heavy display steps (800) and comfortable body
+ * text (400) come from one latin-subset woff2. The headline voice —
+ * large, heavy, negative tracking, compact leading — lives in the type
+ * ramp tokens (src/styles/theme.css), not here.
+ *
+ * License: SIL Open Font License 1.1 (as is Geist Mono's). The file is
+ * fetched and self-hosted by next/font at build time; the OFL notice ships
+ * embedded in the font's own name/license metadata. Only Noto below has a
+ * license file in-repo, because only its woff2 lives in-repo.
+ */
+export const archivoSans = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
 });
 
+/* Code face only — Archivo has no mono companion. */
 export const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 /*
- * Arabic companion face (self-hosted variable font, Arabic subset). Geist
+ * Arabic companion face (self-hosted variable font, Arabic subset). Archivo
  * has no Arabic glyphs, so the sans stack in src/styles/theme.css lists this
  * FIRST, scoped to Arabic code points by the unicode-range below: Latin
- * skips it and renders in Geist, Arabic renders here. next/font self-hosts
+ * skips it and renders in Archivo, Arabic renders here. next/font self-hosts
  * and preloads — no render blocking, no layout shift.
  *
  * Loaded via next/font/local (not google) because the face needs a
@@ -41,15 +56,18 @@ export const notoSansArabic = localFont({
   // No Arial-based metric fallback: local Arial contains Arabic glyphs and
   // an unranged fallback face would intercept scripts it shouldn't. The
   // unicode-range below already scopes this face to Arabic, and the file is
-  // preloaded, so the unstyled-fallback window is negligible.
+  // preloaded, so the unstyled-fallback window is negligible. (This hazard
+  // is why this face must stay FIRST in --font-sans regardless of which
+  // Latin face follows it — any next/font Latin face ships an Arial-based
+  // metric fallback that would intercept Arabic.)
   adjustFontFallback: false,
   declarations: [
     { prop: "size-adjust", value: "115%" },
     // Arabic blocks only (the subset's own coverage): this face sits FIRST
-    // in --font-sans (src/styles/theme.css) so Geist's Arial-based metric
-    // fallback can never intercept Arabic, while Latin skips this face
-    // entirely via the range. Latin digits are deliberately excluded —
-    // numerals render in Geist, matching the Western-numerals default.
+    // in --font-sans (src/styles/theme.css) so the Latin face's Arial-based
+    // metric fallback can never intercept Arabic, while Latin skips this
+    // face entirely via the range. Latin digits are deliberately excluded —
+    // numerals render in Archivo, matching the Western-numerals default.
     {
       prop: "unicode-range",
       value:
@@ -59,4 +77,4 @@ export const notoSansArabic = localFont({
 });
 
 /** The className mounted on `<html>` by both the root layout and global-error. */
-export const FONT_VARIABLE_CLASSES = `${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable}`;
+export const FONT_VARIABLE_CLASSES = `${archivoSans.variable} ${geistMono.variable} ${notoSansArabic.variable}`;
