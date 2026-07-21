@@ -63,9 +63,20 @@ Rationale: prose reads best at 45–75 characters per line; `ch` keeps the
 measure character-based so it follows the element's own font size (larger
 text → proportionally wider column) and measures Arabic against its own
 glyphs. Wide inputs are harder to scan, so forms cap at `28rem`. Dense data
-surfaces gain nothing from a cap — they take the full `Container` width
-(`max-w-6xl` + gutter), which is the fourth and outermost width decision and
-is made once per layout, not per page.
+surfaces gain nothing from a cap — they take the full `Container` width,
+which is the fourth and outermost width decision and is made once per
+layout, not per page.
+
+**The Container cap is `max-w-6xl` (1152px)**: wide enough that the dense
+surfaces — card grids and tables — reach its edges, while keeping content
+comfortably centred with generous side gutters on wide displays (a wider
+1280px cap was tried and reverted — it made the layout read loose). It is
+NOT a reading measure: prose inside a Container must carry `max-w-prose` —
+the wider the container, the easier the measure contract is to violate, so
+treat uncapped paragraphs as defects. Gutters are responsive and unaffected
+by the cap: `px-4` (16px per side) below `sm`, `px-6` (24px) from `sm` up;
+the cap only engages once the viewport exceeds 1152px + gutters, so phone
+and tablet edges are untouched.
 
 Both utilities are `max-width` — a logical, direction-agnostic constraint;
 nothing direction-specific is needed for RTL.
@@ -131,6 +142,20 @@ restoration and anchor behavior are preserved; there is no nested scroll
 container for content. The sidebar is sticky, full-height, and independently
 scrollable; the header is sticky at `z-40` (below the overlay layer's
 `z-50`).
+
+**The header boundary is scroll-dependent** (both shells): at scroll
+position zero the bar has no bottom hairline — bar and page read as one
+surface; once the page scrolls, the hairline appears so content passing
+under the bar reads as designed, not as a rendering bug. Mechanism: an
+IntersectionObserver on a 1px sentinel at the document top
+(`src/hooks/use-scrolled.ts`) toggles `data-scrolled` on the header — no
+scroll listener (fires only when the boundary is crossed, no per-frame
+work), no layout shift (the border is always present, only its color
+changes), and the header's box never changes, so nothing that depends on
+its height moves. The color transition runs on the motion tokens and
+collapses under `prefers-reduced-motion` via the global rule. Without
+IntersectionObserver (jsdom, ancient browsers) the boundary degrades to
+always-visible — the pre-existing behavior.
 
 ### Responsive behavior
 
@@ -212,12 +237,26 @@ rejected list above). The shell consumes the base
 background/border/accent tokens; the `sidebar-*` set belongs to
 application chrome.
 
-**Hierarchy: the brand dominates the bar.** Nav items are secondary
-wayfinding and render on a deliberate three-step ladder (unavailable =
-muted + normal weight; idle link = muted + medium; current page =
-foreground + semibold) — style the brand element at least one type step
-above them (`text-body` bold vs the items' `text-small`, as the demo
-does), never the other way around.
+**Hierarchy: the brand dominates the bar.** Give the brand real presence
+as its own cluster — the demo runs `text-subheading` bold (two steps above
+the nav) with a larger mark and clear breathing room (`me-4`) before
+navigation begins. Nav items are secondary wayfinding at `text-small`,
+normal weight, on a three-step ladder that inverts the usual "light up on
+hover":
+
+- **idle** → `text-foreground` + `font-normal`, _lightening_ to
+  `text-muted-foreground` on hover (the item recedes under the cursor).
+- **current** → `text-foreground` + `font-semibold` (`aria-current`).
+  Because idle links already sit at full foreground strength, color cannot
+  carry current — **weight does**, and weight (unlike an underline) does
+  not fight a dropdown menu opening beneath the item.
+- **unavailable** → `text-muted-foreground` + `font-normal`, muted at rest
+  so it reads distinct from a full-strength idle link.
+
+Hover is color-only — no growing underline or moving element — precisely
+so a nav item can later host a dropdown trigger without the affordance
+fighting the menu. The same scroll-dependent header boundary as the
+AppShell applies (§5).
 
 **Actions below the collapse line** are the caller's decision, made by
 measuring (same rule as the breakpoint): if the compact action set fits

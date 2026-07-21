@@ -19,10 +19,10 @@ Import order (`src/styles/index.css`): base → light → dark → theme.
 
 **Spacing is Tailwind's default scale.** The foundation adds no spacing tokens:
 Tailwind v4's `--spacing`-multiplier scale (0.25rem steps) is the spacing contract.
-The same applies to motion: Tailwind's default `duration-*`/`ease-*` utilities are
-the motion contract until a real product need says otherwise. Vertical rhythm is
-a named five-step scale over that spacing contract, owned by the Stack primitive
-(`docs/LAYOUT.md`) — names, not new tokens.
+Vertical rhythm is a named five-step scale over that spacing contract, owned by
+the Stack primitive (`docs/LAYOUT.md`) — names, not new tokens. Motion, by
+contrast, IS tokenized (two durations, one easing — see § Motion below); raw
+`duration-*` numbers in components are drift.
 
 **Content measure** is tokenized (theme-neutral, in `theme.css` `@theme`):
 `--container-prose: 65ch` (running text) and `--container-form: 28rem`
@@ -38,29 +38,33 @@ defines no z-index tokens.
 ### Colors (semantic, per theme)
 
 The identity is **flat, editorial, high-contrast**: a warm off-white paper
-canvas (oklch hue 84, a perceptible cream cast — not neutral grey, not pure
-white) with near-black ink as the primary action color. There is no
-saturated brand hue on the chrome — near-black IS the interactive signal;
-hue survives only where hue is information (status colors, charts).
-Neutrals carry trace chroma (0.005–0.018) of the warm hue so both themes
-read as one material; the dark theme is the same paper with the lights
-off (warm-dark, not a neutral-grey inversion).
+canvas (oklch hue 84 — perceptibly warm but close to neutral paper, not a
+saturated cream, not grey, not pure white) with near-black ink as the
+primary action color. There is no saturated brand hue on the chrome —
+near-black IS the interactive signal; hue survives only where hue is
+information (status colors, charts). Neutrals carry trace chroma
+(0.003–0.018) of the warm hue so both themes read as one material; the
+light paper family (background + near-white surfaces) was de-warmed in the
+2026-07 polish pass — chroma roughly halved, lightnesses untouched so the
+elevation ladder and contrast held — because the earlier values read too
+saturated. The dark theme is the same paper with the lights off (warm-dark,
+not a neutral-grey inversion) and was not touched by the de-warming.
 
 | Token                                | Light                             | Dark                              |
 | ------------------------------------ | --------------------------------- | --------------------------------- |
-| `--color-background`                 | `oklch(0.968 0.01 84)`            | `oklch(0.145 0.008 84)`           |
+| `--color-background`                 | `oklch(0.968 0.005 84)`           | `oklch(0.145 0.008 84)`           |
 | `--color-foreground`                 | `oklch(0.185 0.012 84)`           | `oklch(0.955 0.006 84)`           |
-| `--color-surface`                    | `oklch(0.988 0.005 84)`           | `oklch(0.205 0.01 84)`            |
+| `--color-surface`                    | `oklch(0.988 0.003 84)`           | `oklch(0.205 0.01 84)`            |
 | `--color-surface-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.955 0.006 84)`           |
-| `--color-popover`                    | `oklch(0.988 0.005 84)`           | `oklch(0.265 0.012 84)`           |
+| `--color-popover`                    | `oklch(0.988 0.003 84)`           | `oklch(0.265 0.012 84)`           |
 | `--color-popover-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.955 0.006 84)`           |
 | `--color-primary`                    | `oklch(0.225 0.014 84)`           | `oklch(0.945 0.006 84)`           |
 | `--color-primary-foreground`         | `oklch(0.985 0.005 84)`           | `oklch(0.16 0.01 84)`             |
-| `--color-secondary`                  | `oklch(0.935 0.012 84)`           | `oklch(0.27 0.012 84)`            |
+| `--color-secondary`                  | `oklch(0.935 0.006 84)`           | `oklch(0.27 0.012 84)`            |
 | `--color-secondary-foreground`       | `oklch(0.26 0.014 84)`            | `oklch(0.955 0.006 84)`           |
-| `--color-muted`                      | `oklch(0.94 0.01 84)`             | `oklch(0.26 0.01 84)`             |
+| `--color-muted`                      | `oklch(0.94 0.005 84)`            | `oklch(0.26 0.01 84)`             |
 | `--color-muted-foreground`           | `oklch(0.46 0.015 84)`            | `oklch(0.72 0.012 84)`            |
-| `--color-accent`                     | `oklch(0.925 0.014 84)`           | `oklch(0.3 0.014 84)`             |
+| `--color-accent`                     | `oklch(0.925 0.007 84)`           | `oklch(0.3 0.014 84)`             |
 | `--color-accent-foreground`          | `oklch(0.26 0.014 84)`            | `oklch(0.955 0.006 84)`           |
 | `--color-success`                    | `oklch(0.52 0.12 155)`            | `oklch(0.7 0.13 155)`             |
 | `--color-success-foreground`         | `oklch(0.985 0.005 155)`          | `oklch(0.145 0.01 155)`           |
@@ -68,7 +72,7 @@ off (warm-dark, not a neutral-grey inversion).
 | `--color-warning-foreground`         | `oklch(0.28 0.05 80)`             | `oklch(0.15 0.012 80)`            |
 | `--color-destructive`                | `oklch(0.505 0.17 25)`            | `oklch(0.7 0.17 25)`              |
 | `--color-destructive-foreground`     | `oklch(0.985 0.005 25)`           | `oklch(0.15 0.01 25)`             |
-| `--color-border`                     | `oklch(0.885 0.01 84)`            | `oklch(0.33 0.012 84)`            |
+| `--color-border`                     | `oklch(0.885 0.005 84)`           | `oklch(0.33 0.012 84)`            |
 | `--color-input`                      | `oklch(0.63 0.018 84)`            | `oklch(0.53 0.015 84)`            |
 | `--color-ring`                       | `oklch(0.32 0.015 84)`            | `oklch(0.76 0.01 84)`             |
 | `--color-chart-1`                    | `oklch(0.55 0.15 262)`            | `oklch(0.68 0.13 262)`            |
@@ -76,11 +80,11 @@ off (warm-dark, not a neutral-grey inversion).
 | `--color-chart-3`                    | `oklch(0.6 0.12 155)`             | `oklch(0.72 0.12 155)`            |
 | `--color-chart-4`                    | `oklch(0.75 0.13 85)`             | `oklch(0.8 0.12 85)`              |
 | `--color-chart-5`                    | `oklch(0.58 0.15 25)`             | `oklch(0.68 0.14 25)`             |
-| `--color-sidebar`                    | `oklch(0.952 0.012 84)`           | `oklch(0.17 0.009 84)`            |
+| `--color-sidebar`                    | `oklch(0.952 0.006 84)`           | `oklch(0.17 0.009 84)`            |
 | `--color-sidebar-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
 | `--color-sidebar-primary`            | `var(--color-primary)`            | `var(--color-primary)`            |
 | `--color-sidebar-primary-foreground` | `var(--color-primary-foreground)` | `var(--color-primary-foreground)` |
-| `--color-sidebar-accent`             | `oklch(0.91 0.014 84)`            | `oklch(0.27 0.012 84)`            |
+| `--color-sidebar-accent`             | `oklch(0.91 0.007 84)`            | `oklch(0.27 0.012 84)`            |
 | `--color-sidebar-accent-foreground`  | `oklch(0.26 0.014 84)`            | `oklch(0.955 0.006 84)`           |
 | `--color-sidebar-border`             | `var(--color-border)`             | `var(--color-border)`             |
 | `--color-sidebar-ring`               | `var(--color-ring)`               | `var(--color-ring)`               |
@@ -177,22 +181,22 @@ re-verified against Archivo).
 
 ### Radius
 
-`--radius-base: 0.375rem` (6px) in `base.css` (theme-neutral) — the flat
+`--radius-base: 0.5rem` (8px) in `base.css` (theme-neutral) — the flat
 identity's crisp, deliberate radius: rounded enough to read as designed,
-tight enough to read as flat (tightened from 10px in the 2026-07
-refinement pass, where controls — most visibly inputs and textareas —
-read soft). Every `rounded-*` step in the bridge derives from it by
-multiplication:
+tight enough to read as flat. Settled by iteration across the 2026-07
+passes: 10px read soft on h-8 controls (most visibly inputs and
+textareas), 6px read severe; 8px does neither. Every `rounded-*` step in
+the bridge derives from it by multiplication:
 
 | Step  | Multiplier | Px  | Used by                                |
 | ----- | ---------- | --- | -------------------------------------- |
-| `sm`  | ×0.5       | 3   | smallest nested elements               |
-| `md`  | ×0.75      | 4.5 | nested elements (toggle items, badges) |
-| `lg`  | ×1         | 6   | controls (buttons, inputs, textareas)  |
-| `xl`  | ×1.5       | 9   | surfaces (cards, dialogs)              |
-| `2xl` | ×2         | 12  | —                                      |
-| `3xl` | ×2.5       | 15  | —                                      |
-| `4xl` | ×3         | 18  | —                                      |
+| `sm`  | ×0.5       | 4   | smallest nested elements               |
+| `md`  | ×0.75      | 6   | nested elements (toggle items, badges) |
+| `lg`  | ×1         | 8   | controls (buttons, inputs, textareas)  |
+| `xl`  | ×1.5       | 12  | surfaces (cards, dialogs)              |
+| `2xl` | ×2         | 16  | —                                      |
+| `3xl` | ×2.5       | 20  | —                                      |
+| `4xl` | ×3         | 24  | —                                      |
 
 Controls sit at `lg`, nested elements step down to stay concentric, and
 surfaces step up so cards and dialogs stay recognisably rounded above the
@@ -235,11 +239,48 @@ itself is the programmatic signal. **Focused + invalid** shows the focus
 geometry in the destructive color (2px line, red): thickness says
 "focused", color says "invalid" — the combination is never ambiguous.
 
+### Motion
+
+Motion here is **feedback and orientation, never decoration**: a state
+confirms it changed; a layer shows where it came from. Anything beyond
+that is noise in a flat, editorial identity. The whole vocabulary is
+three tokens:
+
+| Token               | Value                         | For                                                                                                                                             |
+| ------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--motion-quick`    | `120ms`                       | State feedback (hover, focus, pressed color shifts): fast enough to feel instant, slow enough not to flicker.                                   |
+| `--motion-moderate` | `200ms`                       | Orientation (dialogs, drawers, backdrops entering/leaving): long enough to track, short enough to never delay.                                  |
+| `--ease-out-soft`   | `cubic-bezier(0.25, 0, 0, 1)` | The one curve: decelerate — motion arrives and settles gently. Exits reuse it (at the same durations); a second curve has not earned its place. |
+
+The durations live in `base.css` (theme-neutral); the bridge (`theme.css`)
+sets `--default-transition-duration`/`-timing-function` to them, so **every
+`transition-*` utility resolves through the tokens with no per-component
+duration classes** — plain `transition-colors` is already on-system.
+Explicit durations (overlay `animate-in/out`) use
+`duration-(--motion-moderate)`; a raw `duration-150` in a component is
+drift. `--ease-out-soft` generates the `ease-out-soft` utility via the
+Tailwind `--ease-*` namespace.
+
+**Reduced motion is handled once, globally** (`globals.css`): under
+`prefers-reduced-motion: reduce`, all transitions and animations collapse
+to a single imperceptible frame — end states still apply, movement
+disappears. Never add per-component reduced-motion handling, and never
+make motion the sole carrier of meaning (every animated state change here
+also changes color, border, or content).
+
+**When not to animate:** nothing on page load; nothing that delays
+interaction (motion runs alongside, never in front of, the response);
+nothing layout-affecting where a compositor-friendly property (transform,
+opacity, color) does the job — the nav hover underline scales a transform,
+the header boundary transitions only `border-color`.
+
 ## 3. Verified contrast (WCAG AA)
 
 Computed via OKLCH → linear sRGB → relative luminance (WCAG 2.1 formula).
 Requirement: 4.5:1 for text pairs, 3:1 for UI boundaries/focus. All pairs pass in
-both themes.
+both themes. (Recomputed after the 2026-07 light-paper de-warming: reducing
+chroma at fixed lightness moved only `accent-foreground / accent`, and only
+by 0.01 — the pairs are luminance-driven, and lightnesses were held.)
 
 | Pair                                                          | Requirement | Light | Dark  |
 | ------------------------------------------------------------- | ----------- | ----- | ----- |
@@ -255,7 +296,7 @@ both themes.
 | muted-foreground / muted                                      | 4.5         | 5.98  | 6.26  |
 | primary-foreground / primary                                  | 4.5         | 16.39 | 16.53 |
 | secondary-foreground / secondary                              | 4.5         | 12.84 | 13.22 |
-| accent-foreground / accent                                    | 4.5         | 12.45 | 11.96 |
+| accent-foreground / accent                                    | 4.5         | 12.46 | 11.96 |
 | success-foreground / success                                  | 4.5         | 4.99  | 7.82  |
 | warning-foreground / warning                                  | 4.5         | 8.29  | 10.41 |
 | destructive-foreground / destructive                          | 4.5         | 6.13  | 6.84  |

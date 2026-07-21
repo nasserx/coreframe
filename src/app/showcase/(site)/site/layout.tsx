@@ -34,7 +34,13 @@ function UnavailableAction({
   return (
     <span
       data-unavailable=""
-      className={cn(buttonVariants({ variant }), "pointer-events-none select-none")}
+      // size="lg" (h-9) + px-4: the reference gives header CTAs more
+      // presence than the default control — taller with more horizontal
+      // padding, still proportionate to the h-14 bar.
+      className={cn(
+        buttonVariants({ variant, size: "lg", className: "px-4" }),
+        "pointer-events-none select-none",
+      )}
     >
       {children}
       <span className="sr-only"> — Not yet available</span>
@@ -54,45 +60,60 @@ function UnavailableAction({
 export default function ShowcaseSiteLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     // collapseBelow="lg", measured, not assumed (docs/LAYOUT.md §6): the
-    // auth pair widened the bar past what `md` could hold — brand + nav +
-    // controls + both actions need more than 768px of min-content, so the
-    // navigation collapses below `lg`.
+    // larger brand, the 14px nav, and the h-9 auth buttons grew the bar's
+    // min-content to ~915px — still inside the ~976px available at the `lg`
+    // (1024px) breakpoint, so `lg` holds and the overflow sweep confirms it.
+    // (Re-measured after the polish, not carried over on assumption.)
     <SiteShell collapseBelow="lg">
       <SiteShellHeader>
-        {/* The brand dominates the bar: one full type step above the nav
-            items (text-body vs text-small) at bold — nav links are
-            secondary wayfinding and stay muted/medium. */}
+        {/* The brand anchors the bar as its own cluster: two type steps
+            above the nav items (text-subheading vs text-small) at bold,
+            with clear breathing room (me-4) before navigation begins. It
+            steps down to text-body below `sm`, where the bar is only brand
+            + trigger and the full 20px wordmark overflows a 320px bar in
+            RTL — the anchoring only matters once nav/actions share the bar.
+            Nav links are secondary wayfinding — 14px, normal weight. */}
         <Link
           href="/showcase"
-          className="flex items-center gap-2 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="me-4 flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
         >
-          <BrandMark />
+          <BrandMark className="size-6" />
           Foundation Showcase
         </Link>
         <SiteShellNav label="Site sections">
           <SiteShellNavItem href="/showcase/site">Overview</SiteShellNavItem>
           <SiteShellNavItem href="/showcase/layout">Layout</SiteShellNavItem>
           <SiteShellNavItem>Pricing</SiteShellNavItem>
-          {/* Below `sm` the bar keeps only brand + trigger (measured: even
-              the compact auth pair does not fit beside the brand at 320px),
-              so the drawer is the auth actions' home there — same
-              unavailable pattern, plain items. Hidden from `sm` up: at
-              those widths the pair lives in the bar. */}
-          <div className="mt-2 flex flex-col border-t pt-2 sm:hidden">
+          {/* The auth actions live in the drawer below `md` (measured: the
+              enlarged h-9 CTAs overflow the bar beside the brand until
+              ~768px), so the drawer is their home there — same unavailable
+              pattern, plain items. Hidden from `md` up, where the pair
+              lives in the bar. */}
+          <div className="mt-2 flex flex-col border-t pt-2 md:hidden">
             <SiteShellNavItem>Log in</SiteShellNavItem>
             <SiteShellNavItem>Get started</SiteShellNavItem>
           </div>
         </SiteShellNav>
-        <div className="ms-auto flex items-center gap-2">
-          {/* One h-8 cluster: inspection controls, then the demo auth pair
-              (secondary before primary; the primary CTA holds the end
-              position). Everything here collapses below `sm` — measured,
-              not assumed; the overflow sweep fails this layout otherwise.
-              The e2e matrix drives theme/direction programmatically, so
-              narrow-viewport coverage is unaffected. */}
+        <div className="ms-auto flex items-center gap-3">
+          {/* Two coherent sub-groups, centre-aligned in one cluster: the
+              utility toggles (inspection chrome, kept at their compact
+              intrinsic ~h-8 — deliberately not scaled up; a segmented
+              control blown up to h-9 reads chunky, and the reference gives
+              CTAs more presence than utilities) then the h-9 auth pair
+              (secondary before primary; the primary CTA holds the end).
+              The gap-3 separates the two families; heights differ by design
+              (actions > utilities), centre-aligned so it reads intentional.
+              Reveal breakpoints are measured, not uniform: the compact
+              toggles fit beside the brand from `sm`, but the enlarged CTAs
+              only fit from `md` (below it they move to the drawer) — the
+              overflow sweep fails this layout otherwise. The e2e matrix
+              drives theme/direction programmatically, so narrow coverage
+              holds. */}
           <div className="flex items-center gap-2 max-sm:hidden">
             <DirectionControl />
             <ThemeControl />
+          </div>
+          <div className="flex items-center gap-2 max-md:hidden">
             <UnavailableAction variant="outline">Log in</UnavailableAction>
             <UnavailableAction>Get started</UnavailableAction>
           </div>
