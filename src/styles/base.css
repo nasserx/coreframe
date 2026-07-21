@@ -4,5 +4,8 @@
  * between this file and those.
  */
 :root {
+  /* 0.625rem = 10px: the flat identity's modest, deliberate radius —
+     rounded, not pill-shaped, not sharp. Confirmed (not inherited by
+     accident) during the 2026-07 flat rebrand. */
   --radius-base: 0.625rem;
 }

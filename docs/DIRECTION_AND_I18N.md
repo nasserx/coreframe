@@ -103,24 +103,27 @@ Two related conventions:
 
 ## Fonts and Arabic metrics
 
-- **Stack:** `--font-sans` is `Noto Sans Arabic, Geist` (bridged in
+- **Stack:** `--font-sans` is `Noto Sans Arabic, Archivo` (bridged in
   `src/styles/theme.css`) — Arabic-first, but the Noto face is scoped to
   Arabic code points by a `unicode-range` descriptor, so Latin skips it and
-  renders in Geist. Mixed content gets both faces, correctly, with no
+  renders in Archivo. Mixed content gets both faces, correctly, with no
   component involvement.
 - **Why the order matters (fallback interception):** `next/font` generates a
-  metric-adjusted fallback face for Geist from local Arial — and Arial
-  _contains Arabic glyphs_. If Noto were listed after Geist, `"Geist
-Fallback"` would silently intercept every Arabic character and Noto would
-  never render (this exact defect shipped once; the loaded-face check in the
-  browser's `document.fonts` is the way to catch it). Arabic-first plus
-  `unicode-range` makes interception impossible in either direction; the
-  Noto face's own Arial fallback is disabled (`adjustFontFallback: false`)
-  for the same reason.
+  metric-adjusted fallback face for the Latin face from local Arial — and
+  Arial _contains Arabic glyphs_. If Noto were listed after the Latin face,
+  its fallback would silently intercept every Arabic character and Noto
+  would never render (this exact defect shipped once, when the Latin face
+  was Geist; the loaded-face check in the browser's `document.fonts` is the
+  way to catch it). This hazard is independent of which Latin face is
+  loaded — Arabic-first plus `unicode-range` makes interception impossible
+  in either direction, and the Noto face's own Arial fallback is disabled
+  (`adjustFontFallback: false`) for the same reason.
 - **Optical size:** Arabic renders visibly smaller than Latin at equal em,
   and loosening line-height does not fix perceived size. The Arabic face
   carries **`size-adjust: 115%`** (calibrated visually against Geist at
-  body, small, and heading steps). `size-adjust` scales only glyphs rendered
+  body, small, and heading steps, and re-checked against Archivo during the
+  2026-07 flat rebrand — Archivo's x-height is close enough to Geist's that
+  the calibration holds). `size-adjust` scales only glyphs rendered
   _by that face_, so Latin rendering and mixed-direction layout metrics are
   untouched, and Arabic embedded in LTR pages benefits equally. The
   alternative — direction-scoped `--text-*` font-size overrides — was
@@ -213,7 +216,7 @@ intentionally empty); when a product adds them, they must read
 1. Add the code to `APP_LOCALES.SUPPORTED` in `src/config/app.ts`.
 2. Add its entry to `LOCALE_INFO` (`direction`, `numerals`) — the
    `satisfies` clause fails the typecheck until you do.
-3. If the locale needs a script Geist doesn't cover, load a companion face
+3. If the locale needs a script Archivo doesn't cover, load a companion face
    via `next/font` in `src/app/layout.tsx` and append its variable to the
    `--font-sans` stack in `src/styles/theme.css` (the Noto Sans Arabic wiring
    is the template).

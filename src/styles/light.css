@@ -1,61 +1,75 @@
 /*
  * Light theme semantic variable set.
  *
- * Palette identity: one brand hue (oklch hue 262, a restrained indigo-blue)
- * drives the whole theme. Neutrals carry a trace of the same hue (chroma
- * 0.002–0.015) so surfaces read as one material; status colors share the
- * brand's chroma/lightness band so they feel related, not stock.
+ * Palette identity: flat, editorial, high-contrast. The canvas is a warm
+ * off-white paper (oklch hue 84, a cream cast — deliberately not neutral
+ * grey and not pure white); ink and every neutral carry a trace of the same
+ * warm hue (chroma 0.005–0.018) so the theme reads as one material. The
+ * primary action color is the ink itself (near-black), not a saturated hue:
+ * in this identity, near-black IS the interactive signal. Hue survives only
+ * where hue is information — status colors and charts.
  *
- * Elevation: light mode separates levels by shadow (--elevation-*) on top of
- * a two-step surface ladder (background → surface). Every foreground/
- * background pair meets WCAG AA — verified ratios in docs/DESIGN_TOKENS.md.
+ * Elevation: flat. Surfaces sit close to the background and are separated
+ * by hairline borders, not lightness jumps or shadows; --elevation-xs/sm
+ * are empty by design, and only floating layers (md and up) cast shadows.
+ * Every foreground/background pair meets WCAG AA — verified ratios in
+ * docs/DESIGN_TOKENS.md §3.
  */
 :root {
   color-scheme: light;
-  --color-background: oklch(0.977 0.004 262);
-  --color-foreground: oklch(0.185 0.025 262);
-  --color-surface: oklch(0.995 0.002 262);
-  --color-surface-foreground: oklch(0.185 0.025 262);
-  --color-popover: oklch(0.995 0.002 262);
-  --color-popover-foreground: oklch(0.185 0.025 262);
-  --color-primary: oklch(0.47 0.17 262);
-  --color-primary-foreground: oklch(0.985 0.005 262);
-  --color-secondary: oklch(0.945 0.01 262);
-  --color-secondary-foreground: oklch(0.3 0.05 262);
-  --color-muted: oklch(0.955 0.006 262);
-  --color-muted-foreground: oklch(0.5 0.03 262);
-  --color-accent: oklch(0.945 0.015 262);
-  --color-accent-foreground: oklch(0.3 0.06 262);
+  --color-background: oklch(0.968 0.01 84);
+  --color-foreground: oklch(0.185 0.012 84);
+  --color-surface: oklch(0.988 0.005 84);
+  --color-surface-foreground: oklch(0.185 0.012 84);
+  --color-popover: oklch(0.988 0.005 84);
+  --color-popover-foreground: oklch(0.185 0.012 84);
+  /* Near-black action color: a touch above pure ink so pressed/hover
+     alpha states (primary/80) still darken visibly. */
+  --color-primary: oklch(0.225 0.014 84);
+  --color-primary-foreground: oklch(0.985 0.005 84);
+  --color-secondary: oklch(0.935 0.012 84);
+  --color-secondary-foreground: oklch(0.26 0.014 84);
+  --color-muted: oklch(0.94 0.01 84);
+  --color-muted-foreground: oklch(0.46 0.015 84);
+  --color-accent: oklch(0.925 0.014 84);
+  --color-accent-foreground: oklch(0.26 0.014 84);
   --color-success: oklch(0.52 0.12 155);
   --color-success-foreground: oklch(0.985 0.005 155);
   --color-warning: oklch(0.82 0.14 80);
   --color-warning-foreground: oklch(0.28 0.05 80);
-  --color-destructive: oklch(0.52 0.17 25);
+  /* 0.505 lightness: destructive text also renders over destructive/10
+     tints and the input fill at 30%, and those composites need 4.5:1
+     (docs/DESIGN_TOKENS.md §3). */
+  --color-destructive: oklch(0.505 0.17 25);
   --color-destructive-foreground: oklch(0.985 0.005 25);
-  /* border is a decorative separator; input is a control boundary and holds
-     3:1 against background and surface (WCAG 1.4.11). */
-  --color-border: oklch(0.9 0.008 262);
-  --color-input: oklch(0.62 0.02 262);
-  --color-ring: oklch(0.55 0.15 262);
+  /* border is the structural hairline of the flat system — decorative in
+     WCAG terms; input is a control boundary and holds 3:1 against
+     background and surface (WCAG 1.4.11). */
+  --color-border: oklch(0.885 0.01 84);
+  --color-input: oklch(0.63 0.018 84);
+  --color-ring: oklch(0.32 0.015 84);
+  /* Charts keep hue: in a monochrome chrome, hue is reserved for data.
+     Chart-1 keeps the old indigo as a data color, no longer a brand color. */
   --color-chart-1: oklch(0.55 0.15 262);
   --color-chart-2: oklch(0.62 0.1 195);
   --color-chart-3: oklch(0.6 0.12 155);
   --color-chart-4: oklch(0.75 0.13 85);
   --color-chart-5: oklch(0.58 0.15 25);
-  --color-sidebar: oklch(0.962 0.006 262);
+  --color-sidebar: oklch(0.952 0.012 84);
   --color-sidebar-foreground: var(--color-foreground);
   --color-sidebar-primary: var(--color-primary);
   --color-sidebar-primary-foreground: var(--color-primary-foreground);
-  --color-sidebar-accent: oklch(0.93 0.012 262);
-  --color-sidebar-accent-foreground: oklch(0.3 0.05 262);
+  --color-sidebar-accent: oklch(0.91 0.014 84);
+  --color-sidebar-accent-foreground: oklch(0.26 0.014 84);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-ring);
-  /* Elevation ladder: soft, hue-tinted key + ambient shadows. */
-  --elevation-xs: 0 1px 2px oklch(0.185 0.025 262 / 0.06);
-  --elevation-sm: 0 1px 2px oklch(0.185 0.025 262 / 0.05), 0 2px 4px oklch(0.185 0.025 262 / 0.05);
-  --elevation-md: 0 2px 4px oklch(0.185 0.025 262 / 0.05), 0 4px 10px oklch(0.185 0.025 262 / 0.07);
-  --elevation-lg:
-    0 4px 8px oklch(0.185 0.025 262 / 0.06), 0 10px 24px oklch(0.185 0.025 262 / 0.09);
-  --elevation-xl:
-    0 8px 16px oklch(0.185 0.025 262 / 0.07), 0 18px 44px oklch(0.185 0.025 262 / 0.12);
+  /* Flat elevation: xs/sm are deliberately empty — in-plane surfaces are
+     structured by hairline borders. Shadows exist only for layers that
+     float above the plane: md (dropdowns/popovers), lg (dialogs/drawers),
+     xl (the largest overlays); soft warm-ink washes, no hard key lines. */
+  --elevation-xs: 0 0 0 0 oklch(0 0 0 / 0);
+  --elevation-sm: 0 0 0 0 oklch(0 0 0 / 0);
+  --elevation-md: 0 1px 3px oklch(0.185 0.012 84 / 0.05), 0 4px 12px oklch(0.185 0.012 84 / 0.07);
+  --elevation-lg: 0 2px 8px oklch(0.185 0.012 84 / 0.06), 0 12px 32px oklch(0.185 0.012 84 / 0.1);
+  --elevation-xl: 0 4px 12px oklch(0.185 0.012 84 / 0.07), 0 24px 56px oklch(0.185 0.012 84 / 0.13);
 }

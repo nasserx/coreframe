@@ -118,7 +118,7 @@ See the comment in `env.ts` for how to add a variable.
 The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
 logical properties (lint-enforced), and the sans stack lists Noto Sans Arabic
 first — scoped to Arabic code points via `unicode-range`, so Latin renders in
-Geist while Arabic can never be intercepted by a metric fallback.
+Archivo while Arabic can never be intercepted by a metric fallback.
 Locale/direction/numeral configuration lives in `src/config/app.ts`. Message
 translation is deliberately not included — `docs/DIRECTION_AND_I18N.md` has
 the architecture and the integration points for adding an i18n library.

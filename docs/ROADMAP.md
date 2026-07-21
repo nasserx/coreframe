@@ -111,14 +111,16 @@ signal is the failure mode this repo was designed to avoid.
 
 Honest defects and frictions, none currently blocking:
 
-1. **Dark theme's elevation ladder reads weakly.** The dark
-   `background 0.16 → surface 0.205 → popover 0.25` lightness steps and the
-   heavier dark shadows are correct as authored (token parity and contrast
-   pairs all pass), but at the visual level the surface separation is
-   subtler than intended — cards can read as flush with the background.
-   Fixing it means retuning dark surface lightness (and re-verifying every
-   §3 contrast pair in `docs/DESIGN_TOKENS.md`), ideally against a real
-   product's screens rather than the showcase.
+1. **Dark theme's elevation ladder — retuned in the 2026-07 flat rebrand;
+   treating as resolved pending real-product confirmation.** The old
+   Δ0.045 steps (0.16 → 0.205 → 0.25) read weakly. The flat palette widened
+   the ladder to Δ0.06 (`background 0.145 → surface 0.205 → popover 0.265`)
+   and strengthened the hairline borders, and every §3 contrast pair was
+   recomputed and passes. Screenshot review of the showcase in dark mode
+   shows cards now clearly lifting from the background. The original
+   caveat stands in one respect: final judgement belongs to a real
+   product's screens, not the showcase — reopen this if the first dark
+   deployment still reads flat.
 2. **`DialogContent`'s close button label is hardcoded English** (`sr-only`
    "Close"). Localized products must hide it (`showCloseButton={false}`)
    and compose their own `DialogClose`. The first (Arabic-first) product

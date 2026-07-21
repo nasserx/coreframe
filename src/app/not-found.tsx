@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -24,7 +25,12 @@ export default function NotFound() {
       <p className="max-w-sm text-sm text-muted-foreground">
         The page you are looking for does not exist or may have moved.
       </p>
-      <Button className="mt-1" render={<Link href="/">Go to the home page</Link>} />
+      {/* Navigation styled as a button: buttonVariants on a real Link, so
+          the element keeps link semantics (role, middle-click, focus
+          behavior). Button + render would re-brand it role="button". */}
+      <Link href="/" className={cn(buttonVariants(), "mt-1")}>
+        Go to the home page
+      </Link>
     </main>
   );
 }

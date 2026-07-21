@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page-header";
+import { buttonVariants } from "@/components/ui/button";
+import { Stack } from "@/components/ui/stack";
 import { ShowcaseSection } from "@/features/showcase/components/showcase-section";
 
 export const metadata: Metadata = {
@@ -10,10 +12,37 @@ export const metadata: Metadata = {
 export default function SitePage() {
   return (
     <>
-      <ShowcasePageHeader
-        title="Site shell"
-        description="This page renders inside the SiteShell — the public-site counterpart to the AppShell the rest of the showcase uses: a sticky top bar with brand, navigation, and actions, a footer with grouped link columns, and the same skip link and drawer mechanics. Contracts: docs/LAYOUT.md."
-      />
+      {/*
+        Hero, not a PageHeader: this page demonstrates SiteShell as
+        marketing chrome, so it leads the viewport with the identity's
+        headline voice — display type, generous vertical breathing room,
+        and the flat button pair (near-black primary + hairline outline).
+      */}
+      <Stack gap="lg" className="items-start py-16 sm:py-24">
+        <Stack gap="md" className="items-start">
+          <h1 className="max-w-prose text-title sm:text-display">
+            The public shell, in its own voice.
+          </h1>
+          <p className="max-w-prose text-body-lg text-muted-foreground">
+            This page renders inside the SiteShell — the public-site counterpart to the AppShell the
+            rest of the showcase uses: a sticky top bar with brand, navigation, and actions, a
+            footer with grouped link columns, and the same skip link and drawer mechanics.
+            Contracts: docs/LAYOUT.md.
+          </p>
+        </Stack>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Navigation styled as buttons: buttonVariants on real Links,
+              so the elements keep link semantics (role, middle-click,
+              focus behavior). Button + render would re-brand them
+              role="button". */}
+          <Link href="/showcase/layout" className={buttonVariants({ size: "lg" })}>
+            Read the layout contract
+          </Link>
+          <Link href="/showcase" className={buttonVariants({ variant: "outline", size: "lg" })}>
+            Back to the showcase
+          </Link>
+        </div>
+      </Stack>
       <ShowcaseSection
         title="Responsive collapse"
         description="Below the collapse breakpoint the top-bar navigation moves into a modal drawer opened from the actions cluster — the same Base UI Dialog mechanics as the AppShell drawer: focus trap, Escape, backdrop dismissal, focus return, close on navigation."
