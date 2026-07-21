@@ -7,6 +7,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /*
+   * Designed focus default (docs/DESIGN_TOKENS.md §2): any focusable
+   * element that no primitive styles gets the same 2px offset ink line
+   * the primitives draw with ring utilities — the UA default never
+   * appears. Primitives override with `outline-none` + ring utilities
+   * (attached, inset, or offset per their geometry).
+   */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
   body {
     @apply bg-background text-foreground;
   }

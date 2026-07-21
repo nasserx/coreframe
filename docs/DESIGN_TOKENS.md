@@ -177,10 +177,63 @@ re-verified against Archivo).
 
 ### Radius
 
-`--radius-base: 0.625rem` (10px) in `base.css` (theme-neutral) — the flat
-identity's modest, deliberate radius: rounded, not pill-shaped, not sharp.
-Every `rounded-*` step in the bridge derives from it by multiplication
-(`sm ×0.6 … 4xl ×2.6`).
+`--radius-base: 0.375rem` (6px) in `base.css` (theme-neutral) — the flat
+identity's crisp, deliberate radius: rounded enough to read as designed,
+tight enough to read as flat (tightened from 10px in the 2026-07
+refinement pass, where controls — most visibly inputs and textareas —
+read soft). Every `rounded-*` step in the bridge derives from it by
+multiplication:
+
+| Step  | Multiplier | Px  | Used by                                |
+| ----- | ---------- | --- | -------------------------------------- |
+| `sm`  | ×0.5       | 3   | smallest nested elements               |
+| `md`  | ×0.75      | 4.5 | nested elements (toggle items, badges) |
+| `lg`  | ×1         | 6   | controls (buttons, inputs, textareas)  |
+| `xl`  | ×1.5       | 9   | surfaces (cards, dialogs)              |
+| `2xl` | ×2         | 12  | —                                      |
+| `3xl` | ×2.5       | 15  | —                                      |
+| `4xl` | ×3         | 18  | —                                      |
+
+Controls sit at `lg`, nested elements step down to stay concentric, and
+surfaces step up so cards and dialogs stay recognisably rounded above the
+tighter controls. The Badge is deliberately `rounded-md`, not the
+registry's `rounded-4xl` pill — a full-round badge is a shape decision
+that fights this scale.
+
+### Focus and invalid states
+
+The focus indicator is designed, never the UA default: **a solid 2px line
+of `--color-ring`** (near-black in light, near-white in dark — the same
+ink logic as primary). Its geometry follows the control:
+
+- **Bordered text controls (Input, Textarea):** the border turns to the
+  ring token plus an attached 1px ring — a crisp 2px line at the control
+  edge, in the flat hairline language.
+- **Standalone controls (buttons, links, badges-as-links):** a 2px ring
+  offset by 2px of `background`. Offset, not attached, because the ring
+  barely contrasts with the near-black primary fill (1.35:1 light /
+  1.83:1 dark) — the background-colored gap is what makes it perceptible
+  on any fill.
+- **Nested controls (toggle-group items, tabs triggers):** attached 2px
+  ring — an offset ring would collide with siblings 2px away. Scroll
+  viewports use an inset ring to survive overflow clipping.
+- **Everything else:** a global `:focus-visible` rule in `globals.css`
+  (2px `--ring` outline, 2px offset) catches any focusable element no
+  primitive styles, so the UA default never appears.
+
+All indicators are gated on `:focus-visible`: keyboard (and other
+non-pointer) focus always shows the ring; mouse clicks on buttons do not
+(pointer users have the pressed state), while text inputs match
+`:focus-visible` on any focus per spec — you always see where you type.
+
+**Invalid** (`aria-invalid`) is a 1px `--color-destructive` hairline
+border — distinct from focus at a glance by both color and thickness.
+Color never carries invalidity alone: the Field wiring
+(`src/components/ui/field.tsx`) renders the `FieldError` message
+(`role="alert"`) and cascades `text-destructive`, and `aria-invalid`
+itself is the programmatic signal. **Focused + invalid** shows the focus
+geometry in the destructive color (2px line, red): thickness says
+"focused", color says "invalid" — the combination is never ambiguous.
 
 ## 3. Verified contrast (WCAG AA)
 
@@ -188,35 +241,39 @@ Computed via OKLCH → linear sRGB → relative luminance (WCAG 2.1 formula).
 Requirement: 4.5:1 for text pairs, 3:1 for UI boundaries/focus. All pairs pass in
 both themes.
 
-| Pair                                               | Requirement | Light | Dark  |
-| -------------------------------------------------- | ----------- | ----- | ----- |
-| foreground / background                            | 4.5         | 16.99 | 17.36 |
-| foreground / surface                               | 4.5         | 18.01 | 15.71 |
-| foreground / popover                               | 4.5         | 18.01 | 13.43 |
-| foreground / muted                                 | 4.5         | 15.63 | 13.63 |
-| foreground / secondary                             | 4.5         | 15.40 | 13.22 |
-| foreground / accent                                | 4.5         | 14.94 | 11.96 |
-| muted-foreground / background                      | 4.5         | 6.50  | 7.98  |
-| muted-foreground / surface                         | 4.5         | 6.89  | 7.22  |
-| muted-foreground / popover                         | 4.5         | 6.89  | 6.17  |
-| muted-foreground / muted                           | 4.5         | 5.98  | 6.26  |
-| primary-foreground / primary                       | 4.5         | 16.39 | 16.53 |
-| secondary-foreground / secondary                   | 4.5         | 12.84 | 13.22 |
-| accent-foreground / accent                         | 4.5         | 12.45 | 11.96 |
-| success-foreground / success                       | 4.5         | 4.99  | 7.82  |
-| warning-foreground / warning                       | 4.5         | 8.29  | 10.41 |
-| destructive-foreground / destructive               | 4.5         | 6.13  | 6.84  |
-| destructive / background (error text)              | 4.5         | 5.85  | 6.87  |
-| destructive / surface (error text)                 | 4.5         | 6.20  | 6.22  |
-| destructive / destructive-tint over surface[^tint] | 4.5         | 5.29  | 4.60  |
-| destructive / input fill over surface[^tint]       | 4.5         | 4.53  | 4.55  |
-| foreground / sidebar                               | 4.5         | 16.21 | 16.77 |
-| sidebar-accent-foreground / sidebar-accent         | 4.5         | 11.89 | 13.22 |
-| ring / background                                  | 3.0         | 11.57 | 9.22  |
-| ring / surface                                     | 3.0         | 12.26 | 8.34  |
-| input / background                                 | 3.0         | 3.19  | 3.75  |
-| input / surface                                    | 3.0         | 3.38  | 3.39  |
-| primary / background                               | 3.0         | 15.59 | 16.85 |
+| Pair                                                          | Requirement | Light | Dark  |
+| ------------------------------------------------------------- | ----------- | ----- | ----- |
+| foreground / background                                       | 4.5         | 16.99 | 17.36 |
+| foreground / surface                                          | 4.5         | 18.01 | 15.71 |
+| foreground / popover                                          | 4.5         | 18.01 | 13.43 |
+| foreground / muted                                            | 4.5         | 15.63 | 13.63 |
+| foreground / secondary                                        | 4.5         | 15.40 | 13.22 |
+| foreground / accent                                           | 4.5         | 14.94 | 11.96 |
+| muted-foreground / background                                 | 4.5         | 6.50  | 7.98  |
+| muted-foreground / surface                                    | 4.5         | 6.89  | 7.22  |
+| muted-foreground / popover                                    | 4.5         | 6.89  | 6.17  |
+| muted-foreground / muted                                      | 4.5         | 5.98  | 6.26  |
+| primary-foreground / primary                                  | 4.5         | 16.39 | 16.53 |
+| secondary-foreground / secondary                              | 4.5         | 12.84 | 13.22 |
+| accent-foreground / accent                                    | 4.5         | 12.45 | 11.96 |
+| success-foreground / success                                  | 4.5         | 4.99  | 7.82  |
+| warning-foreground / warning                                  | 4.5         | 8.29  | 10.41 |
+| destructive-foreground / destructive                          | 4.5         | 6.13  | 6.84  |
+| destructive / background (error text)                         | 4.5         | 5.85  | 6.87  |
+| destructive / surface (error text)                            | 4.5         | 6.20  | 6.22  |
+| destructive / destructive-tint over surface[^tint]            | 4.5         | 5.29  | 4.60  |
+| destructive / input fill over surface[^tint]                  | 4.5         | 4.53  | 4.55  |
+| foreground / sidebar                                          | 4.5         | 16.21 | 16.77 |
+| sidebar-accent-foreground / sidebar-accent                    | 4.5         | 11.89 | 13.22 |
+| ring / background                                             | 3.0         | 11.57 | 9.22  |
+| ring / surface                                                | 3.0         | 12.26 | 8.34  |
+| ring / input fill over surface[^tint] (focus)                 | 3.0         | 8.97  | 6.11  |
+| ring / muted (focus in grouped controls)                      | 3.0         | 10.64 | 7.24  |
+| ring / sidebar (focus on sidebar links)                       | 3.0         | 11.03 | 8.90  |
+| destructive / input fill over surface (invalid border)[^tint] | 3.0         | 4.53  | 4.55  |
+| input / background                                            | 3.0         | 3.19  | 3.75  |
+| input / surface                                               | 3.0         | 3.38  | 3.39  |
+| primary / background                                          | 3.0         | 15.59 | 16.85 |
 
 [^tint]:
     Composite pairs, added after an axe scan caught dark-mode failures the
@@ -298,10 +355,14 @@ Steps, sharpened by the second rebrand:
 **Known beyond-token surface** (the honest list from the flat rebrand):
 the font loader (`fonts.ts` + one bridge line), the brand assets (step 8),
 and any component whose _shape_ encodes the old identity — the flat
-rebrand restyled `SiteShellNavItem` from pill-hover to plain text, because
-"nav links are plain text" is a component decision no token can express.
-Everything else — color, elevation, radius, type metrics — was token
-values.
+rebrand restyled `SiteShellNavItem` from pill-hover to plain text and the
+Badge from pill to `rounded-md`, because "nav links are plain text" and
+"badges are square-ish tags" are component decisions no token can
+express. The focus/invalid language (§2) is likewise component classes:
+its _colors_ come from `--ring`/`--destructive`, but the geometry (2px
+line; attached vs offset vs inset) lives in the primitives and the
+`globals.css` base rule. Everything else — color, elevation, radius, type
+metrics — was token values.
 
 ## 5. Theme runtime
 

@@ -267,10 +267,12 @@ export function SiteShellNav({
  * not built yet. Works in both the horizontal bar and the drawer column.
  *
  * Styling is plain text on purpose (the flat identity): no background, no
- * pill, no underline — only weight and color distinguish states. The
+ * pill, no underline — only weight and color distinguish states, on a
+ * three-step ladder that keeps nav items subordinate to the brand element
+ * beside them: unavailable = muted + normal weight; idle link = muted +
+ * medium, darkening on hover; current page = foreground + semibold. The
  * padding is hit area, not a shape; the radius exists only for the focus
- * ring. The current page is `text-foreground` + semibold; idle links are
- * muted and darken on hover.
+ * ring.
  */
 export function SiteShellNavItem({
   href,
@@ -279,14 +281,18 @@ export function SiteShellNavItem({
   children,
 }: SiteShellNavItemProps) {
   const pathname = usePathname();
-  const base = "flex items-center rounded-md px-3 py-2 text-small font-medium";
+  const base = "flex items-center rounded-md px-3 py-2 text-small";
 
   if (href === undefined) {
     return (
       <span
         data-slot="site-shell-nav-item"
         data-unavailable=""
-        className={cn(base, "cursor-default text-muted-foreground select-none", className)}
+        className={cn(
+          base,
+          "cursor-default font-normal text-muted-foreground select-none",
+          className,
+        )}
       >
         {children}
         <span className="sr-only"> — {unavailableLabel}</span>
@@ -302,7 +308,7 @@ export function SiteShellNavItem({
       aria-current={isCurrent ? "page" : undefined}
       className={cn(
         base,
-        "text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
+        "font-medium text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         isCurrent && "font-semibold text-foreground",
         className,
       )}

@@ -29,7 +29,9 @@ export function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
+        // Inset focus ring: the viewport sits inside an overflow-clipping
+        // container, so an outer or offset ring would be cut off.
+        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
         {children}
       </ScrollAreaPrimitive.Viewport>

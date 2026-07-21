@@ -71,7 +71,7 @@ This split exists so registry syncs and styling refinements stay possible withou
 - **Semantic tokens only.** All colors resolve through the theme bridge (`bg-primary`, `border-input`, `text-muted-foreground`). Never hardcode colors. Known sanctioned exception: the overlay scrim (`bg-black/10`) is intentionally theme-independent.
 - **Private CSS variables vs theme tokens.** Component-scoped variables (`--card-spacing`, `--ratio`) coordinate layout inside one primitive and are fine; they are not theme tokens and must never carry color or be referenced across components.
 - **cva when there are multiple variants to select between** (Button, Badge, TabsList) — and export the helper. **Plain class strings plus a typed union** when a single `size`/`variant` axis just maps to `data-*` attributes (Card, Avatar, AlertDialogContent). Don't introduce cva for one axis with two values.
-- Registry vocabulary is kept as-is (e.g. controls `rounded-lg`, surfaces `rounded-xl`, `ring-3`/`ring-[3px]` both mean 3px). Match the nearest existing primitive when in doubt.
+- Registry vocabulary is kept as-is where it doesn't fight the identity (controls `rounded-lg`, surfaces `rounded-xl`). Two deliberate departures: the Badge is `rounded-md` (the registry pill fights the flat radius scale), and the registry's translucent 3px focus halo (`ring-3 ring-ring/50`) is replaced everywhere by the designed focus language — a solid 2px `ring-ring` line, attached/offset/inset per control geometry (`docs/DESIGN_TOKENS.md` §2). Match the nearest existing primitive when in doubt.
 
 ## 7. Server Component Policy
 
