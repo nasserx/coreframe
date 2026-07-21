@@ -2,9 +2,13 @@
  * Light theme semantic variable set.
  *
  * Palette identity: flat, editorial, high-contrast. The canvas is a warm
- * off-white paper (oklch hue 84, a cream cast — deliberately not neutral
- * grey and not pure white); ink and every neutral carry a trace of the same
- * warm hue (chroma 0.005–0.018) so the theme reads as one material. The
+ * off-white paper (oklch hue 84 — perceptibly warm but close to neutral
+ * paper, deliberately not saturated cream, not grey, not pure white); ink
+ * and every neutral carry a trace of the same warm hue (chroma 0.003–0.018)
+ * so the theme reads as one material. The paper family (background and the
+ * near-white surfaces) was de-warmed in the 2026-07 polish pass — chroma
+ * roughly halved — because at the old values the cream read too saturated;
+ * lightnesses were left untouched so the elevation ladder and contrast held. The
  * primary action color is the ink itself (near-black), not a saturated hue:
  * in this identity, near-black IS the interactive signal. Hue survives only
  * where hue is information — status colors and charts.
@@ -17,21 +21,21 @@
  */
 :root {
   color-scheme: light;
-  --color-background: oklch(0.968 0.01 84);
+  --color-background: oklch(0.968 0.005 84);
   --color-foreground: oklch(0.185 0.012 84);
-  --color-surface: oklch(0.988 0.005 84);
+  --color-surface: oklch(0.988 0.003 84);
   --color-surface-foreground: oklch(0.185 0.012 84);
-  --color-popover: oklch(0.988 0.005 84);
+  --color-popover: oklch(0.988 0.003 84);
   --color-popover-foreground: oklch(0.185 0.012 84);
   /* Near-black action color: a touch above pure ink so pressed/hover
      alpha states (primary/80) still darken visibly. */
   --color-primary: oklch(0.225 0.014 84);
   --color-primary-foreground: oklch(0.985 0.005 84);
-  --color-secondary: oklch(0.935 0.012 84);
+  --color-secondary: oklch(0.935 0.006 84);
   --color-secondary-foreground: oklch(0.26 0.014 84);
-  --color-muted: oklch(0.94 0.01 84);
+  --color-muted: oklch(0.94 0.005 84);
   --color-muted-foreground: oklch(0.46 0.015 84);
-  --color-accent: oklch(0.925 0.014 84);
+  --color-accent: oklch(0.925 0.007 84);
   --color-accent-foreground: oklch(0.26 0.014 84);
   --color-success: oklch(0.52 0.12 155);
   --color-success-foreground: oklch(0.985 0.005 155);
@@ -45,7 +49,7 @@
   /* border is the structural hairline of the flat system — decorative in
      WCAG terms; input is a control boundary and holds 3:1 against
      background and surface (WCAG 1.4.11). */
-  --color-border: oklch(0.885 0.01 84);
+  --color-border: oklch(0.885 0.005 84);
   --color-input: oklch(0.63 0.018 84);
   --color-ring: oklch(0.32 0.015 84);
   /* Charts keep hue: in a monochrome chrome, hue is reserved for data.
@@ -55,11 +59,11 @@
   --color-chart-3: oklch(0.6 0.12 155);
   --color-chart-4: oklch(0.75 0.13 85);
   --color-chart-5: oklch(0.58 0.15 25);
-  --color-sidebar: oklch(0.952 0.012 84);
+  --color-sidebar: oklch(0.952 0.006 84);
   --color-sidebar-foreground: var(--color-foreground);
   --color-sidebar-primary: var(--color-primary);
   --color-sidebar-primary-foreground: var(--color-primary-foreground);
-  --color-sidebar-accent: oklch(0.91 0.014 84);
+  --color-sidebar-accent: oklch(0.91 0.007 84);
   --color-sidebar-accent-foreground: oklch(0.26 0.014 84);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-ring);

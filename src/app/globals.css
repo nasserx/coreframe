@@ -37,4 +37,21 @@
     direction: ltr;
     unicode-bidi: isolate;
   }
+  /*
+   * Reduced motion, handled once at the system level (never per
+   * component): every transition and animation collapses to a single
+   * imperceptible frame, so end states still apply (overlays appear,
+   * borders change) without movement. Motion is never the sole carrier
+   * of meaning here, so nothing is lost (docs/DESIGN_TOKENS.md, Motion).
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

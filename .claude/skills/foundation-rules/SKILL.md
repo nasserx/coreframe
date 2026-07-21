@@ -18,8 +18,11 @@ linked docs are authoritative; this skill is the index, not the source.
   `border-input`) — never raw values.
 - **Zero colour literals outside `src/styles`** (no hex/oklch/rgb in
   components; the one sanctioned exception is the overlay scrim
-  `bg-black/10`). Spacing and motion are Tailwind's defaults — the
-  foundation adds no tokens for them.
+  `bg-black/10`). Spacing is Tailwind's default scale — no spacing tokens.
+  Motion IS tokenized (`--motion-quick`/`--motion-moderate` +
+  `--ease-out-soft`; `transition-*` defaults resolve through them): a raw
+  `duration-N` in a component is drift, and reduced motion is handled once
+  globally in `globals.css`, never per component.
 - **Exactly one TS token file:** `src/theme/breakpoints.ts`, because
   `matchMedia` and media queries cannot read CSS custom properties. It must
   mirror Tailwind's default screens. Never add another TS mirror of a CSS
@@ -42,7 +45,7 @@ justification** — nothing else. Directional icons flip individually with
 - Vertical rhythm is the five named Stack steps (`xs`…`xl`,
   `src/components/ui/stack.tsx`), chosen by sibling relationship.
 - Grids, rows, and one-off alignment stay plain Tailwind utilities — do not
-  add wrapper primitives for them, and do not invent spacing/motion tokens.
+  add wrapper primitives for them, and do not invent spacing tokens.
 
 ## The main landmark
 

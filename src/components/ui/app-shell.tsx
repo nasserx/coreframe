@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { MenuIcon, XIcon } from "lucide-react";
 
+import { useScrolled } from "@/hooks/use-scrolled";
 import { cn } from "@/lib/utils";
 import { BREAKPOINTS } from "@/theme";
 
@@ -17,6 +18,7 @@ type AppShellContextValue = Readonly<{
   open: boolean;
   setOpen: (open: boolean) => void;
   triggerRef: RefObject<HTMLButtonElement | null>;
+  scrolled: boolean;
 }>;
 
 const AppShellContext = createContext<AppShellContextValue | null>(null);
@@ -85,6 +87,7 @@ export function AppShell({
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const pathname = usePathname();
+  const { sentinelRef, scrolled } = useScrolled();
 
   // Route navigation from a drawer link must dismiss the drawer; the layout
   // (and therefore the drawer) survives App Router navigations. State is
@@ -97,7 +100,7 @@ export function AppShell({
   }
 
   return (
-    <AppShellContext.Provider value={{ open, setOpen, triggerRef }}>
+    <AppShellContext.Provider value={{ open, setOpen, triggerRef, scrolled }}>
       <div
         data-slot="app-shell"
         className={cn(
@@ -106,6 +109,10 @@ export function AppShell({
         )}
         {...props}
       >
+        {/* Scroll sentinel for the header boundary (see AppShellHeader):
+            absolutely positioned at the document top (no positioned
+            ancestor exists), zero layout impact on the grid. */}
+        <div ref={sentinelRef} aria-hidden="true" className="absolute top-0 h-px w-px" />
         <SkipLink>{skipLinkLabel}</SkipLink>
         {children}
       </div>
@@ -164,7 +171,7 @@ export function AppShellSidebar({
             data-slot="app-shell-drawer"
             aria-label={label}
             finalFocus={triggerRef}
-            className="fixed inset-y-0 start-0 z-50 flex h-dvh w-72 max-w-[calc(100%-3rem)] flex-col border-e bg-sidebar text-sidebar-foreground duration-150 outline-none md:hidden data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+            className="fixed inset-y-0 start-0 z-50 flex h-dvh w-72 max-w-[calc(100%-3rem)] flex-col border-e bg-sidebar text-sidebar-foreground duration-(--motion-moderate) outline-none md:hidden data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
           >
             <div className="flex h-12 shrink-0 items-center justify-end border-b px-2">
               <DialogPrimitive.Close
@@ -217,11 +224,18 @@ export function AppShellSidebarTrigger({
 }
 
 export function AppShellHeader({ className, ...props }: AppShellHeaderProps) {
+  const { scrolled } = useAppShell("AppShellHeader");
+
   return (
     <header
       data-slot="app-shell-header"
+      data-scrolled={scrolled ? "" : undefined}
+      // The hairline under the bar appears only once the page has
+      // scrolled: at position zero, bar and page are one surface. The
+      // border is always present (transparent at top), so its arrival
+      // never shifts layout; only border-color transitions.
       className={cn(
-        "sticky top-0 z-40 flex h-14 min-w-0 items-center gap-3 border-b bg-background px-4 sm:px-6",
+        "sticky top-0 z-40 flex h-14 min-w-0 items-center gap-3 border-b border-transparent bg-background px-4 transition-colors data-scrolled:border-border sm:px-6",
         className,
       )}
       {...props}

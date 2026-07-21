@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { MenuIcon, XIcon } from "lucide-react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
+import { useScrolled } from "@/hooks/use-scrolled";
 import { cn } from "@/lib/utils";
 import { BREAKPOINTS, type BreakpointToken } from "@/theme";
 
@@ -38,6 +39,7 @@ type SiteShellContextValue = Readonly<{
   setOpen: (open: boolean) => void;
   triggerRef: RefObject<HTMLButtonElement | null>;
   collapseBelow: SiteShellCollapseBreakpoint;
+  scrolled: boolean;
 }>;
 
 const SiteShellContext = createContext<SiteShellContextValue | null>(null);
@@ -143,6 +145,7 @@ export function SiteShell({
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const pathname = usePathname();
+  const { sentinelRef, scrolled } = useScrolled();
 
   // Route navigation from a drawer link must dismiss the drawer; state is
   // adjusted during render (the React-sanctioned previous-value pattern),
@@ -154,12 +157,15 @@ export function SiteShell({
   }
 
   return (
-    <SiteShellContext.Provider value={{ open, setOpen, triggerRef, collapseBelow }}>
+    <SiteShellContext.Provider value={{ open, setOpen, triggerRef, collapseBelow, scrolled }}>
       <div
         data-slot="site-shell"
         className={cn("flex min-h-dvh w-full flex-col", className)}
         {...props}
       >
+        {/* Scroll sentinel for the header boundary (see SiteShellHeader):
+            absolutely positioned at the document top, zero layout impact. */}
+        <div ref={sentinelRef} aria-hidden="true" className="absolute top-0 h-px w-px" />
         <SkipLink>{skipLinkLabel}</SkipLink>
         {children}
       </div>
@@ -168,10 +174,20 @@ export function SiteShell({
 }
 
 export function SiteShellHeader({ className, children, ...props }: SiteShellHeaderProps) {
+  const { scrolled } = useSiteShell("SiteShellHeader");
+
   return (
     <header
       data-slot="site-shell-header"
-      className={cn("sticky top-0 z-40 border-b bg-background", className)}
+      data-scrolled={scrolled ? "" : undefined}
+      // The hairline under the bar appears only once the page has
+      // scrolled: at position zero, bar and page are one surface. The
+      // border is always present (transparent at top), so its arrival
+      // never shifts layout; only border-color transitions.
+      className={cn(
+        "sticky top-0 z-40 border-b border-transparent bg-background transition-colors data-scrolled:border-border",
+        className,
+      )}
       {...props}
     >
       {/* The row is capped by Container — bar content must fit inside that
@@ -234,7 +250,7 @@ export function SiteShellNav({
             aria-label={label}
             finalFocus={triggerRef}
             className={cn(
-              "fixed inset-y-0 start-0 z-50 flex h-dvh w-72 max-w-[calc(100%-3rem)] flex-col border-e bg-background text-foreground duration-150 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+              "fixed inset-y-0 start-0 z-50 flex h-dvh w-72 max-w-[calc(100%-3rem)] flex-col border-e bg-background text-foreground duration-(--motion-moderate) outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
               collapse.belowOnly,
             )}
           >
@@ -267,12 +283,25 @@ export function SiteShellNav({
  * not built yet. Works in both the horizontal bar and the drawer column.
  *
  * Styling is plain text on purpose (the flat identity): no background, no
- * pill, no underline — only weight and color distinguish states, on a
- * three-step ladder that keeps nav items subordinate to the brand element
- * beside them: unavailable = muted + normal weight; idle link = muted +
- * medium, darkening on hover; current page = foreground + semibold. The
- * padding is hit area, not a shape; the radius exists only for the focus
- * ring.
+ * pill, no underline — weight and color distinguish states on a three-step
+ * ladder that keeps nav items subordinate to the (larger, bolder) brand:
+ *
+ *   - idle link    → `text-foreground` + `font-normal`; on hover it
+ *                    LIGHTENS to `text-muted-foreground` (the item recedes
+ *                    under the cursor rather than lighting up).
+ *   - current page → `text-foreground` + `font-semibold` (`aria-current`).
+ *                    Weight is what marks it: idle links already sit at
+ *                    full foreground strength, so color cannot carry
+ *                    current — and weight, unlike an underline, does not
+ *                    fight a dropdown menu opening beneath the item.
+ *   - unavailable  → `text-muted-foreground` + `font-normal`, muted at
+ *                    rest so it reads distinct from a full-strength idle
+ *                    link; non-interactive, non-focusable, sr-only hint.
+ *
+ * Hover is color-only (no moving/growing element) so an item can later
+ * host a dropdown trigger without the affordance fighting the menu.
+ * Items sit at `text-small`. The padding is hit area, not a shape; the
+ * radius exists only for the focus ring.
  */
 export function SiteShellNavItem({
   href,
@@ -308,8 +337,11 @@ export function SiteShellNavItem({
       aria-current={isCurrent ? "page" : undefined}
       className={cn(
         base,
-        "font-medium text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        isCurrent && "font-semibold text-foreground",
+        // Idle: full-strength foreground, lightening (receding) on hover.
+        // Current: same color, distinguished by weight — see the component
+        // doc for why weight, not color or an underline, carries current.
+        "font-normal text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        isCurrent && "font-semibold hover:text-foreground",
         className,
       )}
     >

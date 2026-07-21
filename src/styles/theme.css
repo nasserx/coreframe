@@ -54,9 +54,9 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  /* Radius scale, derived from --radius-base (6px). Controls sit at lg
-     (6px, crisp); nested elements step down (md 4.5px, sm 3px) to stay
-     concentric; surfaces step up (xl 9px, 2xl 12px …) so cards and
+  /* Radius scale, derived from --radius-base (8px). Controls sit at lg
+     (8px, crisp); nested elements step down (md 6px, sm 4px) to stay
+     concentric; surfaces step up (xl 12px, 2xl 16px …) so cards and
      dialogs stay recognisably rounded above the tighter controls. */
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
@@ -65,6 +65,14 @@
   --radius-2xl: calc(var(--radius) * 2);
   --radius-3xl: calc(var(--radius) * 2.5);
   --radius-4xl: calc(var(--radius) * 3);
+  /* Motion bridge: one easing curve (decelerate — motion arrives gently,
+     for state changes and entering layers; exits reuse it at the quick
+     duration) and the transition defaults, so every `transition-*`
+     utility resolves through the motion tokens without per-component
+     duration classes. Explicit durations use duration-(--motion-*). */
+  --ease-out-soft: cubic-bezier(0.25, 0, 0, 1);
+  --default-transition-duration: var(--motion-quick);
+  --default-transition-timing-function: var(--ease-out-soft);
   /* Elevation: shadow-xs..xl resolve through the per-theme --elevation-*
      tokens, so `shadow-sm` etc. adapt to light and dark automatically.
      These five levels are the elevation contract; avoid other shadow
