@@ -141,7 +141,10 @@ A CSS grid: sidebar column (`auto`) + content column (`1fr`), header row
 restoration and anchor behavior are preserved; there is no nested scroll
 container for content. The sidebar is sticky, full-height, and independently
 scrollable; the header is sticky at `z-40` (below the overlay layer's
-`z-50`).
+`z-50`). Both shells' headers stand at `h-16` (64px); `globals.css` reserves
+that height as `scroll-padding-block-start` on `html`, so anchor jumps and
+programmatic focus land below the sticky bar rather than behind it — the two
+values are a hand-kept matched pair.
 
 **The header boundary is scroll-dependent** (both shells): at scroll
 position zero the bar has no bottom hairline — bar and page read as one
@@ -241,15 +244,20 @@ application chrome.
 as its own cluster — the demo runs `text-subheading` bold (two steps above
 the nav) with a larger mark and clear breathing room (`me-4`) before
 navigation begins. Nav items are secondary wayfinding at `text-small`,
-normal weight, on a three-step ladder that inverts the usual "light up on
+medium weight, on a three-step ladder that inverts the usual "light up on
 hover":
 
-- **idle** → `text-foreground` + `font-normal`, _lightening_ to
+- **idle** → `text-foreground` + `font-medium`, _lightening_ to
   `text-muted-foreground` on hover (the item recedes under the cursor).
-- **current** → `text-foreground` + `font-semibold` (`aria-current`).
+  Medium, not normal: a primary interactive element should not read as
+  thin at 14px.
+- **current** → `text-foreground` + `font-bold` (`aria-current`).
   Because idle links already sit at full foreground strength, color cannot
   carry current — **weight does**, and weight (unlike an underline) does
-  not fight a dropdown menu opening beneath the item.
+  not fight a dropdown menu opening beneath the item. Current is bold, not
+  semibold, so the gap over a medium idle stays the same 200-unit step the
+  ladder was designed around (medium-vs-semibold alone was too subtle to
+  mark current unambiguously).
 - **unavailable** → `text-muted-foreground` + `font-normal`, muted at rest
   so it reads distinct from a full-strength idle link.
 

@@ -34,11 +34,16 @@ function UnavailableAction({
   return (
     <span
       data-unavailable=""
-      // size="lg" (h-9) + px-4: the reference gives header CTAs more
-      // presence than the default control — taller with more horizontal
-      // padding, still proportionate to the h-14 bar.
+      // Header CTAs use `lg` (h-9) — the "prominent action" step of the
+      // control-height scale (docs/DESIGN_TOKENS.md § Control height), right
+      // for a marketing bar's primary actions in a tall (h-16) header. The
+      // utility toggles beside them are aligned UP to the same h-9 so the
+      // whole cluster shares one optical height. Padding is moderate (px-3.5,
+      // not the earlier chunky px-4): h-9 read oversized before because of
+      // that padding plus a height mismatch with the h-8 toggles, not the
+      // step itself — both are fixed here.
       className={cn(
-        buttonVariants({ variant, size: "lg", className: "px-4" }),
+        buttonVariants({ variant, size: "lg", className: "px-3.5" }),
         "pointer-events-none select-none",
       )}
     >
@@ -60,10 +65,12 @@ function UnavailableAction({
 export default function ShowcaseSiteLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     // collapseBelow="lg", measured, not assumed (docs/LAYOUT.md §6): the
-    // larger brand, the 14px nav, and the h-9 auth buttons grew the bar's
-    // min-content to ~915px — still inside the ~976px available at the `lg`
-    // (1024px) breakpoint, so `lg` holds and the overflow sweep confirms it.
-    // (Re-measured after the polish, not carried over on assumption.)
+    // larger brand, the 14px nav, the toggles, and the two auth CTAs put the
+    // bar's min-content just over ~900px — still inside the ~976px available
+    // at the `lg` (1024px) breakpoint, so `lg` holds and the overflow sweep
+    // confirms it. The 2026-08 pass shrank the CTAs from h-9 to h-8: that is a
+    // vertical change, so it barely moved the (width-driven) collapse line —
+    // re-measured, `lg` is still correct, `md` would overflow.
     <SiteShell collapseBelow="lg">
       <SiteShellHeader>
         {/* The brand anchors the bar as its own cluster: two type steps
@@ -72,7 +79,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
             steps down to text-body below `sm`, where the bar is only brand
             + trigger and the full 20px wordmark overflows a 320px bar in
             RTL — the anchoring only matters once nav/actions share the bar.
-            Nav links are secondary wayfinding — 14px, normal weight. */}
+            Nav links are secondary wayfinding — 14px, medium weight. */}
         <Link
           href="/showcase"
           className="me-4 flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
@@ -85,10 +92,9 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
           <SiteShellNavItem href="/showcase/layout">Layout</SiteShellNavItem>
           <SiteShellNavItem>Pricing</SiteShellNavItem>
           {/* The auth actions live in the drawer below `md` (measured: the
-              enlarged h-9 CTAs overflow the bar beside the brand until
-              ~768px), so the drawer is their home there — same unavailable
-              pattern, plain items. Hidden from `md` up, where the pair
-              lives in the bar. */}
+              CTAs beside the brand overflow the bar until ~768px), so the
+              drawer is their home there — same unavailable pattern, plain
+              items. Hidden from `md` up, where the pair lives in the bar. */}
           <div className="mt-2 flex flex-col border-t pt-2 md:hidden">
             <SiteShellNavItem>Log in</SiteShellNavItem>
             <SiteShellNavItem>Get started</SiteShellNavItem>
@@ -96,19 +102,19 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
         </SiteShellNav>
         <div className="ms-auto flex items-center gap-3">
           {/* Two coherent sub-groups, centre-aligned in one cluster: the
-              utility toggles (inspection chrome, kept at their compact
-              intrinsic ~h-8 — deliberately not scaled up; a segmented
-              control blown up to h-9 reads chunky, and the reference gives
-              CTAs more presence than utilities) then the h-9 auth pair
-              (secondary before primary; the primary CTA holds the end).
-              The gap-3 separates the two families; heights differ by design
-              (actions > utilities), centre-aligned so it reads intentional.
-              Reveal breakpoints are measured, not uniform: the compact
-              toggles fit beside the brand from `sm`, but the enlarged CTAs
-              only fit from `md` (below it they move to the drawer) — the
-              overflow sweep fails this layout otherwise. The e2e matrix
-              drives theme/direction programmatically, so narrow coverage
-              holds. */}
+              utility toggles (inspection chrome) then the auth pair (secondary
+              before primary; the primary CTA holds the end). The settling pass
+              aligned the WHOLE cluster to h-9 — the toggles were bumped up to
+              match the lg CTAs, so every control shares one optical height
+              (docs/DESIGN_TOKENS.md § Control height). h-9 is right here: a
+              tall (h-16) marketing bar wants its actions at the prominent
+              step, and the earlier "oversized" read came from chunky padding
+              plus a toggle/CTA height mismatch, both now gone. The gap-3
+              separates the two families. Reveal breakpoints are measured, not
+              uniform: the toggles fit beside the brand from `sm`, the CTA pair
+              only from `md` (below it they move to the drawer) — the overflow
+              sweep fails this layout otherwise. The e2e matrix drives
+              theme/direction programmatically, so narrow coverage holds. */}
           <div className="flex items-center gap-2 max-sm:hidden">
             <DirectionControl />
             <ThemeControl />

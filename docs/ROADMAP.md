@@ -111,16 +111,26 @@ signal is the failure mode this repo was designed to avoid.
 
 Honest defects and frictions, none currently blocking:
 
-1. **Dark theme's elevation ladder — retuned in the 2026-07 flat rebrand;
-   treating as resolved pending real-product confirmation.** The old
-   Δ0.045 steps (0.16 → 0.205 → 0.25) read weakly. The flat palette widened
-   the ladder to Δ0.06 (`background 0.145 → surface 0.205 → popover 0.265`)
-   and strengthened the hairline borders, and every §3 contrast pair was
-   recomputed and passes. Screenshot review of the showcase in dark mode
-   shows cards now clearly lifting from the background. The original
-   caveat stands in one respect: final judgement belongs to a real
-   product's screens, not the showcase — reopen this if the first dark
-   deployment still reads flat.
+1. **Dark theme's flat elevation — RESOLVED (2026-07), root cause found;
+   values re-tuned 2026-08.** The ladder was widened twice (Δ0.045 → Δ0.06)
+   and still read flat, which was the tell that the ladder was never the
+   mechanism. A scripted check confirmed it: near black, equal OKLCH-L steps
+   produce almost no _luminance_ contrast — `surface / background` sat at
+   ~1.1:1 no matter how wide the ladder was drawn. The actual causes were
+   (a) a near-black background with no headroom and (b) borders too weak to
+   carry structure — the border token was 1.62:1 against background, and
+   cards/popovers/dialogs did not even use it (they drew `ring-foreground/10`,
+   fainter still). The fix was _not_ another ladder widening: borders carry
+   dark separation, and cards/popovers/dialogs switched to `ring-border` so
+   their edges track that hairline. The **2026-08 pass** then moved dark from
+   warm-paper to a **neutral** near-black (warmth reads as dirt in dark, and
+   the trace chroma was tinting the light-on-dark text yellow) and rebalanced
+   the border from the 2026-07 overshoot (0.44 / 2.42:1, which read heavy) to
+   0.40 (2.02:1) — quiet but still visible, verified not to disappear.
+   Every §3 pair recomputed and passes; all six gates and the axe matrix are
+   green; dark screenshots confirm cards, popovers, and dialogs are clearly
+   distinct from their backgrounds and text reads near-pure white. No
+   remaining caveat — this issue is closed.
 2. **`DialogContent`'s close button label is hardcoded English** (`sr-only`
    "Close"). Localized products must hide it (`showCloseButton={false}`)
    and compose their own `DialogClose`. The first (Arabic-first) product
@@ -140,3 +150,43 @@ Honest defects and frictions, none currently blocking:
    axe scans per page). Currently cheap (see `docs/TESTING.md` § CI for the
    measured numbers and the decision); revisit the full-matrix-on-PR policy
    when browser time passes ~10 minutes.
+
+## Friction points a product team is most likely to hit
+
+Surfaced by the 2026-07 system-review pass — the places where a real product
+is most likely to fight the foundation rather than extend it. Not defects;
+recorded so the fix is a deliberate decision when the signal arrives, not a
+surprise.
+
+1. **Two typographic systems coexist.** Pages and `PageHeader` speak the
+   ramp (`text-display`…`text-caption`, with weight/tracking/leading baked
+   in); every `src/components/ui` primitive speaks raw Tailwind
+   (`text-sm`/`text-base`/`text-xs`, `font-medium`). They are not
+   interchangeable — `text-small` and `text-sm` are the same size but
+   different line-heights — so a team writing UI has to know which system a
+   given surface belongs to, and mixing them subtly breaks vertical rhythm.
+   The split is inherited from shadcn (its primitives predate the ramp).
+   **Extension point / trigger:** if this bites, decide one way — either map
+   the primitives onto the ramp (larger, coordinated change; re-verify the
+   overflow sweep) or document the primitives' scale as a deliberate second
+   system. Left as-is for now because converting 20 primitives is a churny
+   change with real regression surface and no product yet asking for it.
+
+2. **The shells are structural-only.** `AppShell`/`SiteShell` deliberately
+   ship no brand slot, user menu, or collapse-to-icons (`docs/LAYOUT.md` §5)
+   — so the first thing nearly every product does is hand-build that chrome
+   at the call site. That is the intended boundary (chrome identity is
+   product territory), but it means "start a real app" is not "drop in the
+   shell and go." **Trigger:** if two products build materially the same
+   header cluster (brand + user menu + actions), promote that composition to
+   a feature-level example, not into the shell.
+
+3. **Frozen primitive strings and variant sets require forking to extend.**
+   `DialogContent`'s close label is hardcoded English (known issue #2),
+   Button's variant/size set is explicitly "do not extend per-product", and
+   several primitives hardcode English affordance copy. A product that needs
+   a localized close button, or one more button variant, edits the primitive
+   rather than composing around it. **Trigger:** the next localized product
+   (adds `closeLabel` and audits the other hardcoded strings together) and
+   the first product with a genuine variant need the official set cannot
+   express.

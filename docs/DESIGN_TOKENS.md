@@ -42,50 +42,75 @@ canvas (oklch hue 84 — perceptibly warm but close to neutral paper, not a
 saturated cream, not grey, not pure white) with near-black ink as the
 primary action color. There is no saturated brand hue on the chrome —
 near-black IS the interactive signal; hue survives only where hue is
-information (status colors, charts). Neutrals carry trace chroma
-(0.003–0.018) of the warm hue so both themes read as one material; the
+information (status colors, charts). The **light** neutrals carry trace
+chroma (0.003–0.018) of the warm hue so the theme reads as one material; the
 light paper family (background + near-white surfaces) was de-warmed in the
 2026-07 polish pass — chroma roughly halved, lightnesses untouched so the
 elevation ladder and contrast held — because the earlier values read too
-saturated. The dark theme is the same paper with the lights off (warm-dark,
-not a neutral-grey inversion) and was not touched by the de-warming.
+saturated.
+
+**The dark theme is a NEUTRAL near-black, not a warm-paper inversion.** The
+2026-08 pass abandoned the earlier "same paper with the lights off"
+decision: warmth reads as paper in a light theme but as brown/dirt in a dark
+one, and the trace warm chroma — invisible on the dark surfaces it was tuned
+on — was clearly visible on the light-on-dark _text_, tinting it yellowish
+instead of white. Dark neutrals now carry only a whisper of the warm hue
+(chroma 0.003–0.008), and the light-on-dark tokens (foreground and every
+`*-foreground` pair) sit at chroma 0.002. Both themes still share hue 84, so
+they read as one token family without the dark theme reading warm.
+
+**Dark foreground — near-white, deliberately not pure white (settling
+pass).** The light-on-dark foreground family sits at **L 0.985** (was 0.965,
+which read soft against a reference that uses effectively pure-white body
+text). It is _not_ pushed to L 1.0: pure white on a dark field is a
+well-documented eye-strain source — at peak monitor luminance it halates and
+leaves afterimages over long reading lengths, which is why most well-regarded
+dark themes stop a few percent short. L 0.985 (≈ 96% luminance) reads as
+white, resolves the "soft" complaint, and keeps that headroom below peak.
+The whole family moves together (`foreground`, `surface-foreground`,
+`popover-foreground`, `secondary-foreground`, `accent-foreground`,
+`sidebar-accent-foreground`) — one value, applied consistently, never tuned
+per token. `--color-muted-foreground` is the deliberate exception: it stays
+dimmed (0.72) because it is the _secondary_-text role. The near-white
+_primary_ fill stays at 0.955, a hair below the text white, so a filled
+button reads as a surface (and `primary/80` hover still shifts visibly).
 
 | Token                                | Light                             | Dark                              |
 | ------------------------------------ | --------------------------------- | --------------------------------- |
-| `--color-background`                 | `oklch(0.968 0.005 84)`           | `oklch(0.145 0.008 84)`           |
-| `--color-foreground`                 | `oklch(0.185 0.012 84)`           | `oklch(0.955 0.006 84)`           |
-| `--color-surface`                    | `oklch(0.988 0.003 84)`           | `oklch(0.205 0.01 84)`            |
-| `--color-surface-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.955 0.006 84)`           |
-| `--color-popover`                    | `oklch(0.988 0.003 84)`           | `oklch(0.265 0.012 84)`           |
-| `--color-popover-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.955 0.006 84)`           |
-| `--color-primary`                    | `oklch(0.225 0.014 84)`           | `oklch(0.945 0.006 84)`           |
-| `--color-primary-foreground`         | `oklch(0.985 0.005 84)`           | `oklch(0.16 0.01 84)`             |
-| `--color-secondary`                  | `oklch(0.935 0.006 84)`           | `oklch(0.27 0.012 84)`            |
-| `--color-secondary-foreground`       | `oklch(0.26 0.014 84)`            | `oklch(0.955 0.006 84)`           |
-| `--color-muted`                      | `oklch(0.94 0.005 84)`            | `oklch(0.26 0.01 84)`             |
-| `--color-muted-foreground`           | `oklch(0.46 0.015 84)`            | `oklch(0.72 0.012 84)`            |
-| `--color-accent`                     | `oklch(0.925 0.007 84)`           | `oklch(0.3 0.014 84)`             |
-| `--color-accent-foreground`          | `oklch(0.26 0.014 84)`            | `oklch(0.955 0.006 84)`           |
+| `--color-background`                 | `oklch(0.968 0.005 84)`           | `oklch(0.185 0.004 84)`           |
+| `--color-foreground`                 | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.002 84)`           |
+| `--color-surface`                    | `oklch(0.988 0.003 84)`           | `oklch(0.225 0.004 84)`           |
+| `--color-surface-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.002 84)`           |
+| `--color-popover`                    | `oklch(0.988 0.003 84)`           | `oklch(0.26 0.005 84)`            |
+| `--color-popover-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.002 84)`           |
+| `--color-primary`                    | `oklch(0.225 0.014 84)`           | `oklch(0.955 0.003 84)`           |
+| `--color-primary-foreground`         | `oklch(0.985 0.005 84)`           | `oklch(0.18 0.004 84)`            |
+| `--color-secondary`                  | `oklch(0.935 0.006 84)`           | `oklch(0.285 0.005 84)`           |
+| `--color-secondary-foreground`       | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.002 84)`           |
+| `--color-muted`                      | `oklch(0.94 0.005 84)`            | `oklch(0.27 0.004 84)`            |
+| `--color-muted-foreground`           | `oklch(0.46 0.015 84)`            | `oklch(0.72 0.005 84)`            |
+| `--color-accent`                     | `oklch(0.925 0.007 84)`           | `oklch(0.315 0.006 84)`           |
+| `--color-accent-foreground`          | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.002 84)`           |
 | `--color-success`                    | `oklch(0.52 0.12 155)`            | `oklch(0.7 0.13 155)`             |
 | `--color-success-foreground`         | `oklch(0.985 0.005 155)`          | `oklch(0.145 0.01 155)`           |
 | `--color-warning`                    | `oklch(0.82 0.14 80)`             | `oklch(0.8 0.13 80)`              |
 | `--color-warning-foreground`         | `oklch(0.28 0.05 80)`             | `oklch(0.15 0.012 80)`            |
-| `--color-destructive`                | `oklch(0.505 0.17 25)`            | `oklch(0.7 0.17 25)`              |
+| `--color-destructive`                | `oklch(0.505 0.17 25)`            | `oklch(0.73 0.17 25)`             |
 | `--color-destructive-foreground`     | `oklch(0.985 0.005 25)`           | `oklch(0.15 0.01 25)`             |
-| `--color-border`                     | `oklch(0.885 0.005 84)`           | `oklch(0.33 0.012 84)`            |
-| `--color-input`                      | `oklch(0.63 0.018 84)`            | `oklch(0.53 0.015 84)`            |
-| `--color-ring`                       | `oklch(0.32 0.015 84)`            | `oklch(0.76 0.01 84)`             |
+| `--color-border`                     | `oklch(0.9 0.004 84)`             | `oklch(0.38 0.005 84)`            |
+| `--color-input`                      | `oklch(0.63 0.018 84)`            | `oklch(0.53 0.008 84)`            |
+| `--color-ring`                       | `oklch(0.32 0.015 84)`            | `oklch(0.76 0.006 84)`            |
 | `--color-chart-1`                    | `oklch(0.55 0.15 262)`            | `oklch(0.68 0.13 262)`            |
 | `--color-chart-2`                    | `oklch(0.62 0.1 195)`             | `oklch(0.7 0.11 195)`             |
 | `--color-chart-3`                    | `oklch(0.6 0.12 155)`             | `oklch(0.72 0.12 155)`            |
 | `--color-chart-4`                    | `oklch(0.75 0.13 85)`             | `oklch(0.8 0.12 85)`              |
 | `--color-chart-5`                    | `oklch(0.58 0.15 25)`             | `oklch(0.68 0.14 25)`             |
-| `--color-sidebar`                    | `oklch(0.952 0.006 84)`           | `oklch(0.17 0.009 84)`            |
+| `--color-sidebar`                    | `oklch(0.952 0.006 84)`           | `oklch(0.205 0.005 84)`           |
 | `--color-sidebar-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
 | `--color-sidebar-primary`            | `var(--color-primary)`            | `var(--color-primary)`            |
 | `--color-sidebar-primary-foreground` | `var(--color-primary-foreground)` | `var(--color-primary-foreground)` |
-| `--color-sidebar-accent`             | `oklch(0.91 0.007 84)`            | `oklch(0.27 0.012 84)`            |
-| `--color-sidebar-accent-foreground`  | `oklch(0.26 0.014 84)`            | `oklch(0.955 0.006 84)`           |
+| `--color-sidebar-accent`             | `oklch(0.91 0.007 84)`            | `oklch(0.285 0.005 84)`           |
+| `--color-sidebar-accent-foreground`  | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.002 84)`           |
 | `--color-sidebar-border`             | `var(--color-border)`             | `var(--color-border)`             |
 | `--color-sidebar-ring`               | `var(--color-ring)`               | `var(--color-ring)`               |
 
@@ -99,18 +124,74 @@ Design notes:
   color among five, no longer an identity. Hue in this system is reserved
   for information: status semantics and chart series.
 - **Surfaces sit close to the background** (light: 0.968 → 0.988) and are
-  separated by hairline borders, not lightness jumps. Dark: elevation IS
-  the lightness ladder `background 0.145 → surface 0.205 → popover 0.265`
-  (Δ0.06 per step, deliberately wider than the previous palette's Δ0.045,
-  which read weakly).
+  separated by hairline borders, not lightness jumps. **Dark surfaces
+  separate by two cues together — a lightness step AND a visible hairline
+  border — because the step alone cannot carry it.** The 2026-07
+  system-review pass established (and screenshots confirmed) that near
+  black, equal OKLCH-L steps produce almost no _luminance_ contrast:
+  `surface / background` sat at ~1.1:1 however wide the ladder was drawn,
+  which is why widening it twice (Δ0.045 → Δ0.06) never fixed the "dark
+  reads flat" complaint. Borders carry it — at the weight fixed by the
+  **hairline rule** (below): dark `0.38` (1.86:1 vs background, 1.71:1 vs
+  surface). Cards, popovers and dialogs draw the **border token**
+  (`ring-border`), so their edges track the same hairline as every other
+  surface. Current dark ladder: `background 0.185 → surface 0.225 → popover
+0.26`.
 - **Status colors in dark invert to light fills with ink text**, matching
   primary, so every filled status surface keeps AA text contrast.
 - **`--color-border` is the structural hairline of the flat system** —
   decorative in WCAG terms (it conveys structure, not meaning), so 1.4.11
-  does not apply to it. **`--color-input` is a control boundary** and holds
-  ≥3:1 against background and surface in both themes (WCAG 1.4.11), as does
-  `--color-ring` (focus indicator — near-black in light, near-white in
-  dark, matching the primary logic).
+  does not apply to it. Its weight is fixed by the **hairline rule** (below),
+  not tuned by feel: light `0.9`, dark `0.38`, and it carries
+  card/popover/dialog edges via `ring-border`. **`--color-input` is a control
+  boundary** and holds ≥3:1 against background and surface in both themes
+  (WCAG 1.4.11), as does `--color-ring` (focus indicator — near-black in
+  light, near-white in dark, matching the primary logic).
+
+**The hairline rule (both themes, a decision not a feel).** A hairline should
+be _quiet but present_: perceptible as an edge, never a drawn line. The
+contrast ratio that achieves this is **not the same in the two themes**,
+because a thin light line on a dark field is harder to see than a thin dark
+line on a light field (near black, equal luminance _ratios_ correspond to
+smaller absolute luminance _steps_, and thin-line perception tracks the
+absolute step). So the rule targets a **perceptual** band, using different
+ratios to land in it:
+
+| Theme | Target vs background | Value    | Ratio vs background | Ratio vs surface |
+| ----- | -------------------- | -------- | ------------------- | ---------------- |
+| Light | 1.2–1.35:1           | L `0.9`  | 1.23:1              | 1.30:1           |
+| Dark  | 1.7–1.9:1            | L `0.38` | 1.86:1              | 1.71:1           |
+
+Light hairlines are easy, so they sit at the whisper end (~1.23:1). Dark
+hairlines need a higher ratio for the _same perceived_ quietness; below
+~1.6:1 a dark hairline disappears (empirically tested — that was the 2026-07
+"invisible border" bug), and above ~2.0:1 it reads heavy (the 2026-07
+overshoot). 0.38 (1.86:1 vs background / 1.71:1 vs surface — the surface side
+is the binding constraint, since a card's fill is the lightest thing a border
+must separate from) sits in the band. Any change to a background or surface
+lightness re-derives the border value from this rule; do not adjust the
+number in isolation.
+
+### Cross-theme perception (same design, different numbers)
+
+The two themes must _feel_ like one design — same perceived weight, contrast,
+surface separation, and prominence for the same element. Best practice is
+that **matching numeric values across themes produces mismatched
+perception**, because the eye responds to absolute luminance steps, not to
+token symmetry, and a near-black field compresses those steps. So several
+tokens are deliberately _asymmetric_ to land the same percept:
+
+| What must feel equal         | Light                       | Dark                             | Why different numbers                                                                                         |
+| ---------------------------- | --------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Hairline "quiet but present" | border 1.23:1 vs bg         | border 1.86:1 vs bg              | a light line on dark needs a higher ratio to be seen (hairline rule above)                                    |
+| Surface lift off background  | ΔL 0.02 (0.968→0.988)       | ΔL 0.04 (0.185→0.225) + border   | near black compresses luminance, so dark needs a bigger step _and_ the border cue for the same perceived lift |
+| Secondary (muted) text       | muted-fg 0.46 (~6.5:1)      | muted-fg 0.72 (~7.5:1)           | "dimmed but readable" is a contrast band, not a lightness — inverted lightness, same band                     |
+| Floating-layer shadow        | ink wash, alpha 0.05–0.13   | black, alpha 0.4–0.55            | a shadow reads against paper vs mid-dark; equal alpha would vanish in dark                                    |
+| Control boundary (input)     | input 0.63 (3.2:1)          | input 0.53 (3.5:1)               | both clear 3:1 (WCAG 1.4.11) from opposite sides; matching the number would over- or under-shoot one theme    |
+| Primary prominence           | ink 0.225 on paper (15.6:1) | near-white 0.955 on ink (16.4:1) | "the primary IS the ink" inverts lightness; both land the same very-high prominence vs background             |
+
+The rule for future changes: decide the _perceptual_ target first, then pick
+each theme's value to hit it — never copy a value across themes for symmetry.
 
 ### Elevation (`--elevation-*`, per theme)
 
@@ -156,28 +237,32 @@ At `text-display`'s size, long single words can exceed a 320px viewport —
 pair it with a smaller step below `sm` (`text-title sm:text-display`, as
 the home page does) when the copy is not under your control.
 
-**The typeface is Archivo** (`next/font/google`, variable wght 100–900,
-Latin subset, OFL 1.1 — the license ships with Google Fonts' hosting; no
-font file lives in this repo for it). Chosen over the alternatives for
-this voice: Space Grotesk and Instrument Sans stop at 700 (no true heavy);
-Inter/Inter Tight read as UI defaults rather than an editorial identity;
-Schibsted and Bricolage Grotesque carry more quirk than "restrained,
-confident" wants; Fontshare faces (General Sans, Cabinet Grotesk) would
-require self-hosting under a non-OFL license. Archivo is a grotesque drawn
-for headline work whose single variable file also reads comfortably at
-body sizes, which preserves the next rule:
+**The typeface is Geist** (`next/font/google`, variable wght 100–900, Latin
+subset, OFL 1.1 — the license ships with Google Fonts' hosting; no font file
+lives in this repo for it). It is a neutral, tightly-spaced grotesk with
+closed apertures. The identity has now gone back and forth once: the 2026-07
+flat rebrand swapped Geist → Archivo for a more open, editorial voice; the
+2026-08 pass swapped back, because the reference direction wanted a
+_tighter, more closed, more neutral_ grotesk at display sizes than Archivo's
+letterforms, and Geist also re-unifies the type system with its own mono
+companion (one family across sans and code). Among open options the shortlist
+is unchanged: Space Grotesk and Instrument Sans stop at 700 (no true heavy);
+Inter/Inter Tight read wide and humanist; Fontshare faces (General Sans,
+Cabinet Grotesk) require self-hosting under a non-OFL license — leaving Geist
+and Archivo as the two credible OFL grotesques with a full variable weight
+axis, and the current brief points at Geist.
 
 **There is deliberately no `--font-heading`.** Headings and body share one
-family (Archivo, `--font-sans`); the heading voice comes from weight and
-negative tracking in the ramp. This decision was re-tested in the 2026-07
-flat rebrand: the reference direction ("tight grotesk headlines, same
-family at reading weight for body") was reachable by swapping the one
-family and re-tuning ramp values — the payload argument (one Latin woff2,
-one FOUT source) held, so no second face was added. Geist Mono remains the
-code face (`--font-mono`); Noto Sans Arabic remains the Arabic companion
-(`docs/DIRECTION_AND_I18N.md` — its unicode-range scoping and
-`size-adjust: 115%` calibration are independent of the Latin face and were
-re-verified against Archivo).
+family (Geist, `--font-sans`); the heading voice comes from weight and
+negative tracking in the ramp. Both face swaps kept this: the reference voice
+("tight grotesk headlines, same family at reading weight for body") is
+reachable by changing the one family and re-tuning ramp values — the payload
+argument (one Latin woff2, one FOUT source) holds regardless of which grotesk
+is loaded. Geist Mono remains the code face (`--font-mono`); Noto Sans Arabic
+remains the Arabic companion (`docs/DIRECTION_AND_I18N.md` — its
+unicode-range scoping and `size-adjust: 115%` calibration are independent of
+the Latin face; the 115% has held across both swaps because Geist and Archivo
+have near-identical x-heights, and the font e2e re-confirms it).
 
 ### Radius
 
@@ -203,6 +288,33 @@ surfaces step up so cards and dialogs stay recognisably rounded above the
 tighter controls. The Badge is deliberately `rounded-md`, not the
 registry's `rounded-4xl` pill — a full-round badge is a shape decision
 that fights this scale.
+
+### Control height
+
+Interactive controls sit on a four-step height scale (the shadcn Button
+`size` set; `h-N` = `N × 0.25rem`). Each step has a job, so a control's
+height is a role decision, not a per-instance nudge:
+
+| Step      | Height   | For                                                           |
+| --------- | -------- | ------------------------------------------------------------- |
+| `xs`      | h-6 (24) | dense/inline actions — table-row controls, tag removes        |
+| `sm`      | h-7 (28) | compact toolbars and dense forms                              |
+| `default` | h-8 (32) | **the baseline** — standard buttons, inputs, most UI          |
+| `lg`      | h-9 (36) | **prominent** actions and touch targets — primary/header CTAs |
+
+**The header action cluster uses `lg` (h-9).** A header's primary actions
+are prominent by role, and the shells' bars stand at h-16 (64px), which wants
+its controls at the top step rather than the baseline — h-8 CTAs read small
+in a bar that tall. **The utility toggles in the same cluster (ThemeControl,
+DirectionControl) align _up_ to h-9** so the whole cluster shares one optical
+height; they render at 36px by construction (inner toggle + the group's
+padding and border). This is the settled answer to two earlier misses: h-9
+CTAs beside h-8 toggles read as a mismatch, and dropping everything to h-8
+read small — the fix was to align the cluster _up_, at h-9, with moderate CTA
+padding (the earlier "oversized" h-9 came from chunky `px-4` plus the
+mismatch, not the step). Within a cluster, keep one gap between peers and a
+larger gap between sub-groups (utilities vs actions); centre-align so unequal
+intrinsic widths still read as one row.
 
 ### Focus and invalid states
 
@@ -271,50 +383,57 @@ also changes color, border, or content).
 **When not to animate:** nothing on page load; nothing that delays
 interaction (motion runs alongside, never in front of, the response);
 nothing layout-affecting where a compositor-friendly property (transform,
-opacity, color) does the job — the nav hover underline scales a transform,
-the header boundary transitions only `border-color`.
+opacity, color) does the job — the header boundary transitions only
+`border-color`, overlays animate opacity and scale, and the button press is
+a 1px `translate-y`. (Nav hover is deliberately color-only — no underline,
+no moving element — so a nav item can later host a dropdown trigger without
+the affordance fighting the menu; see `docs/LAYOUT.md` §6.)
 
 ## 3. Verified contrast (WCAG AA)
 
 Computed via OKLCH → linear sRGB → relative luminance (WCAG 2.1 formula).
 Requirement: 4.5:1 for text pairs, 3:1 for UI boundaries/focus. All pairs pass in
-both themes. (Recomputed after the 2026-07 light-paper de-warming: reducing
-chroma at fixed lightness moved only `accent-foreground / accent`, and only
-by 0.01 — the pairs are luminance-driven, and lightnesses were held.)
+both themes. (Dark column recomputed after the settling pass, which raised the
+dark light-on-dark foreground family to L 0.985 — so every `foreground /*`
+and `*-foreground / *` pair rose a little — and re-set the dark border via the
+hairline rule. Chroma barely affects luminance; the composites (destructive
+over its tint / input fill) hold at 4.73 and 4.82, over 4.5. Light column is
+unchanged: the only light change across recent passes was the border token,
+which is decorative and excluded from this table.)
 
 | Pair                                                          | Requirement | Light | Dark  |
 | ------------------------------------------------------------- | ----------- | ----- | ----- |
-| foreground / background                                       | 4.5         | 16.99 | 17.36 |
-| foreground / surface                                          | 4.5         | 18.01 | 15.71 |
-| foreground / popover                                          | 4.5         | 18.01 | 13.43 |
-| foreground / muted                                            | 4.5         | 15.63 | 13.63 |
-| foreground / secondary                                        | 4.5         | 15.40 | 13.22 |
-| foreground / accent                                           | 4.5         | 14.94 | 11.96 |
-| muted-foreground / background                                 | 4.5         | 6.50  | 7.98  |
-| muted-foreground / surface                                    | 4.5         | 6.89  | 7.22  |
-| muted-foreground / popover                                    | 4.5         | 6.89  | 6.17  |
-| muted-foreground / muted                                      | 4.5         | 5.98  | 6.26  |
-| primary-foreground / primary                                  | 4.5         | 16.39 | 16.53 |
-| secondary-foreground / secondary                              | 4.5         | 12.84 | 13.22 |
-| accent-foreground / accent                                    | 4.5         | 12.46 | 11.96 |
+| foreground / background                                       | 4.5         | 16.99 | 17.85 |
+| foreground / surface                                          | 4.5         | 18.01 | 16.38 |
+| foreground / popover                                          | 4.5         | 18.01 | 14.88 |
+| foreground / muted                                            | 4.5         | 15.63 | 14.43 |
+| foreground / secondary                                        | 4.5         | 15.40 | 13.75 |
+| foreground / accent                                           | 4.5         | 14.94 | 12.38 |
+| muted-foreground / background                                 | 4.5         | 6.50  | 7.51  |
+| muted-foreground / surface                                    | 4.5         | 6.89  | 6.89  |
+| muted-foreground / popover                                    | 4.5         | 6.89  | 6.26  |
+| muted-foreground / muted                                      | 4.5         | 5.98  | 6.07  |
+| primary-foreground / primary                                  | 4.5         | 16.39 | 16.50 |
+| secondary-foreground / secondary                              | 4.5         | 12.84 | 13.75 |
+| accent-foreground / accent                                    | 4.5         | 12.46 | 12.38 |
 | success-foreground / success                                  | 4.5         | 4.99  | 7.82  |
 | warning-foreground / warning                                  | 4.5         | 8.29  | 10.41 |
-| destructive-foreground / destructive                          | 4.5         | 6.13  | 6.84  |
-| destructive / background (error text)                         | 4.5         | 5.85  | 6.87  |
-| destructive / surface (error text)                            | 4.5         | 6.20  | 6.22  |
-| destructive / destructive-tint over surface[^tint]            | 4.5         | 5.29  | 4.60  |
-| destructive / input fill over surface[^tint]                  | 4.5         | 4.53  | 4.55  |
-| foreground / sidebar                                          | 4.5         | 16.21 | 16.77 |
-| sidebar-accent-foreground / sidebar-accent                    | 4.5         | 11.89 | 13.22 |
-| ring / background                                             | 3.0         | 11.57 | 9.22  |
-| ring / surface                                                | 3.0         | 12.26 | 8.34  |
-| ring / input fill over surface[^tint] (focus)                 | 3.0         | 8.97  | 6.11  |
-| ring / muted (focus in grouped controls)                      | 3.0         | 10.64 | 7.24  |
-| ring / sidebar (focus on sidebar links)                       | 3.0         | 11.03 | 8.90  |
-| destructive / input fill over surface (invalid border)[^tint] | 3.0         | 4.53  | 4.55  |
-| input / background                                            | 3.0         | 3.19  | 3.75  |
-| input / surface                                               | 3.0         | 3.38  | 3.39  |
-| primary / background                                          | 3.0         | 15.59 | 16.85 |
+| destructive-foreground / destructive                          | 4.5         | 6.13  | 7.59  |
+| destructive / background (error text)                         | 4.5         | 5.85  | 7.18  |
+| destructive / surface (error text)                            | 4.5         | 6.20  | 6.59  |
+| destructive / destructive-tint over surface[^tint]            | 4.5         | 5.29  | 4.73  |
+| destructive / input fill over surface[^tint]                  | 4.5         | 4.53  | 4.82  |
+| foreground / sidebar                                          | 4.5         | 16.21 | 17.16 |
+| sidebar-accent-foreground / sidebar-accent                    | 4.5         | 11.89 | 13.75 |
+| ring / background                                             | 3.0         | 11.57 | 8.68  |
+| ring / surface                                                | 3.0         | 12.26 | 7.96  |
+| ring / input fill over surface[^tint] (focus)                 | 3.0         | 8.97  | 5.83  |
+| ring / muted (focus in grouped controls)                      | 3.0         | 10.64 | 7.02  |
+| ring / sidebar (focus on sidebar links)                       | 3.0         | 11.03 | 8.34  |
+| destructive / input fill over surface (invalid border)[^tint] | 3.0         | 4.53  | 4.82  |
+| input / background                                            | 3.0         | 3.19  | 3.53  |
+| input / surface                                               | 3.0         | 3.38  | 3.24  |
+| primary / background                                          | 3.0         | 15.59 | 16.35 |
 
 [^tint]:
     Composite pairs, added after an axe scan caught dark-mode failures the
@@ -323,9 +442,11 @@ by 0.01 — the pairs are luminance-driven, and lightnesses were held.)
     and over the dark input fill (`--color-input` at 30% over surface; an
     invalid Field cascades `text-destructive` onto the input value). Alpha
     composited in sRGB space before the luminance computation. These pairs are
-    why dark `--color-destructive` sits at 0.7 lightness — and why the light
-    value moved to 0.505 in the flat rebrand (at 0.52, the light input fill
-    composite landed at 4.14).
+    why dark `--color-destructive` sits at 0.73 lightness (raised from 0.70 in
+    the 2026-07 dark-mode pass, because lifting the surface lightened the
+    composited backdrop and dropped both composites to ~4.2 at 0.70) — and why
+    the light value moved to 0.505 in the flat rebrand (at 0.52, the light input
+    fill composite landed at 4.14).
 
 `--color-border` is excluded by design: it is a decorative separator, not a
 component boundary, so WCAG 1.4.11 does not apply to it. Anything that must be

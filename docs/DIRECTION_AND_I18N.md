@@ -103,10 +103,10 @@ Two related conventions:
 
 ## Fonts and Arabic metrics
 
-- **Stack:** `--font-sans` is `Noto Sans Arabic, Archivo` (bridged in
+- **Stack:** `--font-sans` is `Noto Sans Arabic, Geist` (bridged in
   `src/styles/theme.css`) — Arabic-first, but the Noto face is scoped to
   Arabic code points by a `unicode-range` descriptor, so Latin skips it and
-  renders in Archivo. Mixed content gets both faces, correctly, with no
+  renders in Geist. Mixed content gets both faces, correctly, with no
   component involvement.
 - **Why the order matters (fallback interception):** `next/font` generates a
   metric-adjusted fallback face for the Latin face from local Arial — and
@@ -120,10 +120,12 @@ Two related conventions:
   (`adjustFontFallback: false`) for the same reason.
 - **Optical size:** Arabic renders visibly smaller than Latin at equal em,
   and loosening line-height does not fix perceived size. The Arabic face
-  carries **`size-adjust: 115%`** (calibrated visually against Geist at
-  body, small, and heading steps, and re-checked against Archivo during the
-  2026-07 flat rebrand — Archivo's x-height is close enough to Geist's that
-  the calibration holds). `size-adjust` scales only glyphs rendered
+  carries **`size-adjust: 115%`** (calibrated visually against the Latin
+  face's x-height at body, small, and heading steps). The value has held
+  across two face swaps — Geist → Archivo in the 2026-07 flat rebrand and
+  Archivo → Geist again in the 2026-08 polish pass — because Geist and
+  Archivo have near-identical x-heights; the font e2e re-confirms it.
+  `size-adjust` scales only glyphs rendered
   _by that face_, so Latin rendering and mixed-direction layout metrics are
   untouched, and Arabic embedded in LTR pages benefits equally. The
   alternative — direction-scoped `--text-*` font-size overrides — was
@@ -216,7 +218,7 @@ intentionally empty); when a product adds them, they must read
 1. Add the code to `APP_LOCALES.SUPPORTED` in `src/config/app.ts`.
 2. Add its entry to `LOCALE_INFO` (`direction`, `numerals`) — the
    `satisfies` clause fails the typecheck until you do.
-3. If the locale needs a script Archivo doesn't cover, load a companion face
+3. If the locale needs a script Geist doesn't cover, load a companion face
    via `next/font` in `src/app/layout.tsx` and append its variable to the
    `--font-sans` stack in `src/styles/theme.css` (the Noto Sans Arabic wiring
    is the template).

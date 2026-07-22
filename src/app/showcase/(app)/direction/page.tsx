@@ -81,7 +81,7 @@ export default function DirectionPage() {
       />
       <ShowcaseSection
         title="Arabic type ramp"
-        description="Every ramp step with Arabic text. Under [dir=rtl] the token layer loosens line-height and zeroes letter-spacing — tracking breaks the connected script. Latin renders in Archivo; Arabic falls through the font stack to Noto Sans Arabic."
+        description="Every ramp step with Arabic text. Under [dir=rtl] the token layer loosens line-height and zeroes letter-spacing — tracking breaks the connected script. Latin renders in Geist; Arabic falls through the font stack to Noto Sans Arabic."
       >
         <div dir="rtl" lang="ar" className="flex flex-col rounded-lg border px-4">
           {TYPE_RAMP.map((step) => (

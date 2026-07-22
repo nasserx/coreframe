@@ -23,6 +23,14 @@
   }
   html {
     @apply font-sans;
+    /*
+     * Both shells' headers are sticky at h-16 (4rem). Reserve that height as
+     * scroll padding so in-page anchor jumps and programmatic focus
+     * (skip-link target, `:target`) land BELOW the bar, never behind it.
+     * Kept in sync with the shell header height by hand — the two are a
+     * matched pair; if the bar height changes, change this with it.
+     */
+    scroll-padding-block-start: 4rem;
   }
   /*
    * Code is LTR content categorically: identifiers, paths, and snippets must

@@ -1,64 +1,82 @@
 /*
  * Dark theme semantic variable set.
  *
- * The genuine counterpart to the warm-paper light theme: the same warm hue
- * (oklch hue 84) at low chroma — the same paper with the lights off, not a
- * neutral grey inversion — so switching themes reads as one material in two
- * states. The primary action inverts to near-white ink-on-paper: light
- * buttons with dark text, keeping "no saturated hue on the chrome".
+ * A NEUTRAL near-black, not a warm-paper inversion. The 2026-08 pass
+ * abandoned the "same paper with the lights off" decision: warmth reads as
+ * paper in a light theme but as dirt/brown in a dark one, and the trace warm
+ * chroma — invisible on the dark surfaces it was tuned on — was clearly
+ * visible on the light-on-dark TEXT, tinting it yellowish instead of white.
+ * So the neutrals now carry only a whisper of the warm hue (chroma
+ * 0.003–0.008, hue 84) — just enough that light and dark still read as one
+ * token family, not enough to tint. Light-on-dark tokens (foreground and the
+ * *-foreground pairs) sit at L 0.985 / chroma 0.002: near-pure white, but a
+ * few % below L 1.0 on purpose — pure white on a dark field halates and
+ * strains the eye over long reading, so the settling pass stopped just short
+ * of it (docs/DESIGN_TOKENS.md §2, "Dark foreground"). Charts and status
+ * colors keep their hue — hue is still reserved for data. The primary action
+ * inverts to near-white ink on ink, keeping "no saturated hue on the chrome".
  *
- * Elevation: a flat dark theme cannot use shadows for depth, so elevation
- * IS the surface lightness ladder — background (0.145) → surface (0.205) →
- * popover (0.265), a deliberately wider Δ0.06 per step than the previous
- * palette's Δ0.045 (the ladder read weakly; docs/ROADMAP.md) — with
- * hairline borders as the secondary cue. The --elevation-* shadows exist
- * only from md up, to ground floating layers against what is behind them.
+ * Elevation: a flat dark theme cannot use shadows for in-plane depth, so
+ * surfaces separate by TWO cues together — a lightness step AND a visible
+ * hairline border. The 2026-07 pass established that the lightness step alone
+ * cannot carry it: near black, equal OKLCH-L steps produce almost no
+ * luminance contrast (surface/background sits at ~1.1:1 however wide the
+ * ladder is drawn). Borders do the work, at a weight the settling pass fixed
+ * as a RULE, not a feel: a dark hairline reads quiet-but-present at
+ * ~1.7–1.9:1 vs its background (see the hairline rule in §2). 0.38 lands it
+ * at 1.86:1 vs background / 1.71:1 vs surface — quieter than 2026-07's 0.40,
+ * still clearly above the ~1.6:1 where a dark hairline disappears.
+ * Cards/popovers/dialogs draw that border token (ring-border). The
+ * --elevation-* shadows still exist only from md up. Full write-up:
+ * docs/DESIGN_TOKENS.md §2–3.
  */
 .dark {
   color-scheme: dark;
-  --color-background: oklch(0.145 0.008 84);
-  --color-foreground: oklch(0.955 0.006 84);
-  --color-surface: oklch(0.205 0.01 84);
-  --color-surface-foreground: oklch(0.955 0.006 84);
-  --color-popover: oklch(0.265 0.012 84);
-  --color-popover-foreground: oklch(0.955 0.006 84);
+  --color-background: oklch(0.185 0.004 84);
+  --color-foreground: oklch(0.985 0.002 84);
+  --color-surface: oklch(0.225 0.004 84);
+  --color-surface-foreground: oklch(0.985 0.002 84);
+  --color-popover: oklch(0.26 0.005 84);
+  --color-popover-foreground: oklch(0.985 0.002 84);
   /* Near-white action color: slightly below foreground so hover/pressed
      alpha states still shift visibly. */
-  --color-primary: oklch(0.945 0.006 84);
-  --color-primary-foreground: oklch(0.16 0.01 84);
-  --color-secondary: oklch(0.27 0.012 84);
-  --color-secondary-foreground: oklch(0.955 0.006 84);
-  --color-muted: oklch(0.26 0.01 84);
-  --color-muted-foreground: oklch(0.72 0.012 84);
-  --color-accent: oklch(0.3 0.014 84);
-  --color-accent-foreground: oklch(0.955 0.006 84);
+  --color-primary: oklch(0.955 0.003 84);
+  --color-primary-foreground: oklch(0.18 0.004 84);
+  --color-secondary: oklch(0.285 0.005 84);
+  --color-secondary-foreground: oklch(0.985 0.002 84);
+  --color-muted: oklch(0.27 0.004 84);
+  --color-muted-foreground: oklch(0.72 0.005 84);
+  --color-accent: oklch(0.315 0.006 84);
+  --color-accent-foreground: oklch(0.985 0.002 84);
   --color-success: oklch(0.7 0.13 155);
   --color-success-foreground: oklch(0.145 0.01 155);
   --color-warning: oklch(0.8 0.13 80);
   --color-warning-foreground: oklch(0.15 0.012 80);
-  /* 0.70 lightness: dark-mode destructive text also renders over
-     destructive/20 tints and the input fill, and those composites need
-     4.5:1 (docs/DESIGN_TOKENS.md §3). */
-  --color-destructive: oklch(0.7 0.17 25);
+  /* 0.73 lightness: dark-mode destructive text also renders over
+     destructive/20 tints and the input fill; over the surface those
+     composites need 0.73 to hold 4.5:1 (docs/DESIGN_TOKENS.md §3). */
+  --color-destructive: oklch(0.73 0.17 25);
   --color-destructive-foreground: oklch(0.15 0.01 25);
   /* border is the structural hairline of the flat system — decorative in
-     WCAG terms; input is a control boundary and holds 3:1 against
-     background and surface (WCAG 1.4.11). */
-  --color-border: oklch(0.33 0.012 84);
-  --color-input: oklch(0.53 0.015 84);
-  --color-ring: oklch(0.76 0.01 84);
+     WCAG terms (1.4.11 does not apply); at 0.38 it sits in the dark hairline
+     band (1.86:1 vs background, 1.71:1 vs surface — see the §2 rule) and
+     carries card/popover/dialog edges. input is a control boundary and holds
+     3:1 against background and surface. */
+  --color-border: oklch(0.38 0.005 84);
+  --color-input: oklch(0.53 0.008 84);
+  --color-ring: oklch(0.76 0.006 84);
   /* Charts keep hue: in a monochrome chrome, hue is reserved for data. */
   --color-chart-1: oklch(0.68 0.13 262);
   --color-chart-2: oklch(0.7 0.11 195);
   --color-chart-3: oklch(0.72 0.12 155);
   --color-chart-4: oklch(0.8 0.12 85);
   --color-chart-5: oklch(0.68 0.14 25);
-  --color-sidebar: oklch(0.17 0.009 84);
+  --color-sidebar: oklch(0.205 0.005 84);
   --color-sidebar-foreground: var(--color-foreground);
   --color-sidebar-primary: var(--color-primary);
   --color-sidebar-primary-foreground: var(--color-primary-foreground);
-  --color-sidebar-accent: oklch(0.27 0.012 84);
-  --color-sidebar-accent-foreground: oklch(0.955 0.006 84);
+  --color-sidebar-accent: oklch(0.285 0.005 84);
+  --color-sidebar-accent-foreground: oklch(0.985 0.002 84);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-ring);
   /* Flat elevation: xs/sm empty (the lightness ladder and hairlines carry
