@@ -135,9 +135,25 @@ Two related conventions:
   `src/assets/fonts/noto-sans-arabic-variable.woff2` via `next/font/local`
   (the google loader cannot emit `size-adjust`/`unicode-range` descriptors).
   Still no runtime dependency; the file is the Google-served Arabic-subset
-  variable font (~162 KB), preloaded so Arabic never paints in a fallback.
-  A Latin-only product can set `preload: false` to defer the download until
-  Arabic text appears.
+  variable font (~162 KB). It loads on demand when Arabic appears (scoped by
+  `unicode-range`), and it is **preloaded only on RTL/Arabic-primary
+  deployments** — see _Font preloading_ below.
+- **Font preloading (locale-aware).** A `<link rel="preload">` for a font is
+  fetched eagerly and **ignores `unicode-range`**, so preloading the ~162 KB
+  Arabic face on a Latin-default deployment downloads bytes English pages can
+  never paint (the fix in `docs/audit/2026-07-health-audit.md` §1.1). The shipped
+  English/LTR default therefore does **not** preload Noto (it loads on demand,
+  discovered the moment Arabic renders); an Arabic/RTL default **should**
+  preload it. This cannot be derived from `APP_CONFIG` automatically —
+  `next/font` requires `preload` to be a written literal — so `src/app/fonts.ts`
+  sets `preload: false` and a **compile-time guard couples that literal to
+  `APP_CONFIG.direction`**: flip `APP_LOCALES.DEFAULT` to an RTL locale without
+  also setting the Noto `preload` to `true` and the build fails at
+  `fonts.ts`'s `_NotoPreloadMatchesLocale` assertion, naming the fix. The mono
+  face is never preloaded (it only renders in `font-mono` code, never on the
+  LCP path). To switch to an Arabic-primary deployment: set the RTL default
+  locale **and** set Noto `preload: true` in `src/app/fonts.ts` (the guard
+  will remind you).
 - **License:** Noto Sans Arabic is licensed under the SIL Open Font License,
   Version 1.1; the license accompanies the font at
   `src/assets/fonts/OFL.txt`, as the OFL requires, and must stay next to the
@@ -223,7 +239,10 @@ intentionally empty); when a product adds them, they must read
    `--font-sans` stack in `src/styles/theme.css` (the Noto Sans Arabic wiring
    is the template).
 4. If it is the new deployment default, change `APP_LOCALES.DEFAULT` — `lang`,
-   `dir`, and numeral configuration follow automatically.
+   `dir`, and numeral configuration follow automatically. If the new default
+   is RTL/Arabic-primary, also set the Noto `preload` to `true` in
+   `src/app/fonts.ts` (font preload cannot auto-derive; the compile-time guard
+   there fails the build until you do — see _Font preloading_ above).
 5. For an RTL locale, review `/showcase/direction` and the `[dir="rtl"]`
    ramp metrics — retune the token values if the script's rhythm differs
    from Arabic.

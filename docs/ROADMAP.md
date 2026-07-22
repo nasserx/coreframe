@@ -151,6 +151,62 @@ Honest defects and frictions, none currently blocking:
    measured numbers and the decision); revisit the full-matrix-on-PR policy
    when browser time passes ~10 minutes.
 
+## Deferred from the 2026-07 health audit
+
+The `chore/template-hardening` pass implemented the high-value findings of
+`docs/audit/2026-07-health-audit.md` (LICENSE; locale-aware font preload; zod
+kept out of the client for unvalidated fetches; `shadcn` → devDependencies;
+`.editorconfig` / `SECURITY.md` / Dependabot). These findings were **considered
+and deliberately not actioned** — each is recorded here so the choice is
+visible, not silent.
+
+1. **Three production `npm audit` findings remain (all unreachable).** After
+   moving `shadcn` to devDependencies, the production tree carries `next`→`postcss`
+   (moderate, build-time only), and `next`→`sharp` / `sharp` (high, libvips
+   CVEs). **Not fixed because the only `npm audit fix` is `--force`, which
+   downgrades `next` to 9.x — unacceptable.** None is reachable here: `sharp`
+   is Next's image optimizer and `next/image` is used **0 times**; `postcss`
+   runs at build, never in the client or request path. `next@16.2.11` (bumped
+   this pass) still pins the same transitive versions. **Re-evaluate the moment
+   a product adds `next/image`** (sharp becomes reachable) or a new build
+   plugin. The four dev-only findings (`shadcn`/`@modelcontextprotocol/sdk`/
+   `@hono/node-server`/`fast-uri`) are CLI tooling, absent from `npm ci
+--omit=dev` production installs.
+
+2. **No `browserslist` was added** (audit §2.3 suggested one). Argued against:
+   `browserslist` governs JS **syntax** downleveling, not Web-API availability,
+   so it would not make `AbortSignal.any` (the client's early-2024 platform
+   floor) work on older browsers — it would only imply a guarantee the build
+   cannot keep. The honest fix was **documentation**: the floor and the
+   polyfill escape hatch are now stated in `docs/DATA_LAYER.md`. A product with
+   a hard old-browser requirement should polyfill `AbortSignal`, not add a
+   config that misleads.
+
+3. **`scroll-padding-block-start: 4rem` stays hand-synced to the shells' `h-16`
+   headers** (audit §2.5). Deferring: deriving CSS `scroll-padding` from a
+   Tailwind height token cleanly is not straightforward, the value is
+   commented as a matched pair on both sides, and the failure mode (an anchor
+   target landing behind the bar) is cosmetic and only triggers if a clone
+   changes the header height. **Trigger:** the first product that restyles the
+   shell header height — add an e2e assertion or a shared token then.
+
+4. **Home-route baseline First Load JS (~216 KB gz) is accepted as the
+   framework floor** (audit §1.3): React + Next runtime + the app-wide provider
+   stack (Theme, Query, Toaster, ErrorBoundary). The audit itself recommended
+   no action. **Trigger:** a product whose landing page must be leaner mounts
+   the Query/Toaster providers in a nested layout rather than the root — record
+   that trade-off if taken.
+
+5. **`CLAUDE.md` restates parts of `docs/` at length** (audit §3.4). Not
+   trimmed this pass — it is accurate today, and thinning it is editorial work
+   with its own drift risk. Left as an ongoing maintenance note; the "docs win
+   on conflict" rule already governs it.
+
+6. **`src/config/routes.ts` (`ROUTES`) and `features.ts` (`FEATURE_FLAGS`)
+   remain unused scaffold** (audit §4.1). Kept intentionally: they are
+   documented foundation public-API placeholders, correctly minimal, and cost
+   nothing. A clone deletes or fills them per its needs.
+
 ## Friction points a product team is most likely to hit
 
 Surfaced by the 2026-07 system-review pass — the places where a real product

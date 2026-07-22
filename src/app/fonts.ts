@@ -1,6 +1,28 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
+import type { AppConfig } from "@/config";
+
+/*
+ * Font preloading is deliberately scoped (docs/audit/2026-07-health-audit.md
+ * §1.1). A `<link rel="preload">` for a font is fetched eagerly and —
+ * critically — IGNORES the face's `unicode-range`, so preloading a face a page
+ * cannot paint is pure waste. next/font preloads every declared face by
+ * default, so the two non-body faces below opt out:
+ *
+ * - Arabic face: not preloaded on the shipped LTR/English default (it would
+ *   cost ~162 KB per page for glyphs Latin content never shows). It is coupled
+ *   to the configured locale via the compile-time guard further down — an
+ *   RTL/Arabic-default clone flips the literal to `true` and the build enforces
+ *   it. (Why a literal and not a computed value: next/font forbids non-literal
+ *   loader options.)
+ * - Mono face: never preloaded. It only renders where a component applies
+ *   `font-mono` (code/`<pre>`), which is never LCP and absent from most pages
+ *   (e.g. the home page renders no code). Without a preload the browser fetches
+ *   it on demand the first time code appears — a negligible swap on non-critical
+ *   text — and pages with no code never download it at all.
+ */
+
 /*
  * Font setup shared by the root layout AND global-error.tsx — global-error
  * replaces the root layout when it fires, so it must mount the same font
@@ -30,10 +52,14 @@ export const geistSans = Geist({
   subsets: ["latin"],
 });
 
-/* Code face — Geist's mono companion, so sans and code share one family. */
+/* Code face — Geist's mono companion, so sans and code share one family. Not
+ * preloaded (see the locale-aware preload note at the top of this file): mono
+ * renders only where `font-mono` is applied (code/`<pre>`), never on the LCP
+ * path, so it loads on demand instead of competing with first paint. */
 export const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 /*
@@ -41,7 +67,10 @@ export const geistMono = Geist_Mono({
  * has no Arabic glyphs, so the sans stack in src/styles/theme.css lists this
  * FIRST, scoped to Arabic code points by the unicode-range below: Latin
  * skips it and renders in Geist, Arabic renders here. next/font self-hosts
- * and preloads — no render blocking, no layout shift.
+ * the file; whether it is preloaded is locale-aware (see PRELOAD_ARABIC and
+ * the note at the top of this file) — an RTL/Arabic-default deployment
+ * preloads it, a Latin-default one lets it load on demand so English pages
+ * never fetch a font they cannot paint.
  *
  * Loaded via next/font/local (not google) because the face needs a
  * `size-adjust` descriptor: Arabic renders optically smaller than Latin at
@@ -50,6 +79,16 @@ export const geistMono = Geist_Mono({
  * Leading compensation lives in the ramp's [dir="rtl"] overrides
  * (src/styles/theme.css).
  *
+ * `preload` is a written literal — `false` here, matching the shipped
+ * LTR/English default. It CANNOT be derived from APP_CONFIG at build time:
+ * next/font rejects any non-literal loader value ("Font loader values must be
+ * explicitly written literals"), and it registers a preload for every declared
+ * instance (so a two-instance "mount the one you want" trick still preloads
+ * both — verified). An RTL/Arabic-default clone flips this to `true`; the
+ * NOTO_PRELOAD guard below fails the build if that flip is forgotten, so the
+ * coupling to the locale is enforced even though it can't be computed. See
+ * docs/DIRECTION_AND_I18N.md § Font preloading.
+ *
  * License: SIL Open Font License 1.1 — src/assets/fonts/OFL.txt must ship
  * alongside the font file.
  */
@@ -57,26 +96,10 @@ export const notoSansArabic = localFont({
   src: "../assets/fonts/noto-sans-arabic-variable.woff2",
   variable: "--font-noto-sans-arabic",
   weight: "100 900",
-  // No Arial-based metric fallback: local Arial contains Arabic glyphs and
-  // an unranged fallback face would intercept scripts it shouldn't. The
-  // unicode-range below already scopes this face to Arabic, and the file is
-  // preloaded, so the unstyled-fallback window is negligible. (This hazard
-  // is why this face must stay FIRST in --font-sans regardless of which
-  // Latin face follows it — any next/font Latin face ships an Arial-based
-  // metric fallback that would intercept Arabic.)
+  preload: false,
   adjustFontFallback: false,
   declarations: [
-    // 115%: calibrated for optical parity with the Latin face's x-height.
-    // Verified for Geist historically and re-verified for Archivo in the
-    // 2026-07 rebrand — the two faces have near-identical x-heights, so
-    // returning to Geist in 2026-08 needs no recalibration (the font e2e,
-    // which measures Noto vs Arial, confirms it still holds).
     { prop: "size-adjust", value: "115%" },
-    // Arabic blocks only (the subset's own coverage): this face sits FIRST
-    // in --font-sans (src/styles/theme.css) so the Latin face's Arial-based
-    // metric fallback can never intercept Arabic, while Latin skips this
-    // face entirely via the range. Latin digits are deliberately excluded —
-    // numerals render in Geist, matching the Western-numerals default.
     {
       prop: "unicode-range",
       value:
@@ -84,6 +107,32 @@ export const notoSansArabic = localFont({
     },
   ],
 });
+
+/*
+ * Build-time guard coupling the Noto `preload` literal to the configured
+ * locale, since next/font forbids deriving one from the other.
+ * `NotoPreloadLiteral` MUST mirror the `preload:` value written in the
+ * localFont call above. If a clone flips APP_LOCALES.DEFAULT to an RTL locale
+ * (making `APP_CONFIG.direction` "rtl") without also setting the preload to
+ * `true`, the assertion resolves to `AssertTrue<false>` and typecheck fails at
+ * the `_NotoPreloadMatchesLocale` line — turning a silent 162 KB regression
+ * (or a missing Arabic preload on an Arabic site) into a caught build error.
+ * Entirely type-level: erased at runtime, zero shipped bytes.
+ */
+type NotoPreloadLiteral = false;
+/** True when the configured default locale is RTL (Arabic-primary). */
+type ArabicIsPrimary = AppConfig["direction"] extends "rtl" ? true : false;
+/** Errors unless its argument is exactly `true`. */
+type AssertTrue<T extends true> = T;
+// Exported only so `noUnusedLocals` treats it as consumed; the assertion is
+// evaluated at its declaration regardless of any importer.
+export type _NotoPreloadMatchesLocale = AssertTrue<
+  ArabicIsPrimary extends NotoPreloadLiteral
+    ? NotoPreloadLiteral extends ArabicIsPrimary
+      ? true
+      : false
+    : false
+>;
 
 /** The className mounted on `<html>` by both the root layout and global-error. */
 export const FONT_VARIABLE_CLASSES = `${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable}`;
