@@ -18,7 +18,7 @@
  * `credentials: "include"` for cookie sessions) — never per call site.
  * See docs/DATA_LAYER.md § Authentication.
  */
-import { z } from "zod";
+import type { ZodType } from "zod";
 
 import { ENV_CONFIG } from "@/config/env";
 
@@ -42,12 +42,12 @@ export type ApiFetchOptions = Readonly<{
 
 export async function apiFetch<T>(
   path: string,
-  options: ApiFetchOptions & { schema: z.ZodType<T> },
+  options: ApiFetchOptions & { schema: ZodType<T> },
 ): Promise<T>;
 export async function apiFetch(path: string, options?: ApiFetchOptions): Promise<unknown>;
 export async function apiFetch<T>(
   path: string,
-  options: ApiFetchOptions & { schema?: z.ZodType<T> } = {},
+  options: ApiFetchOptions & { schema?: ZodType<T> } = {},
 ): Promise<unknown> {
   // Empty base URL (the default) means same-origin paths — correct for the
   // browser and for this repo's own route handlers. Server-side callers
@@ -124,9 +124,19 @@ export async function apiFetch<T>(
   }
   const parsed = options.schema.safeParse(payload);
   if (!parsed.success) {
+    // Format from the ZodError instance's own `issues` rather than
+    // `z.prettifyError`: calling a zod runtime helper here would make a static
+    // `import { z }` unavoidable, coupling EVERY apiFetch consumer to zod's
+    // ~69 KB gz even when they pass no schema (docs/audit/2026-07-health-audit.md
+    // §1.2). A caller that does pass a schema already bundles zod to define it,
+    // so validated call sites pay nothing extra; unvalidated ones now pay zero.
+    // `parsed.error` still rides on `cause` for full structured detail.
+    const detail = parsed.error.issues
+      .map((issue) => `  • ${issue.path.join(".") || "(root)"}: ${issue.message}`)
+      .join("\n");
     throw new ApiError({
       kind: "parse",
-      message: `Response from ${url} does not match the expected schema:\n${z.prettifyError(parsed.error)}`,
+      message: `Response from ${url} does not match the expected schema:\n${detail}`,
       url,
       cause: parsed.error,
     });

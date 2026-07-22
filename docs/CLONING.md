@@ -71,9 +71,10 @@ Three options, in order of product maturity:
    `src/app/showcase`, `src/app/api/showcase`, `src/features/showcase`.
    Then finish the deletion in four places that reference the showcase:
    - **The env gate**: `NEXT_PUBLIC_ENABLE_SHOWCASE` becomes dead code once
-     the gated routes are gone. Remove it from `src/config/env.ts` (the
-     schema entry, the `safeParse` input, and the `ProcessEnv` declaration)
-     and from `.env.example`.
+     the gated routes are gone. Remove it from `src/config/env.ts` (its
+     `RAW_ENV` read, its `ENV_CONFIG`/`EnvConfig` field, and the `ProcessEnv`
+     declaration), from `src/config/env-validation.ts` (its line in the Zod
+     schema), and from `.env.example`.
    - **The e2e specs**: route discovery (`tests/e2e/routes.ts`) adjusts
      automatically, but three specs reference showcase URLs directly and
      need retargeting at your product's routes: `shell.spec.ts` (drives
@@ -119,6 +120,11 @@ Do these in order; each step states what proves it worked.
    tab title and home page now show your product's name.
 5. **Gates** — `npm run lint && npm run typecheck && npm test`. All exit 0
    untouched; you now know the gates are green before your first change.
+   (The browser layer, `npm run test:e2e`, is **not** in this line: it has two
+   prerequisites — a prior `npm run build` and a one-time
+   `npx playwright install chromium` — and CI runs it for you on every push.
+   Run it locally only when you touch layout, fonts, or accessibility; see
+   `docs/TESTING.md`.)
 6. **First page** — create `src/app/(home)/hello/page.tsx`:
 
    ```tsx
@@ -138,9 +144,11 @@ Do these in order; each step states what proves it worked.
    `/hello` renders with the foundation's type ramp and tokens. Note that
    the page renders no `<main>` — the layout owns that landmark
    (`docs/LAYOUT.md` § The main landmark): here the `(home)` group's bare
-   layout provides it; a page using full chrome composes a shell in its
-   own layout instead — `AppShell` (see `src/app/showcase/(app)/layout.tsx`)
-   or `SiteShell` (see `src/app/showcase/(site)/site/layout.tsx`).
+   layout provides it. A page that needs full application or site chrome
+   instead composes a shell **in its own route-group layout** — copy the
+   shape of `src/app/showcase/(app)/layout.tsx` (`AppShell`) or
+   `src/app/showcase/(site)/site/layout.tsx` (`SiteShell`), which mount the
+   shell and its `<main>` for every route in the group.
 
 7. **First feature slice** — when the page needs data or components, create
    `src/features/<name>/` and copy the shape of

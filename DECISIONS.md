@@ -80,6 +80,26 @@ Reason: Zod provides TypeScript-friendly runtime validation and can support form
 
 Alternatives considered: Yup, Valibot, custom validation.
 
+## Environment split: zod-free public value contract vs server-only validator
+
+Decision (2026-07): `src/config/env.ts` is the client-safe public contract — the sole `process.env` reader (`RAW_ENV`) and the typed, defaulted `ENV_CONFIG` every module imports — and contains **no zod**. The fail-fast zod schema moved to `src/config/env-validation.ts`, which only `next.config.ts` imports for its side effect, so validation still runs once at startup in every mode while zod never enters a client-reachable module.
+
+Reason: `apiFetch` reads `ENV_CONFIG.NEXT_PUBLIC_API_BASE_URL` on the client, so anything `env.ts` statically imported shipped to the browser for _every_ apiFetch consumer. With the old single-file module that meant zod (~69 KB gz) landed in any bundle that touched the data layer, even routes that validate nothing — measured on a no-schema route as 280.3 KB → 217.2 KB gz once decoupled (`docs/audit/2026-07-health-audit.md` §1.2). The paired change made `client.ts` import zod as a type only and format schema-rejection errors from the `ZodError` instance's own `issues` instead of the runtime `z.prettifyError`. Net: zod reaches the browser only where a call site actually passes a schema (which already bundles zod to define it), so the opt-in-with-a-nudge validation contract is unchanged while unvalidated fetches pay nothing.
+
+Tradeoff accepted: the env logic is now two files and the value defaults/coercion in `env.ts` (e.g. `NEXT_PUBLIC_ENABLE_SHOWCASE !== "false"`) must mirror the schema in `env-validation.ts` — a small duplication guarded by both files' headers and by the fact that startup validation rejects any raw input the plain builder would misread. `env.ts` no longer throws on its own, but fail-fast is preserved because `next.config.ts` loads the validator before any app code (verified: an invalid value fails the build).
+
+Alternatives considered: keeping the single zod-validating `env.ts` (rejected: ships zod to every data-layer client bundle), a runtime `typeof window` guard around the zod import (rejected: a static import can't be tree-shaken by a runtime branch), reading the base URL from `process.env` directly in `client.ts` (rejected: violates the single-reader rule and loses validation).
+
+## Locale-aware font preload via a compile-time guard (not a computed value)
+
+Decision (2026-07): The Arabic (`Noto`) and mono faces in `src/app/fonts.ts` set `preload: false` as a written literal; a type-level assertion couples the Noto literal to `APP_CONFIG.direction`, so flipping the default locale to RTL without also setting `preload: true` fails the build. The shipped LTR/English default therefore preloads only the Latin body face; an Arabic-default clone flips the literal and the guard confirms it.
+
+Reason: A `<link rel="preload">` is fetched eagerly and ignores `unicode-range`, so preloading the ~162 KB Arabic face on a Latin deployment downloaded bytes English pages can never paint — 213.2 KB → 28.6 KB of preloaded font per page once scoped (`docs/audit/2026-07-health-audit.md` §1.1). The value cannot be derived from config at build time: `next/font` rejects any non-literal loader option ("Font loader values must be explicitly written literals"), and it registers a preload for _every_ declared font instance, so a two-instance "mount the one you want" approach still preloads both (verified). The compile-time guard is the strongest available substitute for derivation — it turns a silent per-page regression (or a missing Arabic preload on an Arabic site) into a caught build error.
+
+Tradeoff accepted: switching a deployment to Arabic-primary is a two-line change (default locale + the Noto preload literal) rather than one, but the guard makes the second line unforgettable. Noto still ships and loads on demand when Arabic renders, scoped by `unicode-range`; a Latin page with incidental Arabic takes a brief on-demand swap, which is the correct trade for not taxing every first paint.
+
+Alternatives considered: `preload: APP_CONFIG.direction === "rtl"` (rejected: next/font forbids non-literal options), two literal instances selected at runtime (rejected: both instances preload regardless of which variable mounts), leaving Noto preloaded everywhere (rejected: the 162 KB/page regression this fixes), a bare documented literal with no guard (rejected: silent drift is exactly the failure class this repo guards against).
+
 ## Native fetch as the HTTP client (axios removed)
 
 Decision: The API boundary (`src/api`) is built on native `fetch`; the declared-but-unused axios dependency was removed.

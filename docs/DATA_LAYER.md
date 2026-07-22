@@ -20,6 +20,12 @@ Why fetch and not axios:
 - **Zero bytes.** axios is ~35 kB of client bundle to ship features the
   platform now provides: `AbortSignal.timeout` (timeouts),
   `AbortSignal.any` (cancellation composition), `Response.json`.
+  **Browser floor:** `AbortSignal.any` is the newest of these — Chrome 116+,
+  Safari 17.4+, Firefox 124+ (early-2024 evergreen). It is a Web API, not JS
+  syntax, so a `browserslist` entry would not polyfill it; a product that must
+  support older Safari should polyfill `AbortSignal.any`/`timeout` or replace
+  the composition in `client.ts`. This is the only non-trivial platform floor
+  the client assumes.
 - **What axios actually buys — interceptors and error normalization — is
   replaced by a single choke point.** `apiFetch` is the one function every
   request passes through; cross-cutting behavior (auth, tracing, error
@@ -65,6 +71,19 @@ the schema's inferred type. Without `schema`, the promise resolves to
 `unknown` — the type system forces an unvalidated consumer to cast
 deliberately at the call site. That is the opt-in mechanism: validation is
 the path of least resistance, skipping it is visible in review.
+
+**Client-bundle cost (why `client.ts` imports zod as a type only).** Zod is
+~69 KB gz. To keep it off the client for call sites that pass no schema,
+`client.ts` imports `zod` with `import type` only and formats schema-rejection
+errors from the `ZodError` instance's own `issues` rather than the runtime
+`z.prettifyError` (docs/audit/2026-07-health-audit.md §1.2). A call site that
+**does** pass a schema already bundles zod to define that schema, so validated
+routes pay for zod exactly once and unvalidated ones pay nothing. The same
+reasoning is why the fail-fast env **validator** lives in
+`src/config/env-validation.ts` (zod, imported only by `next.config.ts`) and
+not in `src/config/env.ts` (which `apiFetch` reaches on the client) — see that
+file's header. Net effect: zod ships to the browser only where a response is
+actually validated.
 
 Rationale: validating at the boundary is what makes `"parse"` errors exist
 at all — without it, a backend contract drift surfaces as undefined

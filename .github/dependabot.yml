@@ -1,0 +1,53 @@
+# Dependency updates.
+#
+# Dependabot (not Renovate) is chosen deliberately: it is native to GitHub, so a
+# repository created from this template inherits working automation from its
+# first day with zero external setup. Renovate is more capable (richer grouping,
+# auto-merge), but it requires installing and authorizing the Renovate GitHub App
+# on every clone — friction that contradicts this foundation's "works on the
+# first PR of a fresh clone, no configuration" posture (see docs/CLONING.md §3).
+#
+# Anti-flood measures, because a template must not greet its owner with a wall of
+# PRs: a weekly cadence, and grouped updates so routine minor/patch bumps arrive
+# as at most a few PRs per week instead of one per package. Majors are NOT grouped
+# (they deserve individual review) but are capped by the open-PR limit. Commit
+# messages use a Conventional-Commits prefix to satisfy this repo's commitlint.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      # Routine production bumps collapse into one PR.
+      production-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      # Routine tooling/test/build bumps collapse into another.
+      development-minor-patch:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # Keep the CI workflow's actions current (same cadence, one grouped PR).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      github-actions:
+        patterns:
+          - "*"

@@ -41,6 +41,8 @@ npm run dev        # http://localhost:3000 — /showcase is the living demo
 | `CODE_STYLE.md`              | Naming, imports, exports, TypeScript usage                               |
 | `CONTRIBUTING.md`            | Feature placement, shared-code promotion, PR expectations                |
 | `DECISIONS.md`               | The decision log — every stack choice with reasoning                     |
+| `SECURITY.md`                | How to report a vulnerability; dependency posture                        |
+| `LICENSE`                    | MIT (project code) + the font's separate OFL notice                      |
 | `docs/audit/`                | Historical point-in-time reviews (do not read as current state)          |
 
 ## Tech stack
@@ -110,8 +112,21 @@ tests`, failing fast. Node version comes from `.nvmrc`. The workflow needs
   no secrets or configuration — it works on day one in a fresh clone/fork.
 
 Environment variables are validated fail-fast at startup: `next.config.ts`
-imports `src/config/env.ts`, which throws with the offending variable names.
-See the comment in `env.ts` for how to add a variable.
+imports `src/config/env-validation.ts` (the Zod validator, kept separate so
+Zod never ships to the client — `src/config/env.ts` holds the client-safe
+typed values). It throws with the offending variable names. See the comment
+in `env.ts` for how to add a variable.
+
+## License
+
+[MIT](LICENSE) © Nasser Almutaani. Permissive by design — clone this template
+and ship private or commercial products from it without copyleft obligations.
+When you create a product from it, update the copyright holder in `LICENSE` (or
+replace the file) to your own. The bundled **Noto Sans Arabic** font is covered
+separately by the **SIL Open Font License 1.1** (`src/assets/fonts/OFL.txt`) and
+must keep shipping with that notice; the MIT license does not affect it. Geist /
+Geist Mono are fetched by `next/font` at build time and are OFL-licensed in
+their own metadata.
 
 ## Direction & internationalization
 
