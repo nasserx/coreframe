@@ -22,8 +22,10 @@ const ARABIC_SAMPLE = "المعرفة أساس التقدم، والتصميم �
  * unicode-range, so in the page's stack spaces render in the LATIN face —
  * and the Latin face's space width is not part of this contract (swapping
  * Geist for Archivo in the 2026-07 rebrand shifted it by ~1.3px per space
- * and broke the old spaced assertion). Every code point below resolves
- * through Noto, so stack vs pure-Noto must be pixel-identical.
+ * and broke the old spaced assertion; the 2026-08 pass swapped back to
+ * Geist, which is exactly why this sample stays space-free — immune to the
+ * Latin face). Every code point below resolves through Noto, so stack vs
+ * pure-Noto must be pixel-identical.
  */
 const ARABIC_MEASURE_SAMPLE = "المعرفةأساسالتقدموالتصميمالجيديخدمالجميع";
 

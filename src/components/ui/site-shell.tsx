@@ -193,7 +193,7 @@ export function SiteShellHeader({ className, children, ...props }: SiteShellHead
       {/* The row is capped by Container — bar content must fit inside that
           cap at every width above the collapse line; the e2e overflow sweep
           checks this row against its own box. */}
-      <Container data-slot="site-shell-header-row" className="flex h-14 min-w-0 items-center gap-4">
+      <Container data-slot="site-shell-header-row" className="flex h-16 min-w-0 items-center gap-4">
         {children}
       </Container>
     </header>
@@ -254,7 +254,7 @@ export function SiteShellNav({
               collapse.belowOnly,
             )}
           >
-            <div className="flex h-14 shrink-0 items-center justify-end border-b px-2">
+            <div className="flex h-16 shrink-0 items-center justify-end border-b px-2">
               <DialogPrimitive.Close
                 render={<Button variant="ghost" size="icon-sm" />}
                 data-slot="site-shell-drawer-close"
@@ -286,14 +286,18 @@ export function SiteShellNav({
  * pill, no underline — weight and color distinguish states on a three-step
  * ladder that keeps nav items subordinate to the (larger, bolder) brand:
  *
- *   - idle link    → `text-foreground` + `font-normal`; on hover it
+ *   - idle link    → `text-foreground` + `font-medium`; on hover it
  *                    LIGHTENS to `text-muted-foreground` (the item recedes
  *                    under the cursor rather than lighting up).
- *   - current page → `text-foreground` + `font-semibold` (`aria-current`).
+ *   - current page → `text-foreground` + `font-bold` (`aria-current`).
  *                    Weight is what marks it: idle links already sit at
  *                    full foreground strength, so color cannot carry
  *                    current — and weight, unlike an underline, does not
- *                    fight a dropdown menu opening beneath the item.
+ *                    fight a dropdown menu opening beneath the item. Idle is
+ *                    medium (500) rather than normal so a primary nav element
+ *                    does not read as thin; current is bold (700), keeping the
+ *                    same 200-unit weight gap that makes current unambiguous
+ *                    (medium-vs-semibold alone was too subtle to carry it).
  *   - unavailable  → `text-muted-foreground` + `font-normal`, muted at
  *                    rest so it reads distinct from a full-strength idle
  *                    link; non-interactive, non-focusable, sr-only hint.
@@ -337,11 +341,13 @@ export function SiteShellNavItem({
       aria-current={isCurrent ? "page" : undefined}
       className={cn(
         base,
-        // Idle: full-strength foreground, lightening (receding) on hover.
-        // Current: same color, distinguished by weight — see the component
-        // doc for why weight, not color or an underline, carries current.
-        "font-normal text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        isCurrent && "font-semibold hover:text-foreground",
+        // Idle: full-strength foreground at medium weight (a primary
+        // interactive element should not read as thin), lightening
+        // (receding) on hover. Current: same color, distinguished by weight
+        // — see the component doc for why weight, not color or an underline,
+        // carries current.
+        "font-medium text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        isCurrent && "font-bold hover:text-foreground",
         className,
       )}
     >

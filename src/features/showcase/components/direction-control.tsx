@@ -47,7 +47,10 @@ export function DirectionControl() {
           key={value}
           value={value}
           aria-label={value === "ltr" ? "Left to right" : "Right to left"}
-          className="inline-flex h-6.5 items-center justify-center rounded-md px-1.5 font-mono text-caption text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs"
+          // h-7.5 makes the group 36px (h-9), aligned with ThemeControl and
+          // lg header CTAs in the action cluster (docs/DESIGN_TOKENS.md
+          // § Control height).
+          className="inline-flex h-7.5 items-center justify-center rounded-md px-1.5 font-mono text-caption text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs"
         >
           {value}
         </Toggle>
