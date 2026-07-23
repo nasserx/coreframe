@@ -155,6 +155,39 @@ Honest defects and frictions, none currently blocking:
 
 Upgrades held back on purpose, waiting on an upstream signal — not neglect.
 
+**Shared root cause.** Both blocks below have the same origin: `eslint-config-next`
+bundles its own copies of the lint/type plugins (`eslint-plugin-react`,
+`eslint-plugin-import`, `@typescript-eslint/*`). Our lint/type stack therefore
+advances at eslint-config-next's pace, not ours — a major bump of a _host_ tool
+(`eslint`, `typescript`) that lands ahead of those bundled plugins breaks
+`npm run lint`/`typecheck` in CI even though our own code is unchanged. The
+general rule this encodes: **majors of the lint/type toolchain ride in on a
+Next.js major** (which upgrades eslint-config-next and its plugins together),
+never on their own. `.github/dependabot.yml` ignores `semver-major` for the whole
+family (`eslint`, `typescript`, and defensively `eslint-plugin-*`,
+`@typescript-eslint/*`, `typescript-eslint`); `eslint-config-next` itself is left
+free, since it is the governor that unblocks the rest.
+
+### ESLint 10 (blocked on eslint-config-next's bundled plugins)
+
+- **Blocked:** the ESLint major line. `eslint` is pinned to `^9` and Dependabot
+  ignores its `semver-major` updates (`.github/dependabot.yml`). Minor/patch of
+  ESLint 9 still flow normally.
+- **Why:** `eslint-config-next` bundles `eslint-plugin-react@7.37.x`, which calls
+  `context.getFilename()` — an API removed in ESLint 10. Loading any React rule
+  (e.g. `react/display-name`) throws
+  `contextOrFilename.getFilename is not a function`, aborting the whole lint run.
+  A Dependabot PR bumping `eslint` 9.39.4 → 10.7.0 (#7) was merged and broke CI on
+  `main`; it was reverted on `fix/eslint-major-regression`. This is a tooling gap,
+  not a defect in this repo's code.
+- **Upstream tracking:** eslint-plugin-react ESLint 10 support —
+  <https://github.com/jsx-eslint/eslint-plugin-react/issues/3699>
+- **Revisit signal:** `eslint-config-next` ships a release whose bundled
+  `eslint-plugin-react`/`eslint-plugin-import` support ESLint 10 (normally arrives
+  with a Next.js major). At that point: bump `eslint-config-next`, raise the
+  `eslint` constraint, drop the `eslint` `ignore` entry in
+  `.github/dependabot.yml`, and confirm `npm run lint` passes.
+
 ### TypeScript 6/7 (blocked on typescript-eslint)
 
 - **Blocked:** the TypeScript major line. `typescript` is pinned to `^5` and
