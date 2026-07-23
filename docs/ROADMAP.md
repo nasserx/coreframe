@@ -151,6 +151,31 @@ Honest defects and frictions, none currently blocking:
    measured numbers and the decision); revisit the full-matrix-on-PR policy
    when browser time passes ~10 minutes.
 
+## Deferred tooling upgrades
+
+Upgrades held back on purpose, waiting on an upstream signal — not neglect.
+
+### TypeScript 6/7 (blocked on typescript-eslint)
+
+- **Blocked:** the TypeScript major line. `typescript` is pinned to `^5` and
+  Dependabot is configured to ignore its `semver-major` updates
+  (`.github/dependabot.yml`). Minor/patch of TS 5 still flow normally.
+- **Why:** TypeScript 7 is a full rewrite of the compiler (the "native"/Go
+  port), and the type-aware lint ecosystem has not caught up —
+  typescript-eslint's peer range is `>=4.8.4 <6.1.0`, so a major bump makes
+  `npm run lint` fail in CI (the linter refuses to run against an unsupported
+  compiler). This is a tooling gap, not a defect in this repo's code. A
+  Dependabot PR proposing `7.0.2` was closed unmerged for exactly this reason.
+- **Upstream tracking:**
+  <https://github.com/typescript-eslint/typescript-eslint/issues/10940>
+- **Revisit signal:** typescript-eslint publishes a release whose `typescript`
+  peer range admits the target major (e.g. `<7.1.0` or wider). At that point:
+  bump `@typescript-eslint/*` (via `eslint-config-next`/its own release), then
+  raise the `typescript` constraint, drop the `ignore` entry in
+  `.github/dependabot.yml`, and confirm `npm run lint` + `npm run typecheck`
+  pass. TS 6 is covered by the same block for the same reason and lifts the
+  same way.
+
 ## Deferred from the 2026-07 health audit
 
 The `chore/template-hardening` pass implemented the high-value findings of

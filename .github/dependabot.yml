@@ -23,6 +23,17 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    ignore:
+      # TypeScript 6/7 are held back until typescript-eslint supports them.
+      # TS 7 is a full compiler rewrite; the ESLint type-checking ecosystem
+      # has not caught up (typescript-eslint peer range is <6.1.0), so a major
+      # bump breaks `npm run lint` in CI. Minor/patch of TS 5 keep flowing.
+      # Revisit when typescript-eslint ships the supported range — tracking:
+      # https://github.com/typescript-eslint/typescript-eslint/issues/10940
+      # (see docs/ROADMAP.md "Deferred tooling upgrades").
+      - dependency-name: "typescript"
+        update-types:
+          - version-update:semver-major
     groups:
       # Routine production bumps collapse into one PR.
       production-minor-patch:
