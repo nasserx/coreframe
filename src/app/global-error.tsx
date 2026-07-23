@@ -37,7 +37,7 @@ export default function GlobalError({
     <html
       lang={APP_CONFIG.defaultLocale}
       dir={APP_CONFIG.direction}
-      className={`${FONT_VARIABLE_CLASSES} h-full antialiased`}
+      className={`${FONT_VARIABLE_CLASSES} h-full`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

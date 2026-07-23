@@ -21,6 +21,27 @@
   body {
     @apply bg-background text-foreground;
   }
+  /*
+   * Pointer affordance. Tailwind v4's Preflight dropped the rule that gave
+   * `button`/`[role="button"]` a pointer cursor, so every button-shaped
+   * control across the system fell back to the arrow. Restore it once here for
+   * genuinely interactive elements (buttons, button-role elements, labels
+   * bound to a control, and disclosure summaries). Disabled and aria-disabled
+   * controls read as `not-allowed`; text inputs and textareas are untouched, so
+   * they keep the UA text caret. Controls that go inert via
+   * `pointer-events-none` when disabled (Button, per the shadcn convention)
+   * emit no cursor at all — a stronger "unavailable" signal than a swap.
+   */
+  button:not(:disabled):not([aria-disabled="true"]),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
   html {
     @apply font-sans;
     /*

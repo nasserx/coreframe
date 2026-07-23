@@ -23,7 +23,7 @@ export default function SitePage() {
           <h1 className="max-w-prose text-title sm:text-display">
             The public shell, in its own voice.
           </h1>
-          <p className="max-w-prose text-body-lg text-muted-foreground">
+          <p className="max-w-prose text-body-lg">
             This page renders inside the SiteShell — the public-site counterpart to the AppShell the
             rest of the showcase uses: a sticky top bar with brand, navigation, and actions, a
             footer with grouped link columns, and the same skip link and drawer mechanics.
@@ -47,7 +47,7 @@ export default function SitePage() {
         title="Responsive collapse"
         description="Below the collapse breakpoint the top-bar navigation moves into a modal drawer opened from the actions cluster — the same Base UI Dialog mechanics as the AppShell drawer: focus trap, Escape, backdrop dismissal, focus return, close on navigation."
       >
-        <ul className="flex max-w-prose list-disc flex-col gap-2 ps-5 text-small text-muted-foreground">
+        <ul className="flex max-w-prose list-disc flex-col gap-2 ps-5 text-small">
           <li>
             The breakpoint is a prop (<code>collapseBelow</code>), not a constant. There is no width
             at which an unknown brand + navigation + actions row is guaranteed to fit — measure your
@@ -62,24 +62,25 @@ export default function SitePage() {
         </ul>
       </ShowcaseSection>
       <ShowcaseSection
-        title="Unavailable destinations"
-        description="“Pricing” in the top bar and the footer has no href on purpose: an item without a destination renders as non-interactive, non-focusable muted text with an sr-only availability hint — never a dead link, never a 404. Every new product has unbuilt destinations on day one."
+        title="Unavailable destinations and actions"
+        description="Two shapes, two treatments. A missing destination (“Pricing”, in the top bar and footer) has no href on purpose: it renders as non-interactive, non-focusable muted text with an sr-only availability hint — never a dead link, never a 404. An action-shaped affordance stays interactive and explains itself. Every new product has both on day one."
       >
-        <p className="max-w-prose text-small text-muted-foreground">
+        <p className="max-w-prose text-small">
           Tab through the header: focus moves from the brand through the real links and skips
           &ldquo;Pricing&rdquo; entirely; a screen reader announces it with its availability hint.
           When the destination ships, adding <code>href</code> turns the same item into a link with{" "}
           <code>aria-current</code> handling. The &ldquo;Log in&rdquo; and &ldquo;Get started&rdquo;
-          actions are the same pattern in button clothing: the showcase has no authentication, so
-          they render as non-focusable styled text with the availability hint — real widths for the
-          collapse measurement, no dead destinations.
+          actions take the other treatment: because a button that looks interactive must behave
+          interactively, they are real buttons with full hover, active, and focus states that toast
+          an explanation on activation — real widths for the collapse measurement, and no dead
+          buttons.
         </p>
       </ShowcaseSection>
       <ShowcaseSection
         title="Landmarks and direction"
         description="banner, nav, main, and contentinfo landmarks; a skip link as the first focusable element; document-level scroll. All styling is logical, so the entire shell mirrors under dir=rtl — flip the direction control above to verify."
       >
-        <p className="max-w-prose text-small text-muted-foreground">
+        <p className="max-w-prose text-small">
           The shell is structural, not designed: it consumes the base background, border, and accent
           tokens (the <code>sidebar-*</code> set belongs to application chrome) and takes className
           on every part. Which shell to reach for when is documented in

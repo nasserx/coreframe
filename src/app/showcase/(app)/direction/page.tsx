@@ -223,12 +223,10 @@ export default function DirectionPage() {
               <TabsTrigger value="second">التفاصيل</TabsTrigger>
             </TabsList>
             <TabsContent value="first">
-              <p className="text-muted-foreground">
-                تتنقل مفاتيح الأسهم بين التبويبات وفق اتجاه القراءة.
-              </p>
+              <p>تتنقل مفاتيح الأسهم بين التبويبات وفق اتجاه القراءة.</p>
             </TabsContent>
             <TabsContent value="second">
-              <p className="text-muted-foreground">لوحة التفاصيل.</p>
+              <p>لوحة التفاصيل.</p>
             </TabsContent>
           </Tabs>
         </Stack>

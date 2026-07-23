@@ -49,12 +49,10 @@ export default function NavigationPage() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="first">
-              <p className="text-muted-foreground">
-                Filled list style. Arrow keys move between triggers.
-              </p>
+              <p>Filled list style. Arrow keys move between triggers.</p>
             </TabsContent>
             <TabsContent value="second">
-              <p className="text-muted-foreground">Second panel.</p>
+              <p>Second panel.</p>
             </TabsContent>
           </Tabs>
           <Tabs defaultValue="first">
@@ -63,10 +61,10 @@ export default function NavigationPage() {
               <TabsTrigger value="second">Second</TabsTrigger>
             </TabsList>
             <TabsContent value="first">
-              <p className="text-muted-foreground">Line variant with an underline indicator.</p>
+              <p>Line variant with an underline indicator.</p>
             </TabsContent>
             <TabsContent value="second">
-              <p className="text-muted-foreground">Second panel.</p>
+              <p>Second panel.</p>
             </TabsContent>
           </Tabs>
         </Stack>

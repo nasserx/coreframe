@@ -21,7 +21,7 @@ export default function RootLayout({
       // (docs/DIRECTION_AND_I18N.md). All styling is logical-property based,
       // so this attribute is the only direction switch.
       dir={APP_CONFIG.direction}
-      className={`${FONT_VARIABLE_CLASSES} h-full antialiased`}
+      className={`${FONT_VARIABLE_CLASSES} h-full`}
       // The theme init script sets the `dark` class before hydration.
       suppressHydrationWarning
     >

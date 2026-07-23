@@ -68,13 +68,14 @@ export function ThemeControl({ className, optionLabels, ...props }: ThemeControl
           key={value}
           value={value}
           aria-label={optionLabels?.[value] ?? label}
-          // size-7.5 makes the group 36px tall (h-9) — the "prominent"
+          // size-6.5 makes the group 32px tall (h-8) — the baseline
           // control-height step (docs/DESIGN_TOKENS.md § Control height), so
-          // it aligns with lg header CTAs in a header action cluster.
-          // Attached (not offset) focus ring: the toggle is nested inside
-          // the group's own border, so an offset ring would collide with
-          // its siblings (docs/DESIGN_TOKENS.md §2).
-          className="inline-flex size-7.5 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs [&_svg]:pointer-events-none [&_svg]:size-4"
+          // it aligns with the default-size header CTAs in an action cluster
+          // (the 2026-09 pass brought the cluster down from lg/h-9 to the
+          // baseline). Attached (not offset) focus ring: the toggle is nested
+          // inside the group's own border, so an offset ring would collide
+          // with its siblings (docs/DESIGN_TOKENS.md §2).
+          className="inline-flex size-6.5 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs [&_svg]:pointer-events-none [&_svg]:size-4"
         >
           <Icon />
         </Toggle>

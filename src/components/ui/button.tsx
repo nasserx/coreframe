@@ -14,14 +14,24 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        // Outline, ghost and secondary all sit ON the page in both themes —
+        // the flat identity defines them by border (outline) or a quiet
+        // in-plane fill (secondary), never a fill lighter than the page that
+        // reads as a raised chip. Dark keeps a stronger `input` border on
+        // outline (a control-boundary edge, 3:1) but NO fill; hover lifts to
+        // `accent` (perceptible against both paper and charcoal).
         outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-border bg-background hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground dark:border-input",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+          "hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground",
+        // Tint alphas are contrast-bound on the lifted charcoal surface: dark
+        // rests at /15 (not /20) and both themes hover to /18 — the ceiling
+        // that keeps destructive text over its own tint at 4.5:1
+        // (docs/DESIGN_TOKENS.md §3).
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30",
+          "bg-destructive/10 text-destructive hover:bg-destructive/18 dark:bg-destructive/15",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

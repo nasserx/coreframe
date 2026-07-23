@@ -287,22 +287,33 @@ width while its build stayed green. Measure your bar's real content and
 pick the smallest screen it fits; the browser suite's overflow sweep
 (`tests/e2e/overflow.spec.ts`) fails when the choice is wrong.
 
-### Unavailable destinations
+### Unavailable destinations and actions
 
-A `SiteShellNavItem` without `href` renders as non-interactive,
-non-focusable muted text carrying an sr-only availability hint
-(`unavailableLabel`, localize at the call site) — never a dead link, never
-a 404. Every new product has unbuilt destinations on day one; this is the
-sanctioned way to show them. Adding `href` later turns the same item into
-a real link with `aria-current` handling. The pattern works in the bar,
-the drawer, and (with padding overridden) footer columns.
+The honesty rule — **never present something as available when it is
+not** — has two treatments, split by the _shape_ of the affordance.
 
-The same honesty rule extends to action-shaped affordances: a demo or
-pre-launch "Log in" / "Get started" must not be a dead link, a 404, or a
-no-op `<button>`. The demo renders them as non-focusable `<span>`s
-carrying `buttonVariants` styling, `pointer-events-none`, and the same
-sr-only availability hint — real widths for the collapse measurement,
-no fake interactivity.
+**A destination without a page renders as non-interactive text.** A
+`SiteShellNavItem` without `href` is non-interactive, non-focusable muted
+text carrying an sr-only availability hint (`unavailableLabel`, localize at
+the call site) — never a dead link, never a 404. A link's whole contract is
+"activate me to go somewhere"; with nowhere to go, the correct move is to
+_stop looking like a link_. Every new product has unbuilt destinations on
+day one; this is the sanctioned way to show them. Adding `href` later turns
+the same item into a real link with `aria-current` handling. The pattern
+works in the bar, the drawer, and (with padding overridden) footer columns.
+
+**An action-shaped affordance stays interactive and explains itself.** A
+button's contract is "activate me to _do_ something", and a control that
+looks interactive must behave interactively — a `pointer-events-none`
+button is the exact "dead button" a reviewer rightly flags. So a demo or
+pre-launch "Log in" / "Get started" is a **real** `<button>` with full
+hover / active / focus states that, on activation, explains its
+unavailability (the showcase's `UnavailableCta` toasts a message). The
+no-dead-ends guarantee is preserved by the _explanation_, not by removing
+interactivity — and the button still renders at real widths, so the
+collapse-breakpoint measurement stays honest. Never fake it with a styled
+non-interactive `<span>`: that reproduces the dead-button problem this rule
+exists to prevent.
 
 ### Accessibility and direction
 

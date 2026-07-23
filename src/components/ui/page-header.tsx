@@ -37,10 +37,12 @@ export function PageHeaderDescription({ className, ...props }: PageHeaderDescrip
   return (
     <p
       data-slot="page-header-description"
-      // -mt-2 tightens the title + description pair into a lockup (net
-      // 0.25rem) while the header's gap-3 still separates it from a
-      // preceding breadcrumb — one rhythm decision, owned here.
-      className={cn("-mt-2 max-w-prose text-small text-muted-foreground", className)}
+      // The page's lead paragraph (standfirst): text-body-lg, one step above
+      // ordinary body, so it leads into the page now that tone no longer marks
+      // it (docs/DESIGN_TOKENS.md "Type hierarchy"). -mt-2 tightens the title +
+      // description pair into a lockup while the header's gap-3 still separates
+      // it from a preceding breadcrumb — one rhythm decision, owned here.
+      className={cn("-mt-2 max-w-prose text-body-lg", className)}
       {...props}
     />
   );
