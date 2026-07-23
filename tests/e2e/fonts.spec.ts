@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /*
  * Guards the Arabic font-loading contract (docs/DIRECTION_AND_I18N.md).
  *
- * The original defect was silent: Geist's Arial-based metric fallback
+ * The original defect was silent: the Latin face's Arial-based metric fallback
  * contains Arabic glyphs, so with the wrong stack order Arabic rendered in
  * plausible-looking fallback text while Noto Sans Arabic never loaded.
  * "The page shows Arabic" is therefore not evidence. This spec asserts the
@@ -22,10 +22,11 @@ const ARABIC_SAMPLE = "المعرفة أساس التقدم، والتصميم �
  * unicode-range, so in the page's stack spaces render in the LATIN face —
  * and the Latin face's space width is not part of this contract (swapping
  * Geist for Archivo in the 2026-07 rebrand shifted it by ~1.3px per space
- * and broke the old spaced assertion; the 2026-08 pass swapped back to
- * Geist, which is exactly why this sample stays space-free — immune to the
- * Latin face). Every code point below resolves through Noto, so stack vs
- * pure-Noto must be pixel-identical.
+ * and broke the old spaced assertion; the identity face has since changed
+ * again — to Public Sans in the 2026-10 body-legibility pass — which is
+ * exactly why this sample stays space-free: immune to the Latin face).
+ * Every code point below resolves through Noto, so stack vs pure-Noto must
+ * be pixel-identical.
  */
 const ARABIC_MEASURE_SAMPLE = "المعرفةأساسالتقدموالتصميمالجيديخدمالجميع";
 
