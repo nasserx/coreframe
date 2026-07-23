@@ -10,6 +10,8 @@ import {
   SiteShellMain,
   SiteShellNav,
   SiteShellNavItem,
+  SiteShellNavMenu,
+  SiteShellNavMenuItem,
   SiteShellNavTrigger,
 } from "@/components/ui/site-shell";
 import { Stack } from "@/components/ui/stack";
@@ -66,8 +68,39 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
           Foundation Showcase
         </Link>
         <SiteShellNav label="Site sections">
-          <SiteShellNavItem href="/showcase/site">Overview</SiteShellNavItem>
-          <SiteShellNavItem href="/showcase/layout">Layout</SiteShellNavItem>
+          {/* A dropdown of real showcase destinations (docs/LAYOUT.md §6):
+              every link resolves to an existing route, and "Changelog"
+              demonstrates the unavailable-destination pattern INSIDE the
+              panel. Below the collapse line this same set renders in the
+              drawer as a labelled "Explore" group. */}
+          <SiteShellNavMenu label="Explore">
+            <SiteShellNavMenuItem
+              href="/showcase/site"
+              title="Overview"
+              description="The SiteShell reference composition."
+            />
+            <SiteShellNavMenuItem
+              href="/showcase/layout"
+              title="Layout"
+              description="Measure, rhythm, and page scaffold."
+            />
+            <SiteShellNavMenuItem
+              href="/showcase/tokens"
+              title="Design tokens"
+              description="Colour, type, elevation, and motion."
+            />
+            <SiteShellNavMenuItem
+              href="/showcase/navigation"
+              title="Navigation"
+              description="Menus, tabs, breadcrumbs, pagination."
+            />
+            <SiteShellNavMenuItem
+              href="/showcase/data"
+              title="Data layer"
+              description="apiFetch, query keys, error states."
+            />
+            <SiteShellNavMenuItem title="Changelog" description="Release notes — coming soon." />
+          </SiteShellNavMenu>
           <SiteShellNavItem>Pricing</SiteShellNavItem>
           {/* The auth actions live in the drawer below `md` (measured: the
               CTAs beside the brand overflow the bar until ~768px), so the

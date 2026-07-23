@@ -56,17 +56,22 @@ signal is the failure mode this repo was designed to avoid.
   from the query cache, the URL, or local state (cart, wizard drafts). Most
   products reach this much later than they expect.
 
-### Multi-level site navigation (dropdowns / mega menu)
+### Multi-level site navigation (dropdowns) — SHIPPED (2026-07)
 
-- **Missing:** `SiteShellNav` is single-level — no dropdown sections, no
-  mega menu, no nested drawer groups.
-- **Extension points:** `SiteShellNavItem` composes freely with the
-  existing Menu/Popover primitives at the call site; the drawer renders
-  arbitrary children.
-- **Trigger:** the first product whose public navigation genuinely exceeds
-  one level. The first product built on this foundation did not need it —
-  its bar overflowed for width reasons, not depth reasons — so nothing is
-  prebuilt.
+- **Shipped:** `SiteShellNavMenu` + `SiteShellNavMenuItem` add a two-column
+  dropdown panel of sub-destinations to any `SiteShellNav` item, built on
+  Base UI's `NavigationMenu` (a navigation/disclosure pattern, not a
+  `role="menu"` menubar). Panel opens on hover and click/tap, keyboard
+  operable end to end, Escape/outside-press dismissal with focus return, and
+  the unavailable-destination rule applies inside the panel. Below
+  `collapseBelow` it renders in the drawer as a labelled group, not a flat
+  dump. Full API, interaction model, and rationale in `docs/LAYOUT.md` §6;
+  demo on `/showcase/site`.
+- **Still absent (no signal yet):** a full **mega menu** (mixed media /
+  featured blocks) and **nested submenus** inside a panel — Base UI's
+  `NavigationMenu` supports nesting, but no product has needed either, so the
+  primitive stays a single-level two-column panel. Build on the shipped
+  component when a product's navigation genuinely demands more depth.
 
 ### React Query devtools
 
