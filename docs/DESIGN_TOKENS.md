@@ -81,9 +81,9 @@ reads as white and keeps that headroom below peak. The whole family moves
 together (`foreground`, `surface-foreground`, `popover-foreground`,
 `secondary-foreground`, `accent-foreground`, `sidebar-accent-foreground`) —
 one value, applied consistently, never tuned per token.
-`--color-muted-foreground` is the deliberate exception: it stays dimmed (0.69)
+`--color-muted-foreground` is the deliberate exception: it stays dimmed (0.665)
 because it is the _secondary_-text role (see the cross-theme "Secondary text"
-row for why 0.69, not a value matching light's 0.46). The near-white _primary_ fill stays
+row for why 0.665, not a value matching light's 0.46). The near-white _primary_ fill stays
 at 0.955, a hair below the text white, so a filled button reads as a surface
 (and `primary/80` hover still shifts visibly).
 
@@ -93,14 +93,14 @@ at 0.955, a hair below the text white, so a filled button reads as a surface
 | `--color-foreground`                 | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.001 84)`           |
 | `--color-surface`                    | `oklch(0.996 0.003 84)`           | `oklch(0.278 0.004 84)`           |
 | `--color-surface-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.001 84)`           |
-| `--color-popover`                    | `oklch(0.996 0.003 84)`           | `oklch(0.315 0.005 84)`           |
+| `--color-popover`                    | `oklch(0.996 0.003 84)`           | `oklch(0.295 0.005 84)`           |
 | `--color-popover-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.001 84)`           |
 | `--color-primary`                    | `oklch(0.225 0.014 84)`           | `oklch(0.955 0.001 84)`           |
 | `--color-primary-foreground`         | `oklch(0.985 0.005 84)`           | `oklch(0.18 0.004 84)`            |
 | `--color-secondary`                  | `oklch(0.945 0.006 84)`           | `oklch(0.31 0.005 84)`            |
 | `--color-secondary-foreground`       | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.001 84)`           |
-| `--color-muted`                      | `oklch(0.95 0.005 84)`            | `oklch(0.305 0.004 84)`           |
-| `--color-muted-foreground`           | `oklch(0.46 0.015 84)`            | `oklch(0.72 0.004 84)`            |
+| `--color-muted`                      | `oklch(0.95 0.005 84)`            | `oklch(0.295 0.004 84)`           |
+| `--color-muted-foreground`           | `oklch(0.46 0.015 84)`            | `oklch(0.665 0.004 84)`           |
 | `--color-accent`                     | `oklch(0.935 0.007 84)`           | `oklch(0.34 0.006 84)`            |
 | `--color-accent-foreground`          | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.001 84)`           |
 | `--color-success`                    | `oklch(0.52 0.12 155)`            | `oklch(0.7 0.13 155)`             |
@@ -147,9 +147,12 @@ Design notes:
   **hairline rule** (below): dark `0.385` (1.70:1 vs background, 1.50:1 vs
   surface). Cards, popovers and dialogs draw the **border token**
   (`ring-border`), so their edges track the same hairline as every other
-  surface. Current dark ladder (2026-09 charcoal): `background 0.235 → surface
-0.278 → popover 0.315`; the step is ΔL ~0.04 as before, just shifted up off
-  near-black.
+  surface. Current dark ladder: `background 0.235 → surface 0.278 → popover
+0.295`; the surface step is ΔL ~0.04, and the popover step compresses to ΔL
+  ~0.017 because the 2026-10 body-legibility pass lowered popover `0.315 →
+0.295` to buy AA headroom for dimmer secondary text (see the "Secondary text"
+  cross-theme row) — the hairline cue carries the tighter popover step per the
+  "step AND hairline" rule.
 - **Status colors in dark invert to light fills with ink text**, matching
   primary, so every filled status surface keeps AA text contrast.
 - **`--color-border` is the structural hairline of the flat system** —
@@ -255,14 +258,14 @@ perception**, because the eye responds to absolute luminance steps, not to
 token symmetry, and a near-black field compresses those steps. So several
 tokens are deliberately _asymmetric_ to land the same percept:
 
-| What must feel equal         | Light                       | Dark                             | Why different numbers                                                                                                                                                                                                                   |
-| ---------------------------- | --------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hairline "quiet but present" | border 1.23:1 vs bg         | border 1.70:1 vs bg              | a light line on dark needs a higher ratio to be seen (hairline rule above)                                                                                                                                                              |
-| Surface lift off background  | ΔL 0.018 (0.978→0.996)      | ΔL 0.043 (0.235→0.278) + border  | charcoal still compresses luminance, so dark needs a bigger step _and_ the border cue for the same perceived lift                                                                                                                       |
-| Secondary (muted) text       | muted-fg 0.46 (sep 2.62:1)  | muted-fg 0.69 (sep 2.66:1)       | what must feel equal is the _separation from body_, not each theme's contrast vs bg: light ink↔grey is 2.62:1, so dark is derived to match (2.66:1), a hair higher to offset irradiation; 0.69 is also the AA floor (4.66:1 on popover) |
-| Floating-layer shadow        | ink wash, alpha 0.05–0.13   | black, alpha 0.4–0.55            | a shadow reads against paper vs mid-dark; equal alpha would vanish in dark                                                                                                                                                              |
-| Control boundary (input)     | input 0.63 (3.2:1)          | input 0.555 (3.5:1)              | both clear 3:1 (WCAG 1.4.11) from opposite sides; matching the number would over- or under-shoot one theme                                                                                                                              |
-| Primary prominence           | ink 0.225 on paper (15.6:1) | near-white 0.955 on ink (14.6:1) | "the primary IS the ink" inverts lightness; both land the same very-high prominence vs background                                                                                                                                       |
+| What must feel equal         | Light                       | Dark                             | Why different numbers                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------------- | --------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hairline "quiet but present" | border 1.23:1 vs bg         | border 1.70:1 vs bg              | a light line on dark needs a higher ratio to be seen (hairline rule above)                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Surface lift off background  | ΔL 0.018 (0.978→0.996)      | ΔL 0.043 (0.235→0.278) + border  | charcoal still compresses luminance, so dark needs a bigger step _and_ the border cue for the same perceived lift                                                                                                                                                                                                                                                                                                                                                                      |
+| Secondary (muted) text       | muted-fg 0.46 (sep 2.62:1)  | muted-fg 0.665 (sep 2.92:1)      | what must feel equal is the _separation from body_, not each theme's contrast vs bg. Light ink↔grey is 2.62:1. Dark was 0.69/2.66:1 (matched numerically) but still read alike, because light-on-dark irradiation blooms mid-greys toward the near-white body — so equal _perception_ needs a bigger numeric gap. Dimming secondary required buying AA headroom first: popover/muted dropped `0.315→0.295`, letting muted-fg drop `0.69→0.665` (sep 2.92:1, holding 4.55:1 on popover) |
+| Floating-layer shadow        | ink wash, alpha 0.05–0.13   | black, alpha 0.4–0.55            | a shadow reads against paper vs mid-dark; equal alpha would vanish in dark                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Control boundary (input)     | input 0.63 (3.2:1)          | input 0.555 (3.5:1)              | both clear 3:1 (WCAG 1.4.11) from opposite sides; matching the number would over- or under-shoot one theme                                                                                                                                                                                                                                                                                                                                                                             |
+| Primary prominence           | ink 0.225 on paper (15.6:1) | near-white 0.955 on ink (14.6:1) | "the primary IS the ink" inverts lightness; both land the same very-high prominence vs background                                                                                                                                                                                                                                                                                                                                                                                      |
 
 The rule for future changes: decide the _perceptual_ target first, then pick
 each theme's value to hit it — never copy a value across themes for symmetry.
@@ -296,47 +299,99 @@ confidence: display/title are large, heavy, tightly tracked, and compactly
 leaded (consecutive display lines nearly touch); body steps stay at
 comfortable reading metrics.
 
-| Step         | Size     | Line-height | Letter-spacing | Weight |
-| ------------ | -------- | ----------- | -------------- | ------ |
-| `display`    | 3.5rem   | 1.05        | −0.035em       | 800    |
-| `title`      | 2.25rem  | 1.12        | −0.028em       | 800    |
-| `heading`    | 1.75rem  | 1.2         | −0.022em       | 700    |
-| `subheading` | 1.375rem | 1.3         | −0.014em       | 600    |
-| `body-lg`    | 1.125rem | 1.65        | 0              | 400    |
-| `body`       | 1rem     | 1.6         | 0              | 400    |
-| `small`      | 0.875rem | 1.5         | 0              | 400    |
-| `caption`    | 0.75rem  | 1.35        | +0.01em        | 500    |
+| Step         | Size      | Line-height | Letter-spacing | Weight |
+| ------------ | --------- | ----------- | -------------- | ------ |
+| `display`    | 3.5rem    | 1.05        | −0.035em       | 800    |
+| `title`      | 2.25rem   | 1.12        | −0.028em       | 800    |
+| `heading`    | 1.875rem  | 1.2         | −0.024em       | 700    |
+| `subheading` | 1.5rem    | 1.3         | −0.016em       | 600    |
+| `body-lg`    | 1.1875rem | 1.6         | 0              | 400    |
+| `body`       | 1.0625rem | 1.6         | 0              | 400    |
+| `small`      | 0.875rem  | 1.5         | 0              | 400    |
+| `caption`    | 0.75rem   | 1.35        | +0.01em        | 500    |
+
+Body is **17px** (`1.0625rem`) — raised from 16px in the 2026-10
+body-legibility pass. The mid-ramp opened with it (`heading 1.75→1.875rem`,
+`subheading 1.375→1.5rem`, their tracking tightened a notch) so headings keep
+the same size lead over the larger body; `display`/`title` were left alone
+(they already dominate 17px body at 3.3×/2.1×, and resizing risks hero
+overflow). The lead-paragraph step tracks body up (`body-lg 1.125→1.1875rem`),
+staying one clear step above it.
 
 At `text-display`'s size, long single words can exceed a 320px viewport —
 pair it with a smaller step below `sm` (`text-title sm:text-display`, as
 the home page does) when the copy is not under your control.
 
-**The typeface is Geist** (`next/font/google`, variable wght 100–900, Latin
-subset, OFL 1.1 — the license ships with Google Fonts' hosting; no font file
-lives in this repo for it). It is a neutral, tightly-spaced grotesk with
-closed apertures. The identity has now gone back and forth once: the 2026-07
-flat rebrand swapped Geist → Archivo for a more open, editorial voice; the
-2026-08 pass swapped back, because the reference direction wanted a
-_tighter, more closed, more neutral_ grotesk at display sizes than Archivo's
-letterforms, and Geist also re-unifies the type system with its own mono
-companion (one family across sans and code). Among open options the shortlist
-is unchanged: Space Grotesk and Instrument Sans stop at 700 (no true heavy);
-Inter/Inter Tight read wide and humanist; Fontshare faces (General Sans,
-Cabinet Grotesk) require self-hosting under a non-OFL license — leaving Geist
-and Archivo as the two credible OFL grotesques with a full variable weight
-axis, and the current brief points at Geist.
+**The typeface is Public Sans** (`next/font/google`, variable wght 100–900,
+Latin subset, OFL 1.1 — the license ships with Google Fonts' hosting; no font
+file lives in this repo for it). It is a neutral, Helvetica-adjacent grotesk
+(the US Web Design System's workhorse face, Libre Franklin lineage) with
+substantial stems. It was adopted in the 2026-10 body-legibility pass over
+Geist, and the decision was made by **measurement, not eye** — because every
+prior judgement here had been visual and every one was wrong (three weight
+bumps on Geist, culminating in a 450 body, all failed to fix body copy reading
+"thin"). The cause was never weight; it was the **face**: Geist has among the
+lightest 400 stems of any OFL grotesk.
+
+**The measurement method** (rerun it before ever second-guessing the body face
+— do not eyeball). Render one identical paragraph at 400 weight, same size, in
+each candidate; screenshot at high DPI; then, per face, measure by
+antialiasing-aware pixel analysis (density-weighted, sub-pixel — a hard
+threshold quantises every face to the same few pixels and cannot discriminate):
+
+- **stem width** — density-weighted thickness of a clean vertical (`l`/`I`) at
+  a large render size, as a fraction of the em;
+- **ink per character** — total ink density of the paragraph ÷ (glyph count ×
+  size²), i.e. mean ink area per glyph in em² (wrap-independent; captures stem
+  weight _and_ set width — the true "presence" of body text);
+- **x-height** and **cap-height** as fractions of the em.
+
+The eight faces measured (all OFL, all variable, all `next/font/google`, so the
+loader pattern is unchanged), 400 weight, Geist as baseline:
+
+| Face              | stem (`I`, em) | Δ stem vs Geist | x-height | ink/char (em²·10³) | set width (em) | verdict                                                                                                      |
+| ----------------- | -------------- | --------------- | -------- | ------------------ | -------------- | ------------------------------------------------------------------------------------------------------------ |
+| Geist (baseline)  | 0.086          | —               | 0.530    | 105.3              | 0.456          | lightest stems — the problem                                                                                 |
+| **Public Sans**   | **0.092**      | **+7%**         | 0.517    | 103.6              | 0.461          | **chosen**                                                                                                   |
+| Inter             | 0.093          | +8%             | 0.546    | 108.8              | 0.475          | heaviest presence, but the repo reads it humanist + it is the widest (+4% set width → most layout risk)      |
+| Archivo           | 0.095          | +10%            | 0.526    | 106.6              | 0.436          | heaviest stems, but already tried and rejected as too open/editorial; narrow, so ink/char barely beats Geist |
+| Schibsted Grotesk | 0.088          | +2%             | 0.528    | 101.8              | 0.463          | not substantially heavier                                                                                    |
+| Hanken Grotesk    | 0.088          | +2%             | 0.493    | 95.7               | 0.446          | geometric, low x-height                                                                                      |
+| Onest             | 0.087          | +1%             | 0.527    | 105.9              | 0.470          | geometric; stems ≈ Geist                                                                                     |
+| Figtree           | 0.085          | −1%             | 0.500    | 95.2               | 0.447          | geometric; _lighter_ than Geist                                                                              |
+
+Reading the table: the geometric/rounded faces (Figtree, Onest, Hanken) do
+**not** have heavier stems than Geist — proof that letterform roundness is not
+the lever, stem weight is. The heavy neutral grotesques are Archivo (+10%),
+Inter (+8%), and Public Sans (+7%). **Public Sans wins** because it is the only
+one that is heavy-stemmed (heaviest lowercase `l` of the eight) _and_
+unambiguously neutral (not humanist like Inter, not editorial like the
+already-rejected Archivo) _and_ layout-safe (set width only ~1% over Geist vs
+Inter's +4%). Its ink/char reads a hair below Geist only because its x-height
+is slightly shorter; the +7% thicker stems are what the eye reads as presence,
+confirmed visually at 17px in both themes. This is the exact target the brief
+described — "a neutral Helvetica-adjacent grotesque with substantial stems".
+
+The history for context (do not re-litigate on feel — measure): the 2026-07
+flat rebrand ran Archivo, the 2026-08 pass swapped to Geist for a tighter,
+more closed voice, and Geist then turned out to have the lightest stems tested.
+Space Grotesk / Instrument Sans stop at 700 (no true heavy); Fontshare faces
+(General Sans, Cabinet Grotesk) are non-OFL self-host — so they were not
+measured.
 
 **There is deliberately no `--font-heading`.** Headings and body share one
-family (Geist, `--font-sans`); the heading voice comes from weight and
-negative tracking in the ramp. Both face swaps kept this: the reference voice
-("tight grotesk headlines, same family at reading weight for body") is
-reachable by changing the one family and re-tuning ramp values — the payload
+family (Public Sans, `--font-sans`); the heading voice comes from weight and
+negative tracking in the ramp. Every face swap has kept this: the reference
+voice ("substantial grotesk headlines, same family at reading weight for body")
+is reachable by changing the one family and re-tuning ramp values — the payload
 argument (one Latin woff2, one FOUT source) holds regardless of which grotesk
-is loaded. Geist Mono remains the code face (`--font-mono`); Noto Sans Arabic
-remains the Arabic companion (`docs/DIRECTION_AND_I18N.md` — its
-unicode-range scoping and `size-adjust: 115%` calibration are independent of
-the Latin face; the 115% has held across both swaps because Geist and Archivo
-have near-identical x-heights, and the font e2e re-confirms it).
+is loaded. **Geist Mono remains the code face** (`--font-mono`) — the code face
+is an independent decision from the identity sans, and a monospaced grotesk
+pairs cleanly with Public Sans. Noto Sans Arabic remains the Arabic companion
+(`docs/DIRECTION_AND_I18N.md`); its `size-adjust` was recalibrated `115% → 112%`
+for Public Sans's slightly smaller x-height (measured 0.517 vs Geist's 0.530,
+so 115% × 0.517/0.53 ≈ 112%), confirmed empirically and re-checked by the font
+e2e.
 
 ### Type hierarchy (how a page leads the eye)
 
@@ -352,21 +407,24 @@ The prose/heading **roles** and the ramp step each maps to:
 | Role                            | Ramp step                              | Notes                                                                                                                    |
 | ------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Hero / page display             | `display` / `title`                    | the largest voice; heroes lead the viewport                                                                              |
-| Page title                      | `heading` (1.75rem/700)                | `PageHeaderTitle`; clearly outranks section headings                                                                     |
-| Section heading                 | `subheading` (1.375/600)               | section landmarks; 1.375× body + a 200-unit weight step                                                                  |
-| **Lead paragraph / standfirst** | `body-lg` (1.125/400)                  | the first paragraph under a page title or hero — one size step above body; `PageHeaderDescription` and hero leads use it |
-| Body                            | `body` (1rem/400)                      | running prose, section descriptions                                                                                      |
+| Page title                      | `heading` (1.875rem/700)               | `PageHeaderTitle`; clearly outranks section headings                                                                     |
+| Section heading                 | `subheading` (1.5/600)                 | section landmarks; 1.41× body + a 200-unit weight step                                                                   |
+| **Lead paragraph / standfirst** | `body-lg` (1.1875/400)                 | the first paragraph under a page title or hero — one size step above body; `PageHeaderDescription` and hero leads use it |
+| Body                            | `body` (1.0625rem = 17px / 400)        | running prose, section descriptions                                                                                      |
 | Secondary / annotative          | `small` / `caption`, usually **muted** | captions, labels, metadata (per "Body vs secondary text")                                                                |
 
-Two decisions this pass settled (2026-09, after body copy moved to
-`foreground`):
+Two decisions the 2026-09 pass settled (after body copy moved to `foreground`),
+both re-scaled with body in the 2026-10 body-legibility pass when it moved to
+17px:
 
-- **The mid-ramp was opened.** `heading` `1.5 → 1.75rem` and `subheading`
-  `1.25 → 1.375rem` (with their tracking tightened and leading pulled in a
-  notch, as the ramp does at larger sizes). At the old sizes a section heading
-  sat only 1.25× above body and leaned entirely on weight to lead; now it leads
-  by size too. `display`/`title` were left alone — they already lead, and
-  resizing them risks hero overflow (the sweep guards the rest).
+- **The mid-ramp was opened, and re-opened.** The 2026-09 pass raised `heading`
+  `1.5 → 1.75rem` and `subheading` `1.25 → 1.375rem` so a section heading leads
+  by size, not weight alone; the 2026-10 pass moved them again (`heading
+1.75 → 1.875rem`, `subheading 1.375 → 1.5rem`, tracking tightened a notch) to
+  hold that same lead over the now-larger 17px body (heading stays ~1.77× body,
+  subheading ~1.41×). `display`/`title` were left alone both times — they
+  already lead, and resizing them risks hero overflow (the sweep guards the
+  rest).
 - **The lead-paragraph role was formalised at `body-lg`.** Previously
   `PageHeaderDescription` and section descriptions were `text-small` —
   _smaller_ than the body they introduce, an inversion that only read as
@@ -392,21 +450,24 @@ because they split into two jobs (audited 2026-09):
 | 500    | Ramp caption / UI medium | `text-caption`; and the component UI weight — labels, card/dialog titles, idle nav, table headers           |
 | 400    | Ramp body / base         | `text-body`/`-lg`/`-small` — body copy proper; also the inherited base weight and component help/error text |
 
-**Body copy is 400 (2026-09 body-contrast pass).** A brief mid-month raised the
-body steps to 450 to fight body reading "thin and faint", but that diagnosis
-was wrong. The thinness had two real causes, both fixed at the source: running
-body copy was set in `muted-foreground` (~6.5:1) instead of `foreground` (see
-"Body vs secondary text" below), and the document forced macOS-only grayscale
-smoothing (`antialiased` on `<body>`) that visibly thins stems. With body copy
-at full foreground contrast and the platform's native smoothing restored, **400
-reads substantial** — verified in both themes at normal viewing distance — and
-is the cleaner editorial texture; 450 read a touch heavy once the contrast was
-corrected. 400 also keeps the full 100-unit gap below the 500 UI/label weight
-(body vs labels/nav stay distinct tiers) and re-aligns the ramp's body weight
-with the component base weight. On charcoal the light-on-dark irradiation bloom
-gives 400 enough presence, so it is one value for both themes. `caption` stays
-500: it is the smallest step and already sat at the substantial end for
-legibility.
+**Body copy is 400 — and staying 400 is the entire thesis of the body work.**
+Body copy read "thin and faint", and the wrong fix (weight) was reached for
+three times: the 2026-09 body-contrast pass first raised the steps to 450, then
+walked it back to 400 once it found two _contrast_ causes (body set in
+`muted-foreground` not `foreground`; macOS-only `antialiased` grayscale
+smoothing thinning stems). Those fixes were real but incomplete — the copy
+still lacked presence, and the 2026-10 body-legibility pass proved by
+**measurement** that the last cause was the **typeface**: Geist has among the
+lightest 400 stems of any OFL grotesk (see the "Type ramp" specimen table). The
+fix was structural, not a weight bump: swap Geist → **Public Sans** (+7% heavier
+stems, measured) and raise body to **17px**. Presence now comes from the face's
+stems and the size; weight stays 400, keeping the full 100-unit gap below the
+500 UI/label weight (body vs labels/nav stay distinct tiers) and matching the
+component base weight. On charcoal the light-on-dark irradiation bloom gives 400
+enough presence, so it is one value for both themes. `caption` stays 500: it is
+the smallest step and already sat at the substantial end for legibility. **The
+standing rule: if body ever reads thin again, MEASURE the face's stems — do not
+touch the weight.**
 
 **The ramp uses weight as an optical function of size**: as the step gets
 larger it gets heavier (body 400 → subheading 600 → heading 700 →
@@ -571,20 +632,29 @@ paper (`background 0.968 → 0.978`, `surface/popover → 0.996`, the quiet fill
 sidebar up one step, `border 0.9 → 0.91`): every light pair moved slightly, all
 comfortably in the pass band, and — as predicted — the destructive composites
 only _rose_ (the lighter surface lightens the composited backdrop under the
-dark red), so no destructive intervention was needed in light.)
+dark red), so no destructive intervention was needed in light.) The **2026-10
+body-legibility pass** touched only three dark tokens — `popover 0.315 → 0.295`,
+`muted 0.305 → 0.295`, `muted-foreground 0.69 → 0.665` — to make secondary text
+recede (see the "Secondary text" cross-theme row). Only the pairs involving
+those three moved: the `muted-foreground` pairs fell (dimmer secondary) but all
+still clear 4.5 (binding case `muted-foreground / popover` = 4.55), and
+`foreground / popover` and `foreground / muted` _rose_ (darker backdrops). No
+composite pair was affected, and `background`/`surface`/`border`/`input`/`ring`
+were deliberately left fixed, so the hairline rule did not re-derive. The face
+swap (Geist → Public Sans) changes no colour, so it triggers no recompute.)
 
 | Pair                                                          | Requirement | Light | Dark  |
 | ------------------------------------------------------------- | ----------- | ----- | ----- |
 | foreground / background                                       | 4.5         | 17.50 | 15.97 |
 | foreground / surface                                          | 4.5         | 18.43 | 14.07 |
-| foreground / popover                                          | 4.5         | 18.43 | 12.38 |
-| foreground / muted                                            | 4.5         | 16.11 | 12.83 |
+| foreground / popover                                          | 4.5         | 18.43 | 13.29 |
+| foreground / muted                                            | 4.5         | 16.11 | 13.29 |
 | foreground / secondary                                        | 4.5         | 15.87 | 12.60 |
 | foreground / accent                                           | 4.5         | 15.40 | 11.26 |
-| muted-foreground / background                                 | 4.5         | 6.69  | 6.01  |
-| muted-foreground / surface                                    | 4.5         | 7.05  | 5.30  |
-| muted-foreground / popover                                    | 4.5         | 7.05  | 4.66  |
-| muted-foreground / muted                                      | 4.5         | 6.16  | 4.83  |
+| muted-foreground / background                                 | 4.5         | 6.69  | 5.46  |
+| muted-foreground / surface                                    | 4.5         | 7.05  | 4.81  |
+| muted-foreground / popover                                    | 4.5         | 7.05  | 4.55  |
+| muted-foreground / muted                                      | 4.5         | 6.16  | 4.55  |
 | primary-foreground / primary                                  | 4.5         | 16.39 | 16.50 |
 | secondary-foreground / secondary                              | 4.5         | 13.23 | 12.60 |
 | accent-foreground / accent                                    | 4.5         | 12.84 | 11.26 |
@@ -600,7 +670,7 @@ dark red), so no destructive intervention was needed in light.)
 | ring / background                                             | 3.0         | 11.91 | 7.76  |
 | ring / surface                                                | 3.0         | 12.55 | 6.84  |
 | ring / input fill over surface[^tint] (focus)                 | 3.0         | 9.13  | 4.93  |
-| ring / muted (focus in grouped controls)                      | 3.0         | 10.97 | 6.24  |
+| ring / muted (focus in grouped controls)                      | 3.0         | 10.97 | 6.46  |
 | ring / sidebar (focus on sidebar links)                       | 3.0         | 11.36 | 7.34  |
 | destructive / input fill over surface (invalid border)[^tint] | 3.0         | 4.62  | 4.54  |
 | input / background                                            | 3.0         | 3.29  | 3.51  |

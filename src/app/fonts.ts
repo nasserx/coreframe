@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Public_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 import type { AppConfig } from "@/config";
@@ -31,31 +31,43 @@ import type { AppConfig } from "@/config";
 
 /*
  * The identity face — one family for headlines AND body, deliberately
- * (docs/DESIGN_TOKENS.md §2: there is no --font-heading). Geist is a neutral,
- * tightly-spaced grotesk with closed apertures: a single variable wght axis
- * covers 100–900, so the ramp's heavy display steps (800) and comfortable
- * body text (400) come from one latin-subset woff2. The 2026-08 pass adopted
- * it over Archivo — the reference direction wanted a more neutral, closed
- * grotesk at display sizes than Archivo's more open, editorial letterforms,
- * and Geist also re-unifies the type system with its own mono companion
- * below (one family across sans and code). The headline voice — large, heavy,
- * negative tracking, compact leading — lives in the type ramp tokens
- * (src/styles/theme.css), not here.
+ * (docs/DESIGN_TOKENS.md §2: there is no --font-heading). Public Sans is a
+ * neutral Helvetica-adjacent grotesk (US Web Design System's workhorse face,
+ * Libre Franklin lineage): a single variable wght axis covers 100–900, so the
+ * ramp's heavy display steps (800) and comfortable body text (400) come from
+ * one latin-subset woff2.
+ *
+ * It was adopted in the 2026-10 body-legibility pass over Geist because Geist's
+ * body copy read thin and lacked presence, and MEASUREMENT — not eyeballing —
+ * proved the cause was the FACE, not weight: at 400, Geist has among the
+ * lightest vertical stems of any OFL grotesk (three prior weight bumps failed
+ * because weight was never the variable). Public Sans carries the heaviest
+ * lowercase stem of the eight faces specimen-tested (+7–8% over Geist) while
+ * staying an unambiguously neutral grotesk, and its set width is only ~1%
+ * wider than Geist's, so the layout barely moved. The full specimen method,
+ * the measurement table that drove the choice, and why the geometric/humanist
+ * candidates were rejected on the numbers live in docs/DESIGN_TOKENS.md §
+ * "Type ramp" — the next person who suspects the body face is too light must
+ * MEASURE, not guess. The headline voice — large, heavy, negative tracking,
+ * compact leading — lives in the type ramp tokens (src/styles/theme.css).
  *
  * License: SIL Open Font License 1.1 (as is Geist Mono's). The file is
  * fetched and self-hosted by next/font at build time; the OFL notice ships
  * embedded in the font's own name/license metadata. Only Noto below has a
  * license file in-repo, because only its woff2 lives in-repo.
  */
-export const geistSans = Geist({
-  variable: "--font-geist-sans",
+export const publicSans = Public_Sans({
+  variable: "--font-public-sans",
   subsets: ["latin"],
 });
 
-/* Code face — Geist's mono companion, so sans and code share one family. Not
- * preloaded (see the locale-aware preload note at the top of this file): mono
- * renders only where `font-mono` is applied (code/`<pre>`), never on the LCP
- * path, so it loads on demand instead of competing with first paint. */
+/* Code face — Geist Mono. It stays the code face across the Public Sans swap:
+ * a monospaced grotesk pairs cleanly with Public Sans, and the code face is an
+ * independent decision from the identity sans (docs/DESIGN_TOKENS.md §
+ * "Type ramp"). Not preloaded (see the locale-aware preload note at the top of
+ * this file): mono renders only where `font-mono` is applied (code/`<pre>`),
+ * never on the LCP path, so it loads on demand instead of competing with first
+ * paint. */
 export const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -63,10 +75,10 @@ export const geistMono = Geist_Mono({
 });
 
 /*
- * Arabic companion face (self-hosted variable font, Arabic subset). Geist
- * has no Arabic glyphs, so the sans stack in src/styles/theme.css lists this
- * FIRST, scoped to Arabic code points by the unicode-range below: Latin
- * skips it and renders in Geist, Arabic renders here. next/font self-hosts
+ * Arabic companion face (self-hosted variable font, Arabic subset). Public
+ * Sans has no Arabic glyphs, so the sans stack in src/styles/theme.css lists
+ * this FIRST, scoped to Arabic code points by the unicode-range below: Latin
+ * skips it and renders in Public Sans, Arabic renders here. next/font self-hosts
  * the file; whether it is preloaded is locale-aware (see PRELOAD_ARABIC and
  * the note at the top of this file) — an RTL/Arabic-default deployment
  * preloads it, a Latin-default one lets it load on demand so English pages
@@ -99,7 +111,15 @@ export const notoSansArabic = localFont({
   preload: false,
   adjustFontFallback: false,
   declarations: [
-    { prop: "size-adjust", value: "115%" },
+    // size-adjust matches Noto's x-height to the Latin identity face's, so
+    // mixed Latin/Arabic runs sit optically level. Recalibrated from 115%
+    // (Geist) to 112% in the 2026-10 Public Sans pass: Public Sans has a
+    // slightly smaller x-height than Geist (measured 0.517 vs 0.53 em), so
+    // Noto is scaled down to match (115% × 0.517/0.53 ≈ 112%), then confirmed
+    // empirically by side-by-side screenshot at body, small, and heading steps
+    // (docs/DIRECTION_AND_I18N.md § Font metrics). The font e2e still asserts
+    // Noto loads AND is used (tests/e2e/fonts.spec.ts).
+    { prop: "size-adjust", value: "112%" },
     {
       prop: "unicode-range",
       value:
@@ -135,4 +155,4 @@ export type _NotoPreloadMatchesLocale = AssertTrue<
 >;
 
 /** The className mounted on `<html>` by both the root layout and global-error. */
-export const FONT_VARIABLE_CLASSES = `${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable}`;
+export const FONT_VARIABLE_CLASSES = `${publicSans.variable} ${geistMono.variable} ${notoSansArabic.variable}`;

@@ -30,6 +30,7 @@ NOT cover the bundled font, which carries its own separate license:
   The OFL is not affected by, and does not affect, this MIT license; the font
   must continue to ship with its OFL notice.
 
-The Geist and Geist Mono faces are fetched and self-hosted by next/font at
-build time (not committed to this repository) and are likewise licensed under
-the SIL Open Font License 1.1, carried in their own font metadata.
+The Public Sans (identity face) and Geist Mono (code face) faces are fetched
+and self-hosted by next/font at build time (not committed to this repository)
+and are likewise licensed under the SIL Open Font License 1.1, carried in their
+own font metadata.

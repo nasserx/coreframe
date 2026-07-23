@@ -38,7 +38,14 @@
   --color-foreground: oklch(0.985 0.001 84);
   --color-surface: oklch(0.278 0.004 84);
   --color-surface-foreground: oklch(0.985 0.001 84);
-  --color-popover: oklch(0.315 0.005 84);
+  /* popover lowered 0.315 → 0.295 in the 2026-10 body-legibility pass to buy
+     AA headroom so muted-foreground (secondary text) can be dimmed further —
+     see --color-muted-foreground below. It remains the top of the in-plane
+     ladder (surface 0.278 → popover 0.295); the step compresses to ΔL 0.017,
+     carried together with the hairline (popovers draw ring-border) per the
+     "lightness step AND hairline" rule. background/surface/border/input/ring
+     were deliberately left fixed, so the hairline rule does not re-derive. */
+  --color-popover: oklch(0.295 0.005 84);
   --color-popover-foreground: oklch(0.985 0.001 84);
   /* Near-white action color: slightly below foreground so hover/pressed
      alpha states still shift visibly. */
@@ -46,17 +53,19 @@
   --color-primary-foreground: oklch(0.18 0.004 84);
   --color-secondary: oklch(0.31 0.005 84);
   --color-secondary-foreground: oklch(0.985 0.001 84);
-  --color-muted: oklch(0.305 0.004 84);
-  /* 0.69 (was 0.72): the secondary-text role must separate from BODY by the
-     same perceived amount as it does in light. Light foreground↔muted is a
-     2.62:1 ink-to-grey ratio; at 0.72 (tuned against an older, dimmer body)
-     dark sat at only 2.38:1, and light-on-dark irradiation compresses that gap
-     further, so secondary read nearly as strong as body. Re-derived against the
-     current 0.985 body to 0.69 → 2.66:1 (a hair above light's 2.62 to offset
-     irradiation, per the §2 cross-theme rule). 0.69 is also the floor: muted
-     text must hold 4.5:1 on the lightest surface it renders over (popover
-     0.315 → 4.66:1), so it cannot be dimmed further without failing AA. */
-  --color-muted-foreground: oklch(0.69 0.004 84);
+  --color-muted: oklch(0.295 0.004 84);
+  /* 0.665 (was 0.69): the secondary-text role must RECEDE from BODY, and at
+     0.69 body and secondary still read alike in dark — the 2.66:1 separation
+     that matched light's 2.62:1 numerically was not enough perceptually,
+     because light-on-dark irradiation blooms mid-greys toward the near-white
+     body. The 2026-10 body-legibility pass raised body presence (heavier face,
+     17px), widening the gap secondary must clear. 0.69 was the old AA floor
+     over popover (4.66:1), so dimming further REQUIRED buying headroom: popover
+     and muted were lowered to 0.295 (above), which lets muted-foreground drop
+     to 0.665 → separation 2.92:1 (well above light's 2.62; higher on purpose to
+     offset irradiation, per the §2 cross-theme rule) while still holding 4.5:1
+     on the lightest surface it renders over (popover/muted 0.295 → 4.55:1). */
+  --color-muted-foreground: oklch(0.665 0.004 84);
   --color-accent: oklch(0.34 0.006 84);
   --color-accent-foreground: oklch(0.985 0.001 84);
   --color-success: oklch(0.7 0.13 155);

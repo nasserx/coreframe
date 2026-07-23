@@ -124,16 +124,16 @@ and ship private or commercial products from it without copyleft obligations.
 When you create a product from it, update the copyright holder in `LICENSE` (or
 replace the file) to your own. The bundled **Noto Sans Arabic** font is covered
 separately by the **SIL Open Font License 1.1** (`src/assets/fonts/OFL.txt`) and
-must keep shipping with that notice; the MIT license does not affect it. Geist /
-Geist Mono are fetched by `next/font` at build time and are OFL-licensed in
-their own metadata.
+must keep shipping with that notice; the MIT license does not affect it. Public
+Sans (identity face) / Geist Mono (code face) are fetched by `next/font` at
+build time and are OFL-licensed in their own metadata.
 
 ## Direction & internationalization
 
 The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
 logical properties (lint-enforced), and the sans stack lists Noto Sans Arabic
 first — scoped to Arabic code points via `unicode-range`, so Latin renders in
-Geist while Arabic can never be intercepted by a metric fallback.
+Public Sans while Arabic can never be intercepted by a metric fallback.
 Locale/direction/numeral configuration lives in `src/config/app.ts`. Message
 translation is deliberately not included — `docs/DIRECTION_AND_I18N.md` has
 the architecture and the integration points for adding an i18n library.
