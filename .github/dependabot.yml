@@ -24,14 +24,41 @@ updates:
       prefix: chore
       include: scope
     ignore:
-      # TypeScript 6/7 are held back until typescript-eslint supports them.
-      # TS 7 is a full compiler rewrite; the ESLint type-checking ecosystem
-      # has not caught up (typescript-eslint peer range is <6.1.0), so a major
-      # bump breaks `npm run lint` in CI. Minor/patch of TS 5 keep flowing.
-      # Revisit when typescript-eslint ships the supported range — tracking:
+      # --- Lint/type toolchain: majors are held until eslint-config-next ---
+      #
+      # SHARED ROOT CAUSE (applies to every entry below): `eslint-config-next`
+      # bundles its OWN copies of the lint/type plugins (eslint-plugin-react,
+      # eslint-plugin-import, @typescript-eslint/*, ...). Our lint stack therefore
+      # moves at eslint-config-next's pace, not ours: a major bump of the *host*
+      # tool (eslint, typescript) that lands ahead of the bundled plugins breaks
+      # `npm run lint`/`typecheck` in CI even though our own code is fine. Majors
+      # here ride in on a Next.js major (which upgrades eslint-config-next and its
+      # bundled plugins together) — never on their own. Minor/patch keep flowing.
+      # Full rationale + revisit signals: docs/ROADMAP.md "Deferred tooling upgrades".
+      #
+      # TypeScript 6/7 — blocked on typescript-eslint's peer range (<6.1.0). TS 7
+      # is a full compiler rewrite (the Go/"native" port); the type-aware lint
+      # ecosystem has not caught up. Tracking:
       # https://github.com/typescript-eslint/typescript-eslint/issues/10940
-      # (see docs/ROADMAP.md "Deferred tooling upgrades").
       - dependency-name: "typescript"
+        update-types:
+          - version-update:semver-major
+      # ESLint 10 — its bundled eslint-plugin-react calls context.getFilename(),
+      # removed in ESLint 10 (rule load crashes CI). Held until eslint-config-next
+      # ships plugins built for ESLint 10.
+      - dependency-name: "eslint"
+        update-types:
+          - version-update:semver-major
+      # Defensive: if any of these plugins is ever promoted to a DIRECT dep, its
+      # major is held for the same reason (today they arrive transitively, pinned
+      # by eslint-config-next, so Dependabot does not PR them directly).
+      - dependency-name: "eslint-plugin-*"
+        update-types:
+          - version-update:semver-major
+      - dependency-name: "@typescript-eslint/*"
+        update-types:
+          - version-update:semver-major
+      - dependency-name: "typescript-eslint"
         update-types:
           - version-update:semver-major
     groups:
