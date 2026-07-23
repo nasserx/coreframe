@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/ui/brand-mark";
-import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import {
   SiteShell,
@@ -16,42 +15,20 @@ import {
 import { Stack } from "@/components/ui/stack";
 import { ThemeControl } from "@/components/ui/theme-control";
 import { DirectionControl } from "@/features/showcase/components/direction-control";
-import { cn } from "@/lib/utils";
+import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
 
 /*
- * Demo auth affordances. The showcase has no authentication (a ROADMAP
- * item waiting on a real product), so these are the nav's unavailable-
- * destination pattern in button clothing: real button styling (the bar's
- * collapse breakpoint is measured from real widths), but a non-focusable
- * <span> with an sr-only availability hint — never a dead link, never a
- * no-op <button>. `pointer-events-none` removes the hover/active
- * pretence along with the pointer cursor.
+ * The auth CTAs are the action-shaped half of the unavailable pattern
+ * (docs/LAYOUT.md §6): the showcase has no authentication, but a button that
+ * looks interactive must behave interactively, so UnavailableCta renders a
+ * real <button> with full hover/active/focus that toasts an explanation on
+ * click — never a dead no-op. They also render at real widths, keeping the
+ * collapse-breakpoint measurement honest. Header CTAs sit at the baseline
+ * `default` size (h-8): the 2026-09 pass brought the cluster down a step from
+ * lg/h-9 (docs/DESIGN_TOKENS.md § Control height) — h-9 read a touch oversized
+ * for the flat identity, and h-8, the documented baseline, sits comfortably in
+ * the tall (h-16) bar with the utility toggles aligned to the same height.
  */
-function UnavailableAction({
-  variant,
-  children,
-}: Readonly<{ variant?: "outline"; children: ReactNode }>) {
-  return (
-    <span
-      data-unavailable=""
-      // Header CTAs use `lg` (h-9) — the "prominent action" step of the
-      // control-height scale (docs/DESIGN_TOKENS.md § Control height), right
-      // for a marketing bar's primary actions in a tall (h-16) header. The
-      // utility toggles beside them are aligned UP to the same h-9 so the
-      // whole cluster shares one optical height. Padding is moderate (px-3.5,
-      // not the earlier chunky px-4): h-9 read oversized before because of
-      // that padding plus a height mismatch with the h-8 toggles, not the
-      // step itself — both are fixed here.
-      className={cn(
-        buttonVariants({ variant, size: "lg", className: "px-3.5" }),
-        "pointer-events-none select-none",
-      )}
-    >
-      {children}
-      <span className="sr-only"> — Not yet available</span>
-    </span>
-  );
-}
 
 /*
  * SiteShell reference composition — the marketing-site counterpart to the
@@ -68,9 +45,10 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
     // larger brand, the 14px nav, the toggles, and the two auth CTAs put the
     // bar's min-content just over ~900px — still inside the ~976px available
     // at the `lg` (1024px) breakpoint, so `lg` holds and the overflow sweep
-    // confirms it. The 2026-08 pass shrank the CTAs from h-9 to h-8: that is a
-    // vertical change, so it barely moved the (width-driven) collapse line —
-    // re-measured, `lg` is still correct, `md` would overflow.
+    // confirms it. The 2026-09 pass dropped the CTAs from lg/h-9 to the
+    // baseline h-8 and removed their px-3.5 (default px-2.5): both are small
+    // changes and the second only narrows the bar, so `lg` still holds — the
+    // overflow sweep confirms `lg` fits and `md` would overflow.
     <SiteShell collapseBelow="lg">
       <SiteShellHeader>
         {/* The brand anchors the bar as its own cluster: two type steps
@@ -93,35 +71,35 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
           <SiteShellNavItem>Pricing</SiteShellNavItem>
           {/* The auth actions live in the drawer below `md` (measured: the
               CTAs beside the brand overflow the bar until ~768px), so the
-              drawer is their home there — same unavailable pattern, plain
-              items. Hidden from `md` up, where the pair lives in the bar. */}
-          <div className="mt-2 flex flex-col border-t pt-2 md:hidden">
-            <SiteShellNavItem>Log in</SiteShellNavItem>
-            <SiteShellNavItem>Get started</SiteShellNavItem>
+              drawer is their home there — the same live, self-explaining CTAs
+              as the bar (full-width in the column), not dead text. Hidden from
+              `md` up, where the pair lives in the bar. */}
+          <div className="mt-2 flex flex-col gap-2 border-t pt-2 md:hidden">
+            <UnavailableCta variant="outline" label="Log in" className="w-full" />
+            <UnavailableCta label="Get started" className="w-full" />
           </div>
         </SiteShellNav>
         <div className="ms-auto flex items-center gap-3">
           {/* Two coherent sub-groups, centre-aligned in one cluster: the
               utility toggles (inspection chrome) then the auth pair (secondary
-              before primary; the primary CTA holds the end). The settling pass
-              aligned the WHOLE cluster to h-9 — the toggles were bumped up to
-              match the lg CTAs, so every control shares one optical height
-              (docs/DESIGN_TOKENS.md § Control height). h-9 is right here: a
-              tall (h-16) marketing bar wants its actions at the prominent
-              step, and the earlier "oversized" read came from chunky padding
-              plus a toggle/CTA height mismatch, both now gone. The gap-3
-              separates the two families. Reveal breakpoints are measured, not
-              uniform: the toggles fit beside the brand from `sm`, the CTA pair
-              only from `md` (below it they move to the drawer) — the overflow
-              sweep fails this layout otherwise. The e2e matrix drives
+              before primary; the primary CTA holds the end). The 2026-09 pass
+              brought the WHOLE cluster down to the baseline h-8 — the toggles
+              track the default-size CTAs, so every control shares one optical
+              height (docs/DESIGN_TOKENS.md § Control height). h-8 reads right
+              here: h-9 was a touch oversized for the flat identity, and h-8 is
+              the documented baseline, comfortable in the tall (h-16) bar. The
+              gap-3 separates the two families. Reveal breakpoints are measured,
+              not uniform: the toggles fit beside the brand from `sm`, the CTA
+              pair only from `md` (below it they move to the drawer) — the
+              overflow sweep fails this layout otherwise. The e2e matrix drives
               theme/direction programmatically, so narrow coverage holds. */}
           <div className="flex items-center gap-2 max-sm:hidden">
             <DirectionControl />
             <ThemeControl />
           </div>
           <div className="flex items-center gap-2 max-md:hidden">
-            <UnavailableAction variant="outline">Log in</UnavailableAction>
-            <UnavailableAction>Get started</UnavailableAction>
+            <UnavailableCta variant="outline" label="Log in" />
+            <UnavailableCta label="Get started" />
           </div>
           <SiteShellNavTrigger />
         </div>

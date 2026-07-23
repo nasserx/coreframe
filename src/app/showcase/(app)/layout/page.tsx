@@ -69,7 +69,7 @@ export default function LayoutPage() {
             <code className="self-start font-mono text-caption text-muted-foreground">
               max-w-form — 28rem
             </code>
-            <p dir="auto" className="text-small text-muted-foreground">
+            <p dir="auto" className="text-small">
               Single-column forms and other narrow interactive surfaces. Wider inputs do not get
               easier to use — they get harder to scan.
             </p>
@@ -78,7 +78,7 @@ export default function LayoutPage() {
             <code className="self-start font-mono text-caption text-muted-foreground">
               full width — no cap
             </code>
-            <p dir="auto" className="text-small text-muted-foreground">
+            <p dir="auto" className="text-small">
               Dense data surfaces — tables, card grids — take the full Container width. Capping them
               wastes space without improving readability; the tables and grids across this showcase
               are all uncapped.
@@ -90,7 +90,7 @@ export default function LayoutPage() {
         title="Page scaffold — PageHeader"
         description="The breadcrumb + title + description block at the top of this page is the live example: PageHeader owns the scaffold's rhythm, PageHeaderTitle renders the page's single h1 on the type ramp, and PageHeaderDescription caps itself at the prose measure."
       >
-        <p dir="auto" className="max-w-prose text-small text-muted-foreground">
+        <p dir="auto" className="max-w-prose text-small">
           Compose slots in reading order: an optional Breadcrumb, then PageHeaderTitle, then
           PageHeaderDescription. The showcase binds them once in ShowcasePageHeader; a product does
           the same with its own breadcrumb source.
@@ -100,7 +100,7 @@ export default function LayoutPage() {
         title="Application shell"
         description="This page renders inside the AppShell: a persistent sidebar built on the sidebar tokens, a sticky header, and a main region that scrolls with the document."
       >
-        <ul className="flex max-w-prose list-disc flex-col gap-2 ps-5 text-small text-muted-foreground">
+        <ul className="flex max-w-prose list-disc flex-col gap-2 ps-5 text-small">
           <li>
             Press <kbd>Tab</kbd> from the address bar: the first focusable element is the skip link,
             which moves focus straight to the main region.

@@ -36,11 +36,18 @@ export default defineConfig({
       // Dev-server routes cold-compile on first hit; under full parallel
       // load the heaviest page can exceed the default 30s.
       timeout: 60_000,
-      // A request that races a Turbopack HMR invalidation (source file
-      // written while the suite runs) can transiently 500 with duplicated
-      // module instances. One retry absorbs exactly that; genuine app
-      // errors — e.g. a hydration mismatch — fail deterministically on
-      // every attempt, so the net is not weakened.
+      // One retry absorbs the dev server's transient, non-app flakes, which
+      // come in two observed forms: (1) a request that races a Turbopack HMR
+      // invalidation (source file written while the suite runs) can 500 with
+      // duplicated module instances; (2) under `fullyParallel`, a heavier
+      // route's first (cold) compile can occasionally miss the 60s
+      // `networkidle` wait — the navigation times out before the console
+      // assertion even runs, so no finding is produced. Both are
+      // environmental, not app defects. Genuine app errors — a hydration
+      // mismatch, a real console warning — are deterministic and fail on
+      // EVERY attempt, so the net is not weakened. Do not raise this to mask
+      // a finding: a test that fails then passes with an actual console
+      // message recorded is a real bug, not this.
       retries: 1,
     },
     {

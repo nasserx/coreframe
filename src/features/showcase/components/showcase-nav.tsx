@@ -22,7 +22,7 @@ export function ShowcaseNav() {
       <Link
         href="/showcase"
         aria-current={pathname === "/showcase" ? "page" : undefined}
-        className="flex h-9 items-center gap-2 rounded-md px-3 text-small font-semibold outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
+        className="flex h-9 items-center gap-2 rounded-md px-3 text-small font-bold outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
       >
         <BrandMark className="size-4.5" />
         Foundation Showcase
@@ -36,8 +36,13 @@ export function ShowcaseNav() {
                 href={section.href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex h-8 items-center rounded-md px-3 text-small text-sidebar-foreground/80 outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-                  isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+                  // Idle nav sits at font-medium (500), matching the SiteShell
+                  // nav rule that a primary nav element should not read thin;
+                  // the active row is carried by the sidebar-accent fill (not a
+                  // weight change), so it stays 500 too (docs/DESIGN_TOKENS.md
+                  // § Weight scale).
+                  "flex h-8 items-center rounded-md px-3 text-small font-medium text-sidebar-foreground/80 outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+                  isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
                 )}
               >
                 {section.title}
