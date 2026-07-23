@@ -4,9 +4,12 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ComponentProps, ReactNode, RefObject } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MenuIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon, MenuIcon, XIcon } from "lucide-react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { NavigationMenu } from "@base-ui/react/navigation-menu";
 
+import { useDocumentDirection } from "@/hooks/use-document-direction";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { cn } from "@/lib/utils";
 import { BREAKPOINTS, type BreakpointToken } from "@/theme";
@@ -52,6 +55,15 @@ function useSiteShell(caller: string): SiteShellContextValue {
   return context;
 }
 
+// Nav children render in two surfaces — the horizontal bar and the mobile
+// drawer — so a dropdown has to know which one it is in: a floating panel in
+// the bar, a labelled group in the drawer. SiteShellNav stamps this on each
+// render; SiteShellNavItem ignores it (it renders the same in both), only
+// SiteShellNavMenu reads it.
+type SiteShellNavSurface = "bar" | "drawer";
+
+const SiteShellNavSurfaceContext = createContext<SiteShellNavSurface>("bar");
+
 export type SiteShellProps = ComponentProps<"div"> & {
   /** Label of the built-in skip link; localize at the call site. */
   skipLinkLabel?: string;
@@ -87,6 +99,33 @@ export type SiteShellNavItemProps = Readonly<{
   unavailableLabel?: string;
   className?: string;
   children: ReactNode;
+}>;
+
+export type SiteShellNavMenuProps = Readonly<{
+  /**
+   * Trigger label in the bar; doubles as the group heading in the drawer.
+   * Keep it a short string so both presentations read cleanly.
+   */
+  label: ReactNode;
+  className?: string;
+  /** SiteShellNavMenuItem children — the panel's sub-destinations. */
+  children: ReactNode;
+}>;
+
+export type SiteShellNavMenuItemProps = Readonly<{
+  /**
+   * Destination. Omit it for a destination that does not exist yet: the item
+   * renders as non-interactive, non-focusable muted text with an sr-only hint
+   * — the same honesty rule as SiteShellNavItem, applied inside the panel.
+   */
+  href?: string;
+  /** The item's label line (reads as the bold title against the description). */
+  title: ReactNode;
+  /** One-line muted supporting line beneath the title. */
+  description?: ReactNode;
+  /** sr-only availability hint for href-less items; localize at the call site. */
+  unavailableLabel?: string;
+  className?: string;
 }>;
 
 export type SiteShellNavTriggerProps = ComponentProps<typeof Button>;
@@ -240,7 +279,9 @@ export function SiteShellNav({
         className={cn("flex min-w-0 items-center gap-1", collapse.nav, className)}
         {...props}
       >
-        {children}
+        <SiteShellNavSurfaceContext.Provider value="bar">
+          {children}
+        </SiteShellNavSurfaceContext.Provider>
       </nav>
       <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
         <DialogPortal>
@@ -266,7 +307,9 @@ export function SiteShellNav({
             {/* Nav children render both here and in the horizontal bar, so
                 navigation content must not rely on unique DOM ids. */}
             <nav aria-label={label} className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-              {children}
+              <SiteShellNavSurfaceContext.Provider value="drawer">
+                {children}
+              </SiteShellNavSurfaceContext.Provider>
             </nav>
           </DialogPrimitive.Popup>
         </DialogPortal>
@@ -353,6 +396,209 @@ export function SiteShellNavItem({
     >
       {children}
     </Link>
+  );
+}
+
+/**
+ * A nav item that opens a dropdown panel of sub-destinations. Built on Base
+ * UI's NavigationMenu — a navigation/disclosure primitive, NOT a `role="menu"`
+ * menubar: its trigger is a disclosure button (`aria-expanded`/`aria-controls`,
+ * managed by the primitive) and the panel holds real links, which is what a
+ * list of page destinations is. A menu role would mis-announce links as
+ * commands and impose menuitem arrow-key semantics that fight browser link
+ * behaviour. The primitive owns focus management, outside-press and Escape
+ * dismissal with focus return, and ARIA wiring — none of it is hand-rolled.
+ *
+ * Interaction: the panel opens on hover AND on click/tap (Base UI's default,
+ * with a short delay that stops accidental opens while sweeping the bar), so
+ * pointer users get it instantly and touch users — where hover does not exist
+ * — still get it on tap; keyboard opens with Enter/Space, traverses with
+ * Tab/arrows, and Escape closes and returns focus to the trigger. The trigger
+ * has no destination of its own (it only discloses the panel), so its role is
+ * unambiguous.
+ *
+ * Presentation: in the bar it is a floating popover panel (popover surface,
+ * hairline ring, floating-layer elevation) laid out as two columns of
+ * title+description items; below the collapse breakpoint the same children
+ * render in the drawer as a labelled group with an indented list — grouped,
+ * never a flat dump of every sub-item. Content is supplied by the consumer;
+ * the primitive stays content-agnostic.
+ *
+ * Motion: the chevron rotates on open and the panel fades in with a slight
+ * downward slide (transform/opacity only — never a layout-affecting property,
+ * and never a translate on the trigger itself, which would jitter and fight
+ * the panel opening directly beneath it). Both collapse under
+ * `prefers-reduced-motion` via the global rule.
+ *
+ * Direction: the panel is told the live document direction through a Base UI
+ * DirectionProvider (its positioning cannot read the DOM `dir`), so it aligns
+ * to the correct inline edge in RTL; the two-column grid reorders via the
+ * normal CSS direction cascade.
+ */
+export function SiteShellNavMenu({ label, className, children }: SiteShellNavMenuProps) {
+  const surface = useContext(SiteShellNavSurfaceContext);
+
+  if (surface === "drawer") {
+    return (
+      <div data-slot="site-shell-nav-menu" className={cn("flex flex-col", className)}>
+        {/* Collapsed presentation: the trigger label becomes a group heading
+            and the sub-destinations render as an indented list — grouped and
+            labelled, so the drawer never receives a flat dump of sub-items. */}
+        <p className="px-3 pt-2 pb-1 text-caption font-medium tracking-wide text-muted-foreground uppercase">
+          {label}
+        </p>
+        <ul className="flex flex-col">{children}</ul>
+      </div>
+    );
+  }
+
+  return (
+    <SiteShellNavMenuBar label={label} className={className}>
+      {children}
+    </SiteShellNavMenuBar>
+  );
+}
+
+function SiteShellNavMenuBar({
+  label,
+  className,
+  children,
+}: {
+  label: ReactNode;
+  className: string | undefined;
+  children: ReactNode;
+}) {
+  const direction = useDocumentDirection();
+
+  return (
+    <DirectionProvider direction={direction}>
+      <NavigationMenu.Root
+        data-slot="site-shell-nav-menu"
+        // Rendered as display:contents rather than the default <nav>: the sole
+        // navigation landmark is the enclosing SiteShellNav, and `contents`
+        // lets the trigger sit inline in the bar's flex row like a plain item.
+        render={<div className="contents" />}
+      >
+        <NavigationMenu.List render={<div className="contents" />}>
+          <NavigationMenu.Item render={<div className="contents" />}>
+            <NavigationMenu.Trigger
+              className={cn(
+                "flex items-center gap-1 rounded-md px-3 py-2 text-small font-medium text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                className,
+              )}
+            >
+              {label}
+              {/* A downward chevron is symmetric under RTL — no per-icon flip.
+                  It rotates to point up while the panel is open. */}
+              <NavigationMenu.Icon className="flex transition-transform duration-(--motion-quick) data-popup-open:rotate-180">
+                <ChevronDownIcon className="size-4" />
+              </NavigationMenu.Icon>
+            </NavigationMenu.Trigger>
+            <NavigationMenu.Content>
+              <ul className="grid w-[34rem] max-w-[calc(100vw-2rem)] grid-cols-2 gap-1">
+                {children}
+              </ul>
+            </NavigationMenu.Content>
+          </NavigationMenu.Item>
+        </NavigationMenu.List>
+
+        <NavigationMenu.Portal>
+          <NavigationMenu.Positioner
+            side="bottom"
+            align="start"
+            sideOffset={8}
+            collisionPadding={16}
+          >
+            <NavigationMenu.Popup className="relative z-50 rounded-xl bg-popover p-2 text-popover-foreground shadow-lg ring-1 ring-border transition-[opacity,transform] duration-(--motion-moderate) outline-none data-ending-style:-translate-y-1 data-ending-style:opacity-0 data-starting-style:-translate-y-1 data-starting-style:opacity-0">
+              <NavigationMenu.Viewport className="relative" />
+            </NavigationMenu.Popup>
+          </NavigationMenu.Positioner>
+        </NavigationMenu.Portal>
+      </NavigationMenu.Root>
+    </DirectionProvider>
+  );
+}
+
+/**
+ * One sub-destination inside a SiteShellNavMenu: a title with an optional
+ * one-line muted description. With `href` it is a link (marking the current
+ * page); without `href` it is the unavailable-destination pattern —
+ * non-interactive, non-focusable muted text with an sr-only hint, so it is
+ * also skipped in the tab order. Renders correctly in both the bar panel and
+ * the drawer group.
+ */
+export function SiteShellNavMenuItem({
+  href,
+  title,
+  description,
+  unavailableLabel = "Not yet available",
+  className,
+}: SiteShellNavMenuItemProps) {
+  const surface = useContext(SiteShellNavSurfaceContext);
+  const pathname = usePathname();
+
+  if (href === undefined) {
+    return (
+      <li>
+        <span
+          data-slot="site-shell-nav-menu-item"
+          data-unavailable=""
+          className={cn(
+            "flex cursor-default flex-col gap-0.5 rounded-md p-3 text-muted-foreground select-none",
+            className,
+          )}
+        >
+          <span className="text-small font-normal">{title}</span>
+          {description !== undefined && <span className="truncate text-small">{description}</span>}
+          <span className="sr-only"> — {unavailableLabel}</span>
+        </span>
+      </li>
+    );
+  }
+
+  const isCurrent = pathname === href;
+  const cardClass = cn(
+    "flex flex-col gap-0.5 rounded-md p-3 text-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+    className,
+  );
+  const lockup = (
+    <>
+      <span className="text-small font-medium">{title}</span>
+      {description !== undefined && (
+        <span className="truncate text-small text-muted-foreground">{description}</span>
+      )}
+    </>
+  );
+
+  // In the drawer the item is a plain link (no NavigationMenu context there);
+  // in the bar it is a NavigationMenu.Link so the primitive manages roving
+  // focus, activation, and current-page marking within the panel.
+  if (surface === "drawer") {
+    return (
+      <li>
+        <Link
+          data-slot="site-shell-nav-menu-item"
+          href={href}
+          aria-current={isCurrent ? "page" : undefined}
+          className={cn(cardClass, "aria-[current=page]:font-bold")}
+        >
+          {lockup}
+        </Link>
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      <NavigationMenu.Link
+        data-slot="site-shell-nav-menu-item"
+        render={<Link href={href} />}
+        active={isCurrent}
+        className={cn(cardClass, "data-active:font-bold")}
+      >
+        {lockup}
+      </NavigationMenu.Link>
+    </li>
   );
 }
 

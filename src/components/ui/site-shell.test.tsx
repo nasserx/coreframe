@@ -9,6 +9,8 @@ import {
   SiteShellMain,
   SiteShellNav,
   SiteShellNavItem,
+  SiteShellNavMenu,
+  SiteShellNavMenuItem,
   SiteShellNavTrigger,
 } from "./site-shell";
 
@@ -165,5 +167,132 @@ describe("SiteShell", () => {
       "SiteShellNavTrigger must be rendered inside <SiteShell>.",
     );
     consoleError.mockRestore();
+  });
+});
+
+/*
+ * The dropdown nav item (SiteShellNavMenu). Its keyboard contract — open,
+ * traverse, Escape, focus return, and the unavailable panel item being skipped
+ * in the tab order — is pinned here; the open/dismiss/navigate behaviour in a
+ * real browser (and the axe scan with the panel OPEN) lives in the browser
+ * layer (shell.spec.ts).
+ */
+function renderShellWithMenu() {
+  return render(
+    <SiteShell>
+      <SiteShellHeader>
+        <a href="/brand-home">Brand</a>
+        <SiteShellNav label="Site sections">
+          <SiteShellNavMenu label="Explore">
+            <SiteShellNavMenuItem href="/products" title="Products" description="What we sell." />
+            <SiteShellNavMenuItem href="/pricing" title="Pricing" description="Plans and costs." />
+            <SiteShellNavMenuItem title="Changelog" description="Coming soon." />
+          </SiteShellNavMenu>
+        </SiteShellNav>
+        <SiteShellNavTrigger />
+      </SiteShellHeader>
+      <SiteShellMain>Page content</SiteShellMain>
+      <SiteShellFooter>Footer content</SiteShellFooter>
+    </SiteShell>,
+  );
+}
+
+describe("SiteShellNavMenu", () => {
+  beforeEach(() => {
+    installMatchMedia();
+    // Base UI's anchor positioning observes size changes; jsdom ships no
+    // ResizeObserver, so provide an inert one.
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe(): void {}
+        unobserve(): void {}
+        disconnect(): void {}
+      },
+    );
+  });
+
+  it("renders a collapsed trigger button with a closed disclosure state", () => {
+    renderShellWithMenu();
+    const trigger = screen.getByRole("button", { name: /Explore/ });
+    // A disclosure trigger, not a link and not a menu: no destination of its
+    // own, and it announces its expanded state.
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger.tagName).toBe("BUTTON");
+    // The panel's links are absent from the DOM until it opens.
+    expect(screen.queryByRole("link", { name: /Products/ })).not.toBeInTheDocument();
+  });
+
+  it("opens the panel from the trigger and reveals the sub-destinations as links", async () => {
+    const user = userEvent.setup();
+    renderShellWithMenu();
+
+    const trigger = screen.getByRole("button", { name: /Explore/ });
+    await user.click(trigger);
+
+    await waitFor(() => {
+      expect(trigger).toHaveAttribute("aria-expanded", "true");
+    });
+    expect(await screen.findByRole("link", { name: /Products/ })).toHaveAttribute(
+      "href",
+      "/products",
+    );
+    expect(screen.getByRole("link", { name: /Pricing/ })).toHaveAttribute("href", "/pricing");
+  });
+
+  it("keeps the unavailable panel item out of the tab order as muted text", async () => {
+    const user = userEvent.setup();
+    renderShellWithMenu();
+
+    await user.click(screen.getByRole("button", { name: /Explore/ }));
+    await screen.findByRole("link", { name: /Products/ });
+
+    // Never a link, never focusable — it must not appear in the link list.
+    expect(screen.queryByRole("link", { name: /Changelog/ })).not.toBeInTheDocument();
+    const changelog = screen.getByText("Changelog");
+    expect(changelog.closest("a, button")).toBeNull();
+    // The availability hint is exposed to assistive technology.
+    expect(screen.getByText(/Not yet available/)).toBeInTheDocument();
+  });
+
+  it("traverses into the panel by keyboard, then Escape closes it and returns focus", async () => {
+    const user = userEvent.setup();
+    renderShellWithMenu();
+
+    const trigger = screen.getByRole("button", { name: /Explore/ });
+    await user.click(trigger);
+    await screen.findByRole("link", { name: /Products/ });
+
+    // Arrow/Tab reaches the panel links; assert one can hold focus.
+    const firstLink = screen.getByRole("link", { name: /Products/ });
+    firstLink.focus();
+    expect(firstLink).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(screen.queryByRole("link", { name: /Products/ })).not.toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(trigger).toHaveFocus();
+    });
+  });
+
+  it("renders the same items in the drawer as a labelled group, not a flat dump", async () => {
+    const user = userEvent.setup();
+    renderShellWithMenu();
+
+    await user.click(screen.getByRole("button", { name: "Open navigation" }));
+    const drawer = await screen.findByRole("dialog", { name: "Site sections" });
+
+    // The trigger label becomes the group heading, and the sub-destinations
+    // render as real links (no popup, no dropdown) inside the drawer.
+    expect(within(drawer).getByText("Explore")).toBeInTheDocument();
+    expect(within(drawer).getByRole("link", { name: /Products/ })).toHaveAttribute(
+      "href",
+      "/products",
+    );
+    // The unavailable item stays non-interactive in the drawer too.
+    expect(within(drawer).queryByRole("link", { name: /Changelog/ })).not.toBeInTheDocument();
   });
 });

@@ -315,6 +315,87 @@ collapse-breakpoint measurement stays honest. Never fake it with a styled
 non-interactive `<span>`: that reproduces the dead-button problem this rule
 exists to prevent.
 
+### Dropdown navigation (`SiteShellNavMenu`)
+
+A nav item can host a dropdown panel of sub-destinations — a two-column grid
+of title + one-line-description items — via `SiteShellNavMenu` and its
+`SiteShellNavMenuItem` children:
+
+```tsx
+<SiteShellNav label="Site sections">
+  <SiteShellNavMenu label="Explore">
+    <SiteShellNavMenuItem href="/products" title="Products" description="What we sell." />
+    <SiteShellNavMenuItem href="/pricing" title="Pricing" description="Plans and costs." />
+    <SiteShellNavMenuItem title="Changelog" description="Coming soon." /> {/* no href */}
+  </SiteShellNavMenu>
+  <SiteShellNavItem>Pricing</SiteShellNavItem>
+</SiteShellNav>
+```
+
+**Built on Base UI's `NavigationMenu`, not hand-rolled.** Focus management,
+outside-press and Escape dismissal with focus return, and the ARIA wiring
+(`aria-expanded` / `aria-controls`) all come from the maintained primitive.
+Each `SiteShellNavMenu` is a self-contained `NavigationMenu` rendered inline
+among the plain items (rendered as `display:contents`, so the sole nav
+landmark stays the enclosing `SiteShellNav`); plain `SiteShellNavItem`s are
+untouched, so the existing single-level nav keeps its exact behaviour.
+
+**It is a navigation/disclosure pattern, deliberately not a `role="menu"`
+menubar.** The panel holds page _links_, and a menu role would mis-announce
+links as commands and impose menuitem arrow-key semantics that fight normal
+link behaviour. The trigger is therefore a disclosure `<button>` with no
+destination of its own — unambiguous by construction — and the panel items
+are ordinary links.
+
+**Pointer / touch:** the panel opens on hover **and** on click/tap (Base
+UI's default, with a short open/close delay that stops accidental opens
+while the cursor sweeps the bar). Hover gives pointer users instant access;
+click/tap covers touch, where hover does not exist; keyboard opens with
+Enter/Space, traverses with Tab/arrows, and Escape closes with focus
+returned. The accepted trade-off of hover-open is the delay — the
+alternative of hover-only would be inoperable on touch, and click-only
+slower on the desktop this chrome mostly serves.
+
+**Content is the consumer's.** The primitive is content-agnostic; the
+showcase populates the panel from real showcase routes so it has no dead
+links. The unavailable-destination rule applies **inside** the panel exactly
+as in the bar: a `SiteShellNavMenuItem` without `href` is non-interactive,
+non-focusable muted text with an sr-only hint (demonstrated by "Changelog"),
+so it is also skipped in the tab order.
+
+**Visual + motion.** The panel is a floating popover surface — `bg-popover`,
+the hairline `ring-border`, and floating-layer elevation (`shadow-lg`), all
+existing tokens (no new ones). A chevron on the trigger rotates on open
+(direction-neutral: a down chevron is symmetric under RTL, no per-icon
+flip). Motion is restrained and on the existing tokens: the chevron rotation
+plus a fade with a **slight downward slide of the panel** on entrance
+(transform/opacity only — never a layout property). The original "downward
+movement on hover" request was **rejected on the trigger**: translating a
+trigger that opens a panel directly beneath it reads as jitter and fights the
+panel's own entrance; a growing underline was also rejected (it fights the
+menu and contradicts the color-only nav-hover rule). The downward motion was
+kept, but moved onto the panel where it reads as the surface emerging from
+the trigger. All of it collapses under `prefers-reduced-motion` via the
+global rule.
+
+**Direction.** Base UI positioning reads direction from a `DirectionProvider`,
+not the DOM, so the panel is fed the live document direction (via
+`useDocumentDirection`, which reads `<html dir>` reactively — correct for a
+statically-SSR'd product direction _and_ the showcase's runtime toggle). In
+RTL the panel aligns to the correct inline edge and the two columns reorder
+through the normal CSS direction cascade.
+
+**Collapsed (below `collapseBelow`).** In the drawer a dropdown does **not**
+dump every sub-item flat: the trigger label becomes a group heading and the
+sub-destinations render as an indented labelled list of plain links (no
+popup, no hover). The same children drive both surfaces — `SiteShellNav`
+stamps a bar/drawer context that `SiteShellNavMenu` reads. Adding the
+chevron widened the demo bar's min-content to ~946px (RTL, measured), still
+inside the ~976px available at `lg`, so `collapseBelow="lg"` holds — the
+overflow sweep confirms it, and the `nav-menu` component test plus
+`shell.spec.ts` (open / traverse / Escape / dismiss / navigate, and an axe
+scan with the panel **open** across both themes and directions) pin the rest.
+
 ### Accessibility and direction
 
 Same guarantees as the AppShell: a built-in `SkipLink` targeting

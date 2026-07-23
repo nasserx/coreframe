@@ -159,7 +159,13 @@ Design notes:
   card/popover/dialog edges via `ring-border`. **`--color-input` is a control
   boundary** and holds ≥3:1 against background and surface in both themes
   (WCAG 1.4.11), as does `--color-ring` (focus indicator — near-black in
-  light, near-white in dark, matching the primary logic).
+  light, near-white in dark, matching the primary logic). Which token a
+  control's edge takes turns on 1.4.11's "**required to identify**" test, not
+  on whether it is a control: an **empty** field (input, textarea) has nothing
+  but its edge to announce it, so that edge is required and uses `input`; a
+  **labelled** control (an outline button) is identified by its text, so its
+  border is decorative and uses the `border` hairline in both themes — a dark
+  outline button on the 3:1 `input` band reads as a lit edge, not a quiet one.
 
 **The hairline rule (both themes, a decision not a feel).** A hairline should
 be _quiet but present_: perceptible as an edge, never a drawn line. The

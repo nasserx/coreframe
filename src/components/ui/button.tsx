@@ -17,11 +17,16 @@ export const buttonVariants = cva(
         // Outline, ghost and secondary all sit ON the page in both themes —
         // the flat identity defines them by border (outline) or a quiet
         // in-plane fill (secondary), never a fill lighter than the page that
-        // reads as a raised chip. Dark keeps a stronger `input` border on
-        // outline (a control-boundary edge, 3:1) but NO fill; hover lifts to
-        // `accent` (perceptible against both paper and charcoal).
+        // reads as a raised chip. Outline's border is DECORATIVE, not a
+        // control boundary: the visible text label identifies the control, so
+        // WCAG 1.4.11 does not require the edge to meet 3:1 (that clause
+        // applies only to information "required to identify" a component — an
+        // empty input has nothing but its edge, a labelled button has its
+        // label). So it uses the `border` hairline in BOTH themes; the earlier
+        // dark override to the 3:1 `input` band read as a lit edge, not a quiet
+        // one. Hover lifts to `accent` (perceptible against paper and charcoal).
         outline:
-          "border-border bg-background hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground dark:border-input",
+          "border-border bg-background hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
