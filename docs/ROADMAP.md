@@ -21,20 +21,33 @@ signal is the failure mode this repo was designed to avoid.
   this repo) once it has stabilized. This is the top-priority reference to
   add — the last declared-but-unwired piece of the stack.
 
-### i18n message translation
+### i18n message translation — SHIPPED (2026-07)
 
-- **Missing:** message catalogs, locale routing, pluralization — any i18n
-  library.
-- **Extension points:** `APP_LOCALES`/`LOCALE_INFO` (`src/config/app.ts`),
-  the localization TODO slot in `AppProvider`, prop-overridable primitive
-  strings (including `ThemeControl.optionLabels`, `ErrorFallback`'s copy
-  props, and both shells' label props), and the full RTL/logical-property
-  groundwork (`docs/DIRECTION_AND_I18N.md`). The error-route boundary
-  files hardcode English copy by design until then — they are listed as a
-  rename location in `docs/CLONING.md` §2.
-- **Trigger:** a product that must serve two locales at once. A single-locale
-  deployment (including Arabic-only) needs zero i18n library — change
-  `APP_LOCALES.DEFAULT` and write copy in that language.
+- **Shipped:** a typed in-repo message layer (`src/i18n`) plus a client
+  `LocaleProvider` (`src/core/providers`). Catalogues are typed against a
+  canonical English shape (a missing/renamed key fails `tsc`); a
+  namespace-scoped `useTranslations` (client, active locale) and
+  `getTranslations` (server/static, default locale) resolve keys with
+  compile-time safety. Locale, direction, numerals, and the active catalogue
+  all derive from the ONE selected locale through `LOCALE_INFO`, so they can
+  never disagree. `LocaleControl` replaced the showcase's direction toggle
+  (direction is a property of language, not an independent control) and
+  renders nothing on a single-locale deployment. Every route stays statically
+  prerendered; the default catalogue is bundled and other locales are
+  code-split, so a single-locale build carries no second-locale bytes
+  (measured within 0.2 kB of the multi-locale build). The `(site)` showcase
+  is translated to Arabic end to end (top bar included) as the proof. Full
+  rationale — the routing decision, the library decision, and the
+  single-locale path — in `docs/DIRECTION_AND_I18N.md`, `DECISIONS.md`, and
+  `docs/CLONING.md` §3a.
+- **Still a product's own responsibility (no signal yet):** ICU
+  pluralization/gender and locale-aware number/date **formatting** (the
+  hooks are there — `translate()` interpolation and `LOCALE_INFO.numerals` —
+  but no formatting utilities ship; add them in `src/utils` when a product
+  needs them), and **per-locale-URL routing** for a deployment that must
+  serve multiple indexed locales at once (adopt sub-path `/[locale]/…` then;
+  the message/type/switcher layer sits underneath it unchanged — see the
+  routing decision in `DECISIONS.md`).
 
 ### Authentication
 
@@ -136,13 +149,12 @@ Honest defects and frictions, none currently blocking:
    green; dark screenshots confirm cards, popovers, and dialogs are clearly
    distinct from their backgrounds and text reads near-pure white. No
    remaining caveat — this issue is closed.
-2. **`DialogContent`'s close button label is hardcoded English** (`sr-only`
-   "Close"). Localized products must hide it (`showCloseButton={false}`)
-   and compose their own `DialogClose`. The first (Arabic-first) product
-   build confirmed the friction — its backport fixed the same defect in
-   `ThemeControl` (`optionLabels`) but left this one: a `closeLabel` prop
-   changes a frozen primitive API, so it still waits for the next
-   localized product to demand it.
+2. **`DialogContent`'s close button label — RESOLVED (2026-07).** The i18n
+   pass added an optional `closeLabel` prop to `DialogContent` and
+   `DialogFooter` (default `"Close"`), the sanctioned "optional label prop"
+   extension — localized products pass a translated value instead of hiding
+   the button and composing their own `DialogClose`. Consistent with the
+   shells' label props and `ThemeControl.optionLabels`.
 3. **Three e2e specs hard-reference showcase URLs** (`shell`, `fonts`,
    `errors`) and need retargeting when the showcase is deleted
    (`docs/CLONING.md` §3 lists them precisely, together with the

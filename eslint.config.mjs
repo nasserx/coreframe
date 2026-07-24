@@ -221,7 +221,14 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: ["src/theme/**", "src/config/**", "src/constants/**", "src/types/**", "src/styles/**"],
+    files: [
+      "src/theme/**",
+      "src/config/**",
+      "src/constants/**",
+      "src/types/**",
+      "src/styles/**",
+      "src/i18n/**",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",

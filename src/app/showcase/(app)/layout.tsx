@@ -8,9 +8,9 @@ import {
   AppShellSidebarTrigger,
 } from "@/components/ui/app-shell";
 import { Container } from "@/components/ui/container";
+import { LocaleControl } from "@/components/ui/locale-control";
 import { Stack } from "@/components/ui/stack";
 import { ThemeControl } from "@/components/ui/theme-control";
-import { DirectionControl } from "@/features/showcase/components/direction-control";
 import { ShowcaseNav } from "@/features/showcase/components/showcase-nav";
 
 /*
@@ -28,8 +28,8 @@ export default function ShowcaseAppLayout({ children }: Readonly<{ children: Rea
       {/*
         The header is the showcase's instrument panel, not part of the
         inspected canvas: it stays physically fixed (dir="ltr") so the
-        direction and theme controls never jump to the other side of the
-        screen when the very toggle they host is used. Its copy is
+        language and theme controls never jump to the other side of the
+        screen when the locale switch flips the document to RTL. Its copy is
         English-only sandbox chrome; the page below it is what mirrors.
       */}
       <AppShellHeader dir="ltr" className="justify-between">
@@ -38,7 +38,7 @@ export default function ShowcaseAppLayout({ children }: Readonly<{ children: Rea
           <p className="text-caption text-muted-foreground max-sm:hidden">
             Engineering sandbox — not a product
           </p>
-          <DirectionControl />
+          <LocaleControl />
           <ThemeControl />
         </div>
       </AppShellHeader>

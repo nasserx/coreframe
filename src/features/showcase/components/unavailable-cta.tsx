@@ -3,6 +3,7 @@
 import { toast } from "sonner";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { useTranslations } from "@/core/providers/locale-provider";
 
 export type UnavailableCtaProps = Pick<ButtonProps, "variant" | "size" | "className"> & {
   /** Visible + accessible label; also names the affordance in the toast copy. */
@@ -23,11 +24,12 @@ export type UnavailableCtaProps = Pick<ButtonProps, "variant" | "size" | "classN
  * measurement (docs/LAYOUT.md §6) stays honest.
  */
 export function UnavailableCta({ label, ...props }: UnavailableCtaProps) {
+  const t = useTranslations("site");
   return (
     <Button
       onClick={() =>
-        toast(`“${label}” isn’t available here`, {
-          description: "The showcase ships no authentication — this is a demo affordance.",
+        toast(t("ctaUnavailableTitle", { label }), {
+          description: t("ctaUnavailableDescription"),
         })
       }
       {...props}

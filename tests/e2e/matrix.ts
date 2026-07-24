@@ -8,13 +8,17 @@ import type { Direction, Theme } from "./routes";
  * - Theme is written to localStorage BEFORE any app code runs, so the
  *   pre-paint init script and ThemeProvider adopt it exactly as a returning
  *   user's stored preference — the real deployment state.
- * - Direction is flipped AFTER hydration by stamping `dir` on `<html>`,
- *   mirroring the showcase DirectionControl. Deliberately not pre-hydration:
- *   a real RTL deployment server-renders `dir="rtl"` (APP_CONFIG), so
- *   "server LTR markup + client RTL attribute" is a state no product ships,
- *   and forcing it would manufacture hydration mismatches the app doesn't
- *   have. Post-hydration flipping still exercises all RTL rendering and any
- *   direction-dependent runtime code.
+ * - Direction is flipped AFTER hydration by stamping `dir` on `<html>` — the
+ *   same attribute the LocaleProvider sets when a locale is selected, so this
+ *   exercises the exact runtime state an RTL locale produces. This is the sole
+ *   direction driver in the suite (there is no product direction toggle to
+ *   click): it flips `dir` programmatically for EVERY discovered route, so
+ *   RTL coverage does not depend on any page rendering a switcher. Deliberately
+ *   not pre-hydration: a real RTL deployment server-renders `dir="rtl"`
+ *   (APP_CONFIG), so "server LTR markup + client RTL attribute" is a state no
+ *   product ships, and forcing it would manufacture hydration mismatches the
+ *   app doesn't have. Post-hydration flipping still exercises all RTL rendering
+ *   and any direction-dependent runtime code.
  */
 export async function gotoMatrixCell(
   page: Page,

@@ -5,7 +5,7 @@ import { Stack, stackVariants } from "@/components/ui/stack";
 type ShowcaseSectionProps = Readonly<{
   title: string;
   description?: string;
-  children: ReactNode;
+  children?: ReactNode;
 }>;
 
 export function ShowcaseSection({ title, description, children }: ShowcaseSectionProps) {

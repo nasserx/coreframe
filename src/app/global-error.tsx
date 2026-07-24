@@ -5,8 +5,16 @@ import { useEffect } from "react";
 import { APP_CONFIG } from "@/config";
 import { ErrorFallback } from "@/core/errors/error-fallback";
 import { applyStoredTheme, THEME_INIT_SCRIPT } from "@/core/providers/theme-provider";
+import { getTranslations } from "@/i18n";
 import { FONT_VARIABLE_CLASSES } from "./fonts";
 import "./globals.css";
+
+// This boundary REPLACES the root layout, so it runs without the provider tree
+// and cannot read the active locale. Its copy is therefore fixed to the
+// build-time default catalogue (the synchronous server translator) — an
+// acceptable limitation for a last-resort boundary that already renders
+// default lang/dir and cannot dynamically load a catalogue.
+const t = getTranslations("error");
 
 /*
  * Last-resort boundary: fires only when the root layout itself throws, and
@@ -41,15 +49,19 @@ export default function GlobalError({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <title>{`Something went wrong — ${APP_CONFIG.name}`}</title>
+        <title>{t("documentTitle", { app: APP_CONFIG.name })}</title>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* This file rebuilds the document, so it owns the `<main>`
             landmark itself (docs/LAYOUT.md § The main landmark). */}
         <main className="flex flex-1 flex-col">
           <ErrorFallback
-            description="The application failed to render. Try again, or reload the page if the problem persists."
+            title={t("title")}
+            description={t("globalDescription")}
+            actionLabel={t("actionLabel")}
             onAction={retry}
-            detail={error.digest === undefined ? undefined : `Reference: ${error.digest}`}
+            detail={
+              error.digest === undefined ? undefined : t("reference", { digest: error.digest })
+            }
             className="min-h-full flex-1"
           />
         </main>

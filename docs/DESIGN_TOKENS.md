@@ -534,7 +534,7 @@ identity's restraint, and `default`/h-8 is the documented baseline for
 vertical breathing room. The scale itself is unchanged; only the header's
 _assignment_ moved (lg remains available for a surface that genuinely wants
 the prominent step). **The utility toggles in the same cluster (ThemeControl,
-DirectionControl) align to h-8** so the whole cluster shares one optical
+LocaleControl) align to h-8** so the whole cluster shares one optical
 height; they render at 32px by construction (a 26px inner toggle + the group's
 `p-0.5` padding and 1px border). CTA padding stays at the size's own `px-2.5`
 (the earlier `px-3.5` override is gone — with h-8 it is not needed and only

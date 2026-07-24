@@ -1,8 +1,11 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/ui/brand-mark";
 import { Container } from "@/components/ui/container";
+import { LocaleControl } from "@/components/ui/locale-control";
 import {
   SiteShell,
   SiteShellFooter,
@@ -16,7 +19,7 @@ import {
 } from "@/components/ui/site-shell";
 import { Stack } from "@/components/ui/stack";
 import { ThemeControl } from "@/components/ui/theme-control";
-import { DirectionControl } from "@/features/showcase/components/direction-control";
+import { useTranslations } from "@/core/providers/locale-provider";
 import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
 
 /*
@@ -34,107 +37,121 @@ import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
 
 /*
  * SiteShell reference composition — the marketing-site counterpart to the
- * `(app)` group's AppShell layout. Unlike the AppShell header (a pinned
- * LTR instrument panel), this whole shell IS the inspected canvas, so it
- * mirrors under the direction toggle like any product site would.
+ * `(app)` group's AppShell layout, AND the message-translation proof surface:
+ * a "use client" layout whose chrome reads from `useTranslations`, so
+ * selecting Arabic in the LocaleControl swaps every string here, mirrors the
+ * whole shell to RTL (direction follows the locale through LOCALE_INFO), and
+ * renders Arabic in the Noto face — the top bar included. Unlike the AppShell
+ * header (a pinned LTR instrument panel), this whole shell IS the inspected
+ * canvas, so it mirrors under the selected language like any product site.
  *
  * "Pricing" deliberately has no href: it demonstrates the unavailable-
  * destination pattern every new product needs on day one.
  */
 export default function ShowcaseSiteLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const t = useTranslations("site");
+  const tShell = useTranslations("shell");
+  const tTheme = useTranslations("theme");
+
   return (
-    // collapseBelow="lg", measured, not assumed (docs/LAYOUT.md §6): the
-    // larger brand, the 14px nav, the toggles, and the two auth CTAs put the
-    // bar's min-content just over ~900px — still inside the ~976px available
-    // at the `lg` (1024px) breakpoint, so `lg` holds and the overflow sweep
-    // confirms it. The 2026-09 pass dropped the CTAs from lg/h-9 to the
-    // baseline h-8 and removed their px-3.5 (default px-2.5): both are small
-    // changes and the second only narrows the bar, so `lg` still holds — the
-    // overflow sweep confirms `lg` fits and `md` would overflow.
-    <SiteShell collapseBelow="lg">
+    // collapseBelow="lg", measured, not assumed (docs/LAYOUT.md §6): above the
+    // line the bar carries the brand, the language + theme toggles, and the two
+    // auth CTAs; below it, nav AND auth collapse into the drawer, leaving only
+    // brand + toggles + trigger. The overflow sweep (English, both directions —
+    // `overflow.spec.ts`) confirms the bar fits at every width; the Arabic bar
+    // is covered separately in `i18n.spec.ts`. Note the language switcher shows
+    // both autonyms regardless of the active locale, so its width is
+    // locale-independent.
+    <SiteShell collapseBelow="lg" skipLinkLabel={tShell("skipLink")}>
       <SiteShellHeader>
         {/* The brand anchors the bar as its own cluster: two type steps
             above the nav items (text-subheading vs text-small) at bold,
             with clear breathing room (me-4) before navigation begins. It
             steps down to text-body below `sm`, where the bar is only brand
-            + trigger and the full 20px wordmark overflows a 320px bar in
-            RTL — the anchoring only matters once nav/actions share the bar.
-            Nav links are secondary wayfinding — 14px, medium weight. */}
+            + trigger. Nav links are secondary wayfinding — 14px, medium. */}
         <Link
           href="/showcase"
           className="me-4 flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
         >
           <BrandMark className="size-6" />
-          Foundation Showcase
+          {t("brand")}
         </Link>
-        <SiteShellNav label="Site sections">
+        <SiteShellNav label={t("navLabel")} closeLabel={tShell("closeNav")}>
           {/* A dropdown of real showcase destinations (docs/LAYOUT.md §6):
               every link resolves to an existing route, and "Changelog"
               demonstrates the unavailable-destination pattern INSIDE the
               panel. Below the collapse line this same set renders in the
-              drawer as a labelled "Explore" group. */}
-          <SiteShellNavMenu label="Explore">
+              drawer as a labelled group. */}
+          <SiteShellNavMenu label={t("exploreMenu")}>
             <SiteShellNavMenuItem
               href="/showcase/site"
-              title="Overview"
-              description="The SiteShell reference composition."
+              title={t("overviewTitle")}
+              description={t("overviewDescription")}
             />
             <SiteShellNavMenuItem
               href="/showcase/layout"
-              title="Layout"
-              description="Measure, rhythm, and page scaffold."
+              title={t("layoutTitle")}
+              description={t("layoutDescription")}
             />
             <SiteShellNavMenuItem
               href="/showcase/tokens"
-              title="Design tokens"
-              description="Colour, type, elevation, and motion."
+              title={t("tokensTitle")}
+              description={t("tokensDescription")}
             />
             <SiteShellNavMenuItem
               href="/showcase/navigation"
-              title="Navigation"
-              description="Menus, tabs, breadcrumbs, pagination."
+              title={t("navigationTitle")}
+              description={t("navigationDescription")}
             />
             <SiteShellNavMenuItem
               href="/showcase/data"
-              title="Data layer"
-              description="apiFetch, query keys, error states."
+              title={t("dataTitle")}
+              description={t("dataDescription")}
             />
-            <SiteShellNavMenuItem title="Changelog" description="Release notes — coming soon." />
+            <SiteShellNavMenuItem
+              title={t("changelogTitle")}
+              description={t("changelogDescription")}
+              unavailableLabel={tShell("unavailable")}
+            />
           </SiteShellNavMenu>
-          <SiteShellNavItem>Pricing</SiteShellNavItem>
-          {/* The auth actions live in the drawer below `md` (measured: the
-              CTAs beside the brand overflow the bar until ~768px), so the
-              drawer is their home there — the same live, self-explaining CTAs
-              as the bar (full-width in the column), not dead text. Hidden from
-              `md` up, where the pair lives in the bar. */}
-          <div className="mt-2 flex flex-col gap-2 border-t pt-2 md:hidden">
-            <UnavailableCta variant="outline" label="Log in" className="w-full" />
-            <UnavailableCta label="Get started" className="w-full" />
+          <SiteShellNavItem unavailableLabel={tShell("unavailable")}>
+            {t("pricing")}
+          </SiteShellNavItem>
+          {/* The auth actions live in the drawer below `lg` — the collapse
+              breakpoint — the same live, self-explaining CTAs as the bar
+              (full-width in the column). */}
+          <div className="mt-2 flex flex-col gap-2 border-t pt-2 lg:hidden">
+            <UnavailableCta variant="outline" label={t("logIn")} className="w-full" />
+            <UnavailableCta label={t("getStarted")} className="w-full" />
           </div>
         </SiteShellNav>
         <div className="ms-auto flex items-center gap-3">
           {/* Two coherent sub-groups, centre-aligned in one cluster: the
-              utility toggles (inspection chrome) then the auth pair (secondary
-              before primary; the primary CTA holds the end). The 2026-09 pass
-              brought the WHOLE cluster down to the baseline h-8 — the toggles
-              track the default-size CTAs, so every control shares one optical
-              height (docs/DESIGN_TOKENS.md § Control height). h-8 reads right
-              here: h-9 was a touch oversized for the flat identity, and h-8 is
-              the documented baseline, comfortable in the tall (h-16) bar. The
-              gap-3 separates the two families. Reveal breakpoints are measured,
-              not uniform: the toggles fit beside the brand from `sm`, the CTA
-              pair only from `md` (below it they move to the drawer) — the
-              overflow sweep fails this layout otherwise. The e2e matrix drives
-              theme/direction programmatically, so narrow coverage holds. */}
+              utility controls (language + theme) then the auth pair. The whole
+              cluster shares the baseline h-8 (docs/DESIGN_TOKENS.md § Control
+              height). Reveal breakpoints are measured, not uniform: the
+              controls fit beside the brand from `sm`; the CTA pair only from
+              `lg` — the collapse breakpoint — since the wider language switcher
+              (autonym labels, always both) plus the pair overflows the bar
+              between `md` and `lg` (the overflow sweep proves it), so below the
+              collapse line the auth actions live in the drawer with the nav.
+              The LocaleControl renders nothing on a single-locale deployment. */}
           <div className="flex items-center gap-2 max-sm:hidden">
-            <DirectionControl />
-            <ThemeControl />
+            <LocaleControl />
+            <ThemeControl
+              aria-label={tTheme("label")}
+              optionLabels={{
+                light: tTheme("light"),
+                dark: tTheme("dark"),
+                system: tTheme("system"),
+              }}
+            />
           </div>
-          <div className="flex items-center gap-2 max-md:hidden">
-            <UnavailableCta variant="outline" label="Log in" />
-            <UnavailableCta label="Get started" />
+          <div className="flex items-center gap-2 max-lg:hidden">
+            <UnavailableCta variant="outline" label={t("logIn")} />
+            <UnavailableCta label={t("getStarted")} />
           </div>
-          <SiteShellNavTrigger />
+          <SiteShellNavTrigger aria-label={tShell("openNav")} />
         </div>
       </SiteShellHeader>
       <SiteShellMain>
@@ -145,14 +162,14 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
       <SiteShellFooter>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <Stack gap="sm">
-            <h2 className="text-small font-medium">Explore</h2>
+            <h2 className="text-small font-medium">{t("footerExplore")}</h2>
             <ul className="flex flex-col gap-1">
               <li>
                 <Link
                   href="/showcase"
                   className="text-small text-muted-foreground hover:text-foreground"
                 >
-                  Showcase index
+                  {t("footerIndex")}
                 </Link>
               </li>
               <li>
@@ -160,28 +177,38 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
                   href="/showcase/tokens"
                   className="text-small text-muted-foreground hover:text-foreground"
                 >
-                  Tokens
+                  {t("footerTokens")}
                 </Link>
               </li>
             </ul>
           </Stack>
           <Stack gap="sm">
-            <h2 className="text-small font-medium">Product</h2>
+            <h2 className="text-small font-medium">{t("footerProduct")}</h2>
             <ul className="flex flex-col gap-1">
               <li>
                 {/* The unavailable pattern works in footer columns too:
                     className strips the bar-item padding and weight. */}
-                <SiteShellNavItem className="px-0 py-0 font-normal">Pricing</SiteShellNavItem>
+                <SiteShellNavItem
+                  className="px-0 py-0 font-normal"
+                  unavailableLabel={tShell("unavailable")}
+                >
+                  {t("pricing")}
+                </SiteShellNavItem>
               </li>
               <li>
-                <SiteShellNavItem className="px-0 py-0 font-normal">Changelog</SiteShellNavItem>
+                <SiteShellNavItem
+                  className="px-0 py-0 font-normal"
+                  unavailableLabel={tShell("unavailable")}
+                >
+                  {t("footerChangelog")}
+                </SiteShellNavItem>
               </li>
             </ul>
           </Stack>
           <Stack gap="sm">
-            <h2 className="text-small font-medium">Foundation</h2>
+            <h2 className="text-small font-medium">{t("footerFoundation")}</h2>
             <p className="max-w-prose text-small text-muted-foreground">
-              Structural chrome only — restyle through tokens and className.
+              {t("footerFoundationNote")}
             </p>
           </Stack>
         </div>
