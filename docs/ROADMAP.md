@@ -235,6 +235,8 @@ kept out of the client for unvalidated fetches; `shadcn` → devDependencies;
 and deliberately not actioned** — each is recorded here so the choice is
 visible, not silent.
 
+> **Current state (since removed):** `LICENSE` and `SECURITY.md` no longer exist — the repo is now private with no project licence. The record above of what the hardening pass did stays true; for the reversal see `DECISIONS.md` → _Private repository, no project license_.
+
 1. **Three production `npm audit` findings remain (all unreachable).** After
    moving `shadcn` to devDependencies, the production tree carries `next`→`postcss`
    (moderate, build-time only), and `next`→`sharp` / `sharp` (high, libvips
