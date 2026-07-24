@@ -41,8 +41,6 @@ npm run dev        # http://localhost:3000 — /showcase is the living demo
 | `CODE_STYLE.md`              | Naming, imports, exports, TypeScript usage                               |
 | `CONTRIBUTING.md`            | Feature placement, shared-code promotion, PR expectations                |
 | `DECISIONS.md`               | The decision log — every stack choice with reasoning                     |
-| `SECURITY.md`                | How to report a vulnerability; dependency posture                        |
-| `LICENSE`                    | MIT (project code) + the font's separate OFL notice                      |
 | `docs/audit/`                | Historical point-in-time reviews (do not read as current state)          |
 
 ## Tech stack
@@ -119,14 +117,22 @@ in `env.ts` for how to add a variable.
 
 ## License
 
-[MIT](LICENSE) © Nasser Almutaani. Permissive by design — clone this template
-and ship private or commercial products from it without copyleft obligations.
-When you create a product from it, update the copyright holder in `LICENSE` (or
-replace the file) to your own. The bundled **Noto Sans Arabic** font is covered
-separately by the **SIL Open Font License 1.1** (`src/assets/fonts/OFL.txt`) and
-must keep shipping with that notice; the MIT license does not affect it. Public
-Sans (identity face) / Geist Mono (code face) are fetched by `next/font` at
-build time and are OFL-licensed in their own metadata.
+This repository is **private** and carries **no open-source license** —
+default copyright applies (all rights reserved). It is not
+distributed publicly; do not add a project license unless it is deliberately
+made public (see `DECISIONS.md` → _Private repository, no project license_ for
+the checklist that reversal would require).
+
+This says nothing about the fonts, whose licences are third-party obligations
+independent of the repo's own status. The built application self-hosts and
+redistributes **all three** families — **Noto Sans Arabic**, **Public Sans**
+(identity face), and **Geist Mono** (code face) — each under the **SIL Open
+Font License 1.1**. Noto is the only one committed to this repo as a source
+file, so it is the only one whose full OFL text is vendored here
+(`src/assets/fonts/OFL.txt`) and must keep shipping alongside it. Public Sans
+and Geist Mono are fetched by `next/font` at build time, and the woff2 files it
+generates carry their copyright notice and OFL licence reference in the font's
+name-table metadata.
 
 ## Direction & internationalization
 
