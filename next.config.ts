@@ -11,6 +11,8 @@ import type { NextConfig } from "next";
 // `next start` when every route is prerendered.)
 import "./src/config/env-validation";
 
-const nextConfig: NextConfig = {/* config options here */};
+const nextConfig: NextConfig = {
+  allowedDevOrigins: ["192.168.1.2"],
+};
 
 export default nextConfig;
