@@ -29,20 +29,15 @@ everything else derives from them:
 error pages, and everything else that displays the app's identity — no
 component references the name directly.
 
-**Non-English products have a third rename location: the error-route
-copy.** The boundary files ship English user-facing text that `APP_CONFIG`
-does not derive — rewrite it in your product's language:
-
-| File                       | English copy to replace                                                               |
-| -------------------------- | ------------------------------------------------------------------------------------- |
-| `src/app/not-found.tsx`    | The `metadata.title`, 404 heading, body copy, and "Go to the home page" link          |
-| `src/app/error.tsx`        | The fallback description                                                              |
-| `src/app/global-error.tsx` | The fallback description **and** the `<title>` it builds ("Something went wrong — …") |
-
-The shared defaults inside `ErrorFallback`
-(`src/core/errors/error-fallback.tsx`) are prop-overridable, like every
-primitive's English defaults — the boundary files above are where those
-props are (or are not yet) passed.
+**Non-English products translate the message catalogue, not the boundary
+files.** All user-facing copy — the error routes (`not-found.tsx`,
+`error.tsx`, `global-error.tsx`), the `ErrorBoundary` fallback, and every
+primitive label — reads from `src/i18n/messages/<locale>.ts` via
+`useTranslations`/`getTranslations`. For a single-locale product, translate
+**one** catalogue (§3a below); the boundary files never need editing. The
+English defaults still embedded in primitives (`ErrorFallback`,
+`DialogContent.closeLabel`, the shell label props) are prop-overridable
+fallbacks — the call sites pass translated values.
 
 Also rewrite for your product:
 
@@ -100,11 +95,48 @@ historical reviews) and `docs/ROADMAP.md` (or repurpose it as your own).
 - Environment — copy `.env.example` to `.env.local`; set
   `NEXT_PUBLIC_API_BASE_URL` if your backend is not same-origin
   (`src/config/env.ts` is the validated contract; empty = same-origin).
-- `src/config/app.ts` — `APP_LOCALES.DEFAULT` if your deployment is not
-  English/LTR (one value flips language and direction together).
+- `src/config/app.ts` — locale (see §3a for the language a product ships in).
 - CI works with zero configuration: `.github/workflows/ci.yml` needs no
   secrets, no environment, no registry access — it runs on the first PR of
   a fresh clone as-is.
+
+## 3a. Ship in one language (the common case)
+
+Most products built on this foundation ship **one** locale, and that path is
+designed to cost nothing — no locale routing, no switcher, no second-locale
+bytes. To ship entirely in one language (Arabic shown; any locale is the same
+shape):
+
+1. **`src/config/app.ts`** — set the locale as the sole entry:
+
+   ```ts
+   export const APP_LOCALES = { DEFAULT: "ar", SUPPORTED: ["ar"] } as const;
+   ```
+
+   Trim `LOCALE_INFO` to that one locale (the `satisfies` clause enforces it).
+   `lang`, `dir`, and numerals now follow automatically; `LocaleControl`
+   renders nothing (nothing to switch).
+
+2. **Translate one catalogue.** Rename `src/i18n/messages/en.ts` to your
+   locale (e.g. `ar.ts`, `export const ar`) and translate every value, or keep
+   `en.ts` as the reference and add `ar.ts` declared `: Messages`. In
+   `src/i18n/catalogue.ts`, point the static `DEFAULT_CATALOGUE` import and
+   `DefaultCatalogueLocale` at your locale and trim `CATALOGUE_LOADERS` to the
+   one entry. The typecheck (and the `DEFAULT_CATALOGUE` guard) fail until this
+   is consistent — a forgotten step is a build error, not a silent English
+   leak.
+
+3. **If the locale is RTL/Arabic-primary**, set the Noto `preload` to `true`
+   in `src/app/fonts.ts` (the compile-time guard there names this) and review
+   the `[dir="rtl"]` ramp metrics in `src/styles/theme.css`.
+
+That is the whole path: one config change and one catalogue. Every route stays
+statically prerendered, the bundle carries no multi-locale machinery, and the
+product is fully in your language, RTL and all. To serve **two** locales at
+once instead, keep `SUPPORTED` at two entries and translate both catalogues —
+`LocaleControl` then appears automatically; see
+`docs/DIRECTION_AND_I18N.md` for the full add-a-locale procedure and the
+routing decision.
 
 ## 4. First-run checklist (~30 minutes)
 

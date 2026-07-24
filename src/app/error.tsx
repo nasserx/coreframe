@@ -1,6 +1,7 @@
 "use client";
 
 import { ErrorFallback } from "@/core/errors/error-fallback";
+import { useTranslations } from "@/core/providers/locale-provider";
 
 /*
  * Route-level error boundary (Next.js file convention): catches errors
@@ -23,14 +24,19 @@ export default function RouteError({
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  // Renders inside the provider tree, so the ACTIVE locale's copy is used and
+  // it re-translates when the visitor switches language.
+  const t = useTranslations("error");
   return (
     // Boundary files replace the segment layouts, so this file owns the
     // `<main>` landmark itself (docs/LAYOUT.md § The main landmark).
     <main className="flex flex-1 flex-col">
       <ErrorFallback
-        description="An unexpected error occurred while loading this page. Try again, or reload if the problem persists."
+        title={t("title")}
+        description={t("routeDescription")}
+        actionLabel={t("actionLabel")}
         onAction={retry}
-        detail={error.digest === undefined ? undefined : `Reference: ${error.digest}`}
+        detail={error.digest === undefined ? undefined : t("reference", { digest: error.digest })}
         className="min-h-full flex-1"
       />
     </main>

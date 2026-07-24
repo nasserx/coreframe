@@ -18,12 +18,16 @@ export type DialogOverlayProps = DialogPrimitive.Backdrop.Props;
 
 export type DialogContentProps = DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  /** Accessible name of the built-in close button; localize at the call site. */
+  closeLabel?: string;
 };
 
 export type DialogHeaderProps = ComponentProps<"div">;
 
 export type DialogFooterProps = ComponentProps<"div"> & {
   showCloseButton?: boolean;
+  /** Visible label of the built-in close button; localize at the call site. */
+  closeLabel?: string;
 };
 
 export type DialogTitleProps = DialogPrimitive.Title.Props;
@@ -78,6 +82,7 @@ export function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeLabel = "Close",
   ...props
 }: DialogContentProps) {
   return (
@@ -98,7 +103,7 @@ export function DialogContent({
             render={<Button variant="ghost" className="absolute end-2 top-2" size="icon-sm" />}
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{closeLabel}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -115,6 +120,7 @@ export function DialogHeader({ className, ...props }: DialogHeaderProps) {
 export function DialogFooter({
   className,
   showCloseButton = false,
+  closeLabel = "Close",
   children,
   ...props
 }: DialogFooterProps) {
@@ -129,7 +135,9 @@ export function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="outline" />}>Close</DialogPrimitive.Close>
+        <DialogPrimitive.Close render={<Button variant="outline" />}>
+          {closeLabel}
+        </DialogPrimitive.Close>
       )}
     </div>
   );

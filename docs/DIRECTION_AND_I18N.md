@@ -4,34 +4,77 @@ How this foundation supports right-to-left rendering and Arabic typography,
 and where a product plugs in message translation. The living demo is
 `/showcase/direction`.
 
-## Scope: what the foundation provides — and deliberately does not
+## Scope: what the foundation provides
 
 **Provided:** direction as a first-class, lint-guarded concern (logical
 properties everywhere), an Arabic-capable font stack with correct vertical
-metrics, per-locale direction/numeral configuration, and RTL-verified
-primitives.
+metrics, per-locale direction/numeral configuration, RTL-verified primitives,
+**and message translation** — a typed in-repo message layer with a client
+locale runtime (see below).
 
-**Not provided: message translation.** An i18n library (message catalogs,
-locale routing, pluralization) is a product decision — it dictates routing
-shape (`/[locale]/…` segments, domains, or cookies), bundling, and content
-workflow, none of which a domain-neutral foundation should preempt. The
-integration points a product uses to add it:
+**Message translation.** Ships as `src/i18n` (the typed message layer) plus
+`LocaleProvider` in `src/core/providers` (the client runtime — the concrete
+Localization slot in `AppProvider`). The two decisions that shaped it:
 
-- `src/config/app.ts` — `APP_LOCALES` / `LOCALE_INFO` already model the locale
-  set; an i18n library's locale list should be derived from (or replace) this.
-- `src/app/layout.tsx` — `lang` and `dir` currently come from `APP_CONFIG`;
-  a locale-routed app moves this to the `[locale]` segment layout and sets
-  both per request (this is the point where prerendering strategy becomes the
-  product's decision).
-- Primitive strings — the primitives carry almost no text; localize what
-  exists at the call site: `PaginationPrevious`/`PaginationNext` (`text`,
-  `aria-label`), the AppShell defaults (`skipLinkLabel`, `label`,
-  `closeLabel`, the trigger's `aria-label` — all props), and any
-  `aria-label` you pass. `DialogContent`'s built-in close button has a
-  hardcoded English `sr-only` label ("Close"); a localized product hides it
-  (`showCloseButton={false}`) and composes its own `DialogClose`.
-- `src/core/providers/app-provider.tsx` — the documented slot for a
-  localization provider (see its TODO).
+**Routing: static locale per deployment, plus an optional client runtime — no
+locale routing.** The foundation's hard constraint is that every route is
+statically prerendered. Each strategy was judged against it: a **cookie**-read
+locale opts every route into dynamic rendering (a regression); **domain**
+routing needs host detection via middleware; **sub-path `/[locale]/…`** can
+stay static with `generateStaticParams` but forces the `/`→`/locale` redirect
+through middleware (dynamic), nests the whole route tree under a `[locale]`
+segment, and taxes the common case — a single-locale product pays for routing
+it never uses. So the base is **build-time static locale** (every route
+prerenders in the configured locale), and multi-locale deployments layer a
+**client-side switch** modelled exactly on the theme runtime: localStorage +
+cross-tab `storage` sync + a pre-paint script that sets `<html lang/dir>` with
+no flash. This is the same call the repo already made for theme (a cookie was
+rejected there for the identical static-rendering reason). Trade-off: no
+per-locale URLs, so a returning non-default-locale visitor gets correct
+direction pre-paint but a brief text re-render on hydration, and crawlers see
+the default-locale HTML — correct and SEO-clean for a single-locale
+deployment. A product needing multiple **indexed** locales from one deployment
+adopts sub-path routing then; the message/type/switcher layer sits underneath
+it unchanged. Full reasoning: `DECISIONS.md`.
+
+**Library: a typed in-repo solution, not a dependency.** Because the routing
+decision means the foundation does not use an i18n library's routing/
+negotiation, what remained — message loading, `{placeholder}` interpolation, a
+typed accessor — is ~150 lines. Adding next-intl/Paraglide/react-i18next to
+use a fraction of it (and ship its runtime on the single-locale common path)
+is the opposite of the discipline that removed axios and zustand. `DECISIONS.md`
+records the comparison.
+
+The message layer, concretely:
+
+- `src/i18n/messages/en.ts` is the **canonical** catalogue; `<locale>.ts`
+  catalogues are typed `: Messages`, so a missing or renamed key fails `tsc`.
+- `useTranslations("<ns>")` (client, **active** locale, re-renders on switch)
+  and `getTranslations("<ns>")` (server/static, **default** locale — for
+  Server Components like `not-found.tsx` and the provider-less
+  `global-error.tsx`) resolve keys with `keyof`-checked safety.
+- The default catalogue is statically bundled; other locales are code-split
+  behind dynamic `import()`, so a single-locale build ships exactly one
+  catalogue (measured within 0.2 kB of the pre-i18n build; the second locale
+  is a ~1.9 kB gz chunk fetched only on switch, in no route's First Load JS).
+- `LOCALE_INFO` (`src/config/app.ts`) stays the single source of truth for a
+  locale's direction, numerals, and autonym (`label`); the message layer reads
+  it and never restates it — so Arabic messages can never render LTR.
+
+**Primitive strings** localize at the call site (the primitives carry almost no
+text): `PaginationPrevious`/`PaginationNext` (`text`, `aria-label`), the
+AppShell/SiteShell label props (`skipLinkLabel`, `label`, `closeLabel`,
+`unavailableLabel`, the trigger `aria-label`), `ThemeControl.optionLabels` +
+`aria-label`, and — added in this pass — `DialogContent`/`DialogFooter`'s
+optional `closeLabel` (default `"Close"`). Pass a `useTranslations`/
+`getTranslations` value into each. The `(site)` showcase layout is the worked
+example.
+
+**Still a product's own responsibility:** ICU pluralization/gender and
+locale-aware number/date **formatting** — `translate()` does simple
+`{placeholder}` substitution only; formatting utilities belong in `src/utils`
+reading `LOCALE_INFO.numerals` (see Numerals below) when a product needs them —
+and **per-locale-URL routing** (see the routing decision above).
 
 ## Direction architecture
 
@@ -44,19 +87,25 @@ integration points a product uses to add it:
   changes **one value** (`DEFAULT`) to flip the deployment's language and
   direction together.
 
-**Direction is static per deployment.** Rationale: direction follows locale;
-runtime _locale_ switching requires routing and translation decisions that
-belong to the product, and a runtime _direction_ toggle without a locale
-switch is not a real product behavior. Static direction also keeps every
-route statically prerenderable — a cookie- or storage-driven `dir` would
-either force dynamic rendering or need pre-paint script gymnastics for no
-product value. Because all styling is logical-property based, a product that
-later adds locale routing only has to set `dir` per request/segment — no
+**The default direction is static per deployment; runtime changes come only
+from switching _locale_.** Direction follows locale, never the reverse — nobody
+wants English rendered right-to-left, so there is no standalone direction
+control. The server-rendered `<html dir>` is the configured default (keeping
+every route statically prerenderable); when a multi-locale deployment's visitor
+selects a locale, `LocaleProvider` sets `lang`/`dir` from `LOCALE_INFO` in one
+move (pre-paint on return visits, so direction never flashes). A cookie- or
+storage-driven `dir` divorced from a locale choice was rejected: it would force
+dynamic rendering or need script gymnastics for no product value. Because all
+styling is logical-property based, direction is the entire switch — no
 component changes.
 
-The showcase header's LTR/RTL control is an **inspection tool** (a showcase
-feature component, not a primitive): it flips `document.documentElement.dir`
-ephemerally so every page can be reviewed in both directions.
+A **standalone direction toggle used to live in the showcase header** as an
+engineering inspection tool. It was removed in the 2026-07 i18n pass: it read
+to a visitor as a broken translation feature, and its real engineering value —
+reviewing a page in both directions — belongs to the test suite, which flips
+`dir` programmatically for **every** route (`tests/e2e/matrix.ts`), not to the
+product surface. The showcase header now carries a real `LocaleControl` (the
+language switcher); direction follows the chosen language.
 
 ## The logical-property rule
 
@@ -213,10 +262,12 @@ inspected under RTL reads "backwards" to an LTR reader; that is the reader's
 direction, not a component defect (verified by geometry: root at
 inline-start in both directions).
 
-One deliberate exception to mirroring: the showcase header pins `dir="ltr"`.
-It is the inspection instrument panel — its controls must not jump to the
-other side of the screen when the direction toggle they host is pressed, and
-its copy is English-only sandbox chrome. Product headers should mirror.
+One deliberate exception to mirroring: the `(app)` showcase header pins
+`dir="ltr"`. It is the inspection instrument panel — its controls must not jump
+to the other side of the screen when the `LocaleControl` it hosts flips the
+document to RTL, and its copy is English-only sandbox chrome. Product headers
+should mirror — the `(site)` showcase header does (it is translated and mirrors
+under Arabic like any product site).
 
 ## Numerals
 
@@ -237,18 +288,28 @@ intentionally empty); when a product adds them, they must read
 ## How to add a locale
 
 1. Add the code to `APP_LOCALES.SUPPORTED` in `src/config/app.ts`.
-2. Add its entry to `LOCALE_INFO` (`direction`, `numerals`) — the
-   `satisfies` clause fails the typecheck until you do.
-3. If the locale needs a script Public Sans doesn't cover, load a companion face
+2. Add its entry to `LOCALE_INFO` (`direction`, `numerals`, `label` autonym) —
+   the `satisfies` clause fails the typecheck until you do.
+3. Add its message catalogue: copy `src/i18n/messages/en.ts` to
+   `<code>.ts`, declare it `: Messages`, and translate every value — the
+   typecheck names any key you miss. Register it in `src/i18n/catalogue.ts`'s
+   `CATALOGUE_LOADERS` (`() => import("./messages/<code>").then((m) => m.<code>)`);
+   the `Record<AppLocale, …>` type fails the build until you do.
+4. If the locale needs a script Public Sans doesn't cover, load a companion face
    via `next/font` in `src/app/layout.tsx` and append its variable to the
    `--font-sans` stack in `src/styles/theme.css` (the Noto Sans Arabic wiring
    is the template).
-4. If it is the new deployment default, change `APP_LOCALES.DEFAULT` — `lang`,
-   `dir`, and numeral configuration follow automatically. If the new default
-   is RTL/Arabic-primary, also set the Noto `preload` to `true` in
-   `src/app/fonts.ts` (font preload cannot auto-derive; the compile-time guard
-   there fails the build until you do — see _Font preloading_ above).
-5. For an RTL locale, review `/showcase/direction` and the `[dir="rtl"]`
-   ramp metrics — retune the token values if the script's rhythm differs
-   from Arabic.
-6. Message translation: see the scope section above — that part is yours.
+5. If it is the new deployment **default**, change `APP_LOCALES.DEFAULT` —
+   `lang`, `dir`, and numeral configuration follow automatically. Also
+   re-point `src/i18n/catalogue.ts`'s static `DEFAULT_CATALOGUE` import (and
+   `DefaultCatalogueLocale`) to the new default; the guard there fails the
+   build if you forget. If the new default is RTL/Arabic-primary, also set the
+   Noto `preload` to `true` in `src/app/fonts.ts` (font preload cannot
+   auto-derive; the compile-time guard there fails the build until you do — see
+   _Font preloading_ above).
+6. For an RTL locale, review `/showcase/direction`, `/showcase/site` (the
+   translated proof surface), and the `[dir="rtl"]` ramp metrics — retune the
+   token values if the script's rhythm differs from Arabic.
+7. With more than one supported locale, `LocaleControl` appears automatically
+   (it renders nothing for a single-locale deployment). Place it in your
+   product chrome where a language switch belongs.

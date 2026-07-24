@@ -16,7 +16,12 @@ export type TextDirection = "ltr" | "rtl";
 export type NumberingSystem = "latn" | "arab";
 
 /**
- * Per-locale rendering facts.
+ * Per-locale rendering facts — the single source of truth every locale-derived
+ * decision reads (direction, numerals, message catalogue, and the switcher's
+ * option name). Because direction, numerals, and the active message catalogue
+ * are all COMPUTED from the selected locale through this map, it is impossible
+ * for two configs to disagree — e.g. Arabic messages can never ship with LTR
+ * direction (docs/DIRECTION_AND_I18N.md).
  *
  * - `direction` drives the `dir` attribute on `<html>` (and the Tailwind
  *   `rtl:` variant).
@@ -25,11 +30,17 @@ export type NumberingSystem = "latn" | "arab";
  *   Arabic-Indic (٠–٩). The foundation defaults Arabic to Western numerals —
  *   the prevailing convention in modern Arabic product UIs — and a product
  *   flips this one value to switch.
+ * - `label` is the locale's autonym (its name written in its own language) —
+ *   the correct label for a language switcher regardless of the current UI
+ *   locale, so it is deliberately NOT a translated message.
  */
 export const LOCALE_INFO = {
-  en: { direction: "ltr", numerals: "latn" },
-  ar: { direction: "rtl", numerals: "latn" },
-} as const satisfies Record<AppLocale, { direction: TextDirection; numerals: NumberingSystem }>;
+  en: { direction: "ltr", numerals: "latn", label: "English" },
+  ar: { direction: "rtl", numerals: "latn", label: "العربية" },
+} as const satisfies Record<
+  AppLocale,
+  { direction: TextDirection; numerals: NumberingSystem; label: string }
+>;
 
 export const APP_CONFIG = {
   name: "Frontend Foundation",

@@ -2,10 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { getTranslations } from "@/i18n";
 import { cn } from "@/lib/utils";
 
+// Server Component: statically prerendered in the build-time default locale, so
+// its copy comes from the default catalogue via the synchronous server
+// translator (no per-request work — the route stays static).
+const t = getTranslations("notFound");
+
 export const metadata: Metadata = {
-  title: "Page not found",
+  title: t("metaTitle"),
 };
 
 /*
@@ -20,16 +26,14 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-3 p-6 text-center">
-      <p className="text-sm font-medium text-muted-foreground">404</p>
-      <h1 className="text-base font-medium text-foreground">Page not found</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">
-        The page you are looking for does not exist or may have moved.
-      </p>
+      <p className="text-sm font-medium text-muted-foreground">{t("code")}</p>
+      <h1 className="text-base font-medium text-foreground">{t("title")}</h1>
+      <p className="max-w-sm text-sm text-muted-foreground">{t("description")}</p>
       {/* Navigation styled as a button: buttonVariants on a real Link, so
           the element keeps link semantics (role, middle-click, focus
           behavior). Button + render would re-brand it role="button". */}
       <Link href="/" className={cn(buttonVariants(), "mt-1")}>
-        Go to the home page
+        {t("homeAction")}
       </Link>
     </main>
   );
