@@ -74,9 +74,12 @@ comfortably centred with generous side gutters on wide displays (a wider
 NOT a reading measure: prose inside a Container must carry `max-w-prose` —
 the wider the container, the easier the measure contract is to violate, so
 treat uncapped paragraphs as defects. Gutters are responsive and unaffected
-by the cap: `px-4` (16px per side) below `sm`, `px-6` (24px) from `sm` up;
-the cap only engages once the viewport exceeds 1152px + gutters, so phone
-and tablet edges are untouched.
+by the cap: `px-4` (16px per side) below `sm`, `px-5` (20px) from `sm` up —
+the 2026-08 settling pass tightened the wide-screen gutter one step from
+`px-6` (24px), which read marginally wide, bringing dense surfaces (tables,
+card grids) a touch closer to the edge without crowding. The cap only
+engages once the viewport exceeds 1152px + gutters, so phone and tablet
+edges are untouched.
 
 Both utilities are `max-width` — a logical, direction-agnostic constraint;
 nothing direction-specific is needed for RTL.
@@ -111,13 +114,21 @@ and continues to apply.
 <PageHeader>
   <Breadcrumb>…</Breadcrumb> {/* optional, caller-composed */}
   <PageHeaderTitle>Title</PageHeaderTitle> {/* the page's single h1, text-heading */}
-  <PageHeaderDescription>…</PageHeaderDescription> {/* prose measure, muted */}
+  <PageHeaderDescription>…</PageHeaderDescription>{" "}
+  {/* prose measure, text-body-lg lead paragraph — foreground, not muted */}
 </PageHeader>
 ```
 
 The primitive owns the scaffold's rhythm (breadcrumb → lockup) and the
 description's measure. Slots compose in reading order; anything a page does
-not need is simply omitted. The showcase binds its breadcrumb root once in
+not need is simply omitted.
+
+`PageHeaderDescription` is the **lead-paragraph role**, one ramp step above
+body at `text-body-lg`, and it is the deliberate exception to the muted rule:
+it is definitionally the page's lead prose, so it stays `foreground`. Greying
+it back re-creates the flat "everything at one tone" page the 2026-09
+body-contrast pass fixed. See `docs/DESIGN_TOKENS.md` §2 "Text colour: body vs
+secondary" and "Type hierarchy". The showcase binds its breadcrumb root once in
 `ShowcasePageHeader` (feature layer) — a product does the same with its own
 breadcrumb source.
 
