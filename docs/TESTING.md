@@ -72,7 +72,7 @@ browser can falsify.
 - `fonts.spec.ts` — asserts the Arabic face is **loaded** (`document.fonts`)
   and **used** (an Arabic string measured through the page's font stack is
   pixel-identical to the Noto face and differs from the Arial fallback —
-  `size-adjust: 115%` makes interception measurable). "The page shows
+  `size-adjust: 112%` makes interception measurable). "The page shows
   Arabic" is not evidence; the original defect rendered plausible fallback
   text.
 - `a11y.spec.ts` — axe-core (WCAG 2.x A/AA) over every route in all four

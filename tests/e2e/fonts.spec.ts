@@ -12,7 +12,7 @@ import { expect, test } from "@playwright/test";
  * 1. Loaded — a FontFace for the Noto family reports status "loaded".
  * 2. Used — an Arabic string measured with the page's actual font stack is
  *    pixel-identical to the same string forced into the Noto face, and
- *    differs from the Arial fallback rendering (Noto's size-adjust: 115%
+ *    differs from the Arial fallback rendering (Noto's size-adjust: 112%
  *    makes interception measurable).
  */
 const ARABIC_SAMPLE = "المعرفة أساس التقدم، والتصميم الجيد يخدم الجميع";
@@ -86,7 +86,7 @@ test("Noto Sans Arabic is loaded and actually renders Arabic glyphs", async ({ p
   expect(probe.loadedFaces.length).toBeGreaterThan(0);
 
   // 2. Used: the page's stack renders Arabic with Noto's metrics, not a
-  // fallback's. size-adjust: 115% guarantees a measurable difference.
+  // fallback's. size-adjust: 112% guarantees a measurable difference.
   expect(Math.abs(probe.stackWidth - probe.notoWidth)).toBeLessThan(0.5);
   expect(Math.abs(probe.stackWidth - probe.arialWidth)).toBeGreaterThan(1);
 });
