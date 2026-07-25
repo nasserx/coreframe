@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -53,6 +53,7 @@ async function renderLocaleRuntime() {
 describe("locale runtime", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.doUnmock("@/i18n");
     window.localStorage.clear();
     document.documentElement.removeAttribute("dir");
     document.documentElement.removeAttribute("lang");
@@ -131,5 +132,59 @@ describe("locale runtime", () => {
 
     expect(await screen.findByText("المظهر")).toBeInTheDocument();
     expect(screen.getByTestId("direction")).toHaveTextContent("rtl");
+  });
+
+  /*
+   * A code-split catalogue can fail to load (offline, CDN blip, chunk hashes
+   * rotated by a deploy while the tab was open). Direction switches
+   * synchronously with the locale while messages fall back to the default
+   * catalogue, so the runtime must not settle half-switched — English prose in
+   * an RTL document labelled `lang="ar"` would be silently wrong.
+   */
+  it("reverts the locale when a catalogue chunk fails to load, without throwing", async () => {
+    const chunkFailure = new Error("Loading chunk for locale ar failed");
+    const unhandled: unknown[] = [];
+    const onUnhandledRejection = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on("unhandledRejection", onUnhandledRejection);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    // Everything else in the module passes through untouched; only the loader
+    // is replaced, so the provider exercises its real rejection path.
+    vi.doMock("@/i18n", async () => ({
+      ...(await vi.importActual<Record<string, unknown>>("@/i18n")),
+      loadCatalogue: () => Promise.reject(chunkFailure),
+    }));
+
+    try {
+      const user = userEvent.setup();
+      await renderLocaleRuntime();
+
+      await user.click(screen.getByRole("button", { name: "choose arabic" }));
+
+      // Language, direction, and the document attributes come back together.
+      await waitFor(() => {
+        expect(screen.getByTestId("locale")).toHaveTextContent("en");
+      });
+      expect(screen.getByTestId("direction")).toHaveTextContent("ltr");
+      expect(document.documentElement.lang).toBe("en");
+      expect(document.documentElement.dir).toBe("ltr");
+      expect(screen.getByTestId("label")).toHaveTextContent("Theme");
+      // The failed choice must not persist for the next visit either.
+      expect(window.localStorage.getItem("locale")).toBe("en");
+
+      // Reported for diagnosis, and never left as an unhandled rejection.
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.stringContaining('Could not load the "ar" message catalogue'),
+        chunkFailure,
+      );
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      expect(unhandled).toEqual([]);
+    } finally {
+      process.off("unhandledRejection", onUnhandledRejection);
+      vi.doUnmock("@/i18n");
+    }
   });
 });

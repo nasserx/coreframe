@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
 } from "react";
@@ -147,6 +148,11 @@ export type LocaleProviderProps = Readonly<{
  *   `<html>` already sets `suppressHydrationWarning` for the theme class, which
  *   also covers these attributes.
  *
+ * - If a code-split catalogue fails to load, the locale REVERTS to the last one
+ *   whose catalogue was in hand and the failure is logged. A half-switched state
+ *   (RTL document, English prose) is never left behind, and the failure is
+ *   non-fatal — a lost language switch must not take the page down.
+ *
  * Single-locale deployments pay effectively nothing: one catalogue is bundled,
  * no second-locale chunk is ever fetched, and `LocaleControl` renders nothing.
  *
@@ -165,17 +171,51 @@ export function LocaleProvider({ children }: LocaleProviderProps) {
   const [, setLoadedVersion] = useState(0);
   const messages = catalogueCache.get(locale) ?? DEFAULT_CATALOGUE;
 
+  /*
+   * The last locale whose catalogue was actually in hand. A failed load reverts
+   * to it, so the runtime can never settle in a half-switched state — see the
+   * rejection handler below.
+   */
+  const settledLocaleRef = useRef<AppLocale>(APP_LOCALES.DEFAULT);
+
   useEffect(() => {
     if (catalogueCache.has(locale)) {
+      settledLocaleRef.current = locale;
       return undefined;
     }
+    const previousLocale = settledLocaleRef.current;
     let cancelled = false;
-    void loadCatalogue(locale).then((loaded) => {
-      catalogueCache.set(locale, loaded);
-      if (!cancelled) {
-        setLoadedVersion((version) => version + 1);
-      }
-    });
+    void loadCatalogue(locale).then(
+      (loaded) => {
+        catalogueCache.set(locale, loaded);
+        if (!cancelled) {
+          settledLocaleRef.current = locale;
+          setLoadedVersion((version) => version + 1);
+        }
+      },
+      (cause: unknown) => {
+        /*
+         * A non-default catalogue is a code-split chunk, so this rejects on any
+         * chunk-load failure: offline, a CDN blip, or a deploy that rotated
+         * chunk hashes while the tab was open. Reverting is the only consistent
+         * outcome available: `direction` and `lang`/`dir` derive synchronously
+         * from the locale and have already switched, while `messages` falls back
+         * to the default catalogue — so doing nothing would render English prose
+         * in a right-to-left document labelled `lang="ar"`, silently
+         * (docs/audit/2026-07-comprehensive-review.md CORR-01).
+         *
+         * Non-fatal by design: the failure is reported for diagnosis, never
+         * thrown. Losing a language switch must not take the page down with it.
+         */
+        console.error(
+          `[LocaleProvider] Could not load the "${locale}" message catalogue; reverting to "${previousLocale}".`,
+          cause,
+        );
+        if (!cancelled) {
+          setPreference(previousLocale);
+        }
+      },
+    );
     return () => {
       cancelled = true;
     };
