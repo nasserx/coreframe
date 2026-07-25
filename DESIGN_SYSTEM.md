@@ -38,9 +38,11 @@ Props should be explicit, typed, and minimal. Prefer semantic prop names over st
 
 Forward refs for primitives that render a meaningful DOM element consumers may need to focus, measure, or integrate with form and overlay libraries. Do not forward refs only because it is convenient.
 
-## When To Use asChild
+## When To Use The `render` Prop
 
-Use `asChild` only when consumers need to replace the rendered element while preserving component behavior. It should not be used as a default escape hatch for unclear component APIs.
+Use the `render` prop only when consumers need to replace the rendered element while preserving component behavior. It should not be used as a default escape hatch for unclear component APIs.
+
+This stack's element-replacement API is Base UI's `render` prop, not Radix's `asChild` — searching the codebase for `asChild` finds nothing. Before using it across a server→client boundary, read `docs/UI_LIBRARY.md` §7 (the slot contract): never set the same prop, including `data-slot`, on both a component and its `render` element — that combination is a guaranteed hydration mismatch, and it is a defect that actually shipped here.
 
 ## When To Split Components
 
