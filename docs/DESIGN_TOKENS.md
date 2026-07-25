@@ -158,7 +158,7 @@ Design notes:
 - **`--color-border` is the structural hairline of the flat system** —
   decorative in WCAG terms (it conveys structure, not meaning), so 1.4.11
   does not apply to it. Its weight is fixed by the **hairline rule** (below),
-  not tuned by feel: light `0.9`, dark `0.385`, and it carries
+  not tuned by feel: light `0.91`, dark `0.385`, and it carries
   card/popover/dialog edges via `ring-border`. **`--color-input` is a control
   boundary** and holds ≥3:1 against background and surface in both themes
   (WCAG 1.4.11), as does `--color-ring` (focus indicator — near-black in
