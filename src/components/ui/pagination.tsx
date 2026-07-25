@@ -29,8 +29,8 @@ export type PaginationEllipsisProps = ComponentProps<"span">;
  *
  * Accessibility: renders a `<nav aria-label="pagination">` landmark with a
  * list of links; the active link carries `aria-current="page"`, prev/next
- * expose descriptive `aria-label`s, and the ellipsis is hidden with an
- * `sr-only` fallback.
+ * expose descriptive `aria-label`s, and the ellipsis announces the elision
+ * through an `sr-only` label (see PaginationEllipsis).
  *
  * Constraints: UI-only — page math, ranges, and hrefs belong to the
  * consumer; the primitive renders whatever items it is given.
@@ -117,10 +117,19 @@ export function PaginationNext({ className, text = "Next", ...props }: Paginatio
   );
 }
 
+/**
+ * Marks elided pages in the range.
+ *
+ * Registry divergence (docs/UI_LIBRARY.md §8): upstream puts `aria-hidden` on
+ * this wrapper AND an `sr-only` label inside it, which cannot both work —
+ * `aria-hidden` prunes the whole subtree, so the label was unreachable and a
+ * screen-reader user met a silent gap in the range. The elision is meaningful
+ * information, so the wrapper is exposed and the label announces; only the icon
+ * is decorative.
+ */
 export function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {
   return (
     <span
-      aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
         "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
@@ -128,7 +137,7 @@ export function PaginationEllipsis({ className, ...props }: PaginationEllipsisPr
       )}
       {...props}
     >
-      <MoreHorizontalIcon />
+      <MoreHorizontalIcon aria-hidden="true" />
       <span className="sr-only">More pages</span>
     </span>
   );

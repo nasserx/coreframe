@@ -35,7 +35,12 @@ Why fetch and not axios:
 What `apiFetch` provides:
 
 - Base URL from validated config (`NEXT_PUBLIC_API_BASE_URL` in
-  `src/config/env.ts`; empty default = same-origin).
+  `src/config/env.ts`; empty default = same-origin). The **base URL is the only
+  thing that may decide a request's origin**: `path` must be root-relative and
+  start with a single `/`, and `apiFetch` throws a `TypeError` before issuing
+  the request otherwise. A `//host` or `/\host` path would concatenate into a
+  protocol-relative URL and send the request — with whatever credentials the
+  auth extension point attaches — to an origin the path chose.
 - Default 10 s timeout (`timeoutMs` to override), composed with the
   caller's `AbortSignal` — pass React Query's `signal` through.
 - JSON body serialization and `content-type` handling.

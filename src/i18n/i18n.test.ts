@@ -18,6 +18,24 @@ function flatKeys(catalogue: Record<string, Record<string, string>>): string[] {
     .sort();
 }
 
+/*
+ * Mirrors the PLACEHOLDER pattern in translate.ts. Types cannot reach inside a
+ * message string, so placeholder drift is invisible to `tsc`: a translation
+ * that drops {digest} or misspells {count} keeps perfect key parity, and
+ * `translate` deliberately leaves unknown placeholders verbatim — so the only
+ * symptom is a literal "{digest}" rendered to a user in that locale.
+ */
+function placeholdersByKey(catalogue: Record<string, Record<string, string>>): Map<string, string> {
+  const found = new Map<string, string>();
+  for (const [namespace, entries] of Object.entries(catalogue)) {
+    for (const [key, message] of Object.entries(entries)) {
+      const names = [...message.matchAll(/\{(\w+)\}/g)].map((match) => match[1] ?? "");
+      found.set(`${namespace}.${key}`, [...new Set(names)].sort().join(","));
+    }
+  }
+  return found;
+}
+
 describe("message catalogues", () => {
   it("registers a loader for every supported locale", () => {
     for (const locale of APP_LOCALES.SUPPORTED) {
@@ -30,6 +48,23 @@ describe("message catalogues", () => {
     for (const locale of APP_LOCALES.SUPPORTED) {
       const catalogue = await CATALOGUE_LOADERS[locale]();
       expect(flatKeys(catalogue), `locale "${locale}" key parity`).toEqual(englishKeys);
+    }
+  });
+
+  it("every supported locale uses the same placeholders as the canonical English message", async () => {
+    const englishPlaceholders = placeholdersByKey(en);
+    // Guard against the comparison below going vacuous if the extraction ever
+    // stops matching translate.ts's pattern.
+    expect(
+      [...englishPlaceholders.values()].filter((names) => names !== "").length,
+    ).toBeGreaterThan(0);
+
+    for (const locale of APP_LOCALES.SUPPORTED) {
+      const catalogue = await CATALOGUE_LOADERS[locale]();
+      const localePlaceholders = placeholdersByKey(catalogue);
+      for (const [key, expected] of englishPlaceholders) {
+        expect(localePlaceholders.get(key), `locale "${locale}", message "${key}"`).toBe(expected);
+      }
     }
   });
 

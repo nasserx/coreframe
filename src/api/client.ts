@@ -49,6 +49,8 @@ export async function apiFetch<T>(
   path: string,
   options: ApiFetchOptions & { schema?: ZodType<T> } = {},
 ): Promise<unknown> {
+  assertRootRelativePath(path);
+
   // Empty base URL (the default) means same-origin paths — correct for the
   // browser and for this repo's own route handlers. Server-side callers
   // need an absolute NEXT_PUBLIC_API_BASE_URL (docs/DATA_LAYER.md).
@@ -63,6 +65,15 @@ export async function apiFetch<T>(
     headers.set("content-type", "application/json");
   }
 
+  // The combined signal stays armed for the WHOLE exchange — the fetch and the
+  // body read alike — so both rejection sites classify aborts the same way.
+  const abortContext: AbortContext = {
+    callerSignal: options.signal,
+    timeoutSignal,
+    url,
+    timeoutMs: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+  };
+
   let response: Response;
   try {
     response = await fetch(url, {
@@ -72,19 +83,7 @@ export async function apiFetch<T>(
       ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
     });
   } catch (cause) {
-    // Caller cancellation is not a failure — rethrow untouched so
-    // signal-aware consumers (React Query) see a genuine abort.
-    if (options.signal?.aborted === true) {
-      throw cause;
-    }
-    if (timeoutSignal.aborted) {
-      throw new ApiError({
-        kind: "timeout",
-        message: `Request to ${url} timed out after ${options.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms.`,
-        url,
-        cause,
-      });
-    }
+    throwIfAborted(cause, abortContext);
     throw new ApiError({
       kind: "network",
       message: `Request to ${url} failed before a response was received.`,
@@ -99,7 +98,7 @@ export async function apiFetch<T>(
       message: `Request to ${url} failed with HTTP ${response.status}.`,
       url,
       status: response.status,
-      body: await parseJsonBodyOrUndefined(response),
+      body: await parseJsonBodyOrUndefined(response, abortContext),
     });
   }
 
@@ -111,6 +110,10 @@ export async function apiFetch<T>(
   try {
     payload = await response.json();
   } catch (cause) {
+    // Streaming the body can still be cancelled or time out. Without this, an
+    // ordinary React Query teardown mid-body would surface as malformed JSON
+    // (docs/audit/2026-07-comprehensive-review.md DATA-01).
+    throwIfAborted(cause, abortContext);
     throw new ApiError({
       kind: "parse",
       message: `Response from ${url} is not valid JSON.`,
@@ -144,11 +147,95 @@ export async function apiFetch<T>(
   return parsed.data;
 }
 
-/** Best-effort read of an error response's JSON payload; never throws. */
-async function parseJsonBodyOrUndefined(response: Response): Promise<unknown> {
+/**
+ * `path` must be root-relative, so the configured base URL is the only thing
+ * that can decide the request's origin.
+ *
+ * The URL is built by concatenation, and with the default empty base a `path`
+ * starting `//` (or `/\`, which browsers normalize to `//`) becomes a
+ * PROTOCOL-RELATIVE url — `fetch` would send the request to an origin the path
+ * chose. Every call site today passes a developer-written literal, so this is
+ * latent, but the auth extension point documented at the top of this file lives
+ * in this same function: once credentials are attached here, a path built from
+ * user or CMS input becomes credential exfiltration. Guarding is free now
+ * (docs/audit/2026-07-comprehensive-review.md SEC-01).
+ *
+ * A `TypeError`, deliberately not an `ApiError`: this is a caller contract
+ * violation, not a transport failure, and it must not be swallowed by the
+ * `isApiError` handling that wraps ordinary request errors.
+ */
+function assertRootRelativePath(path: string): void {
+  if (!path.startsWith("/") || path.startsWith("//") || path.startsWith("/\\")) {
+    throw new TypeError(
+      `apiFetch path must be root-relative and start with a single "/", got ${JSON.stringify(path)}. Set the request's origin through NEXT_PUBLIC_API_BASE_URL, never through the path.`,
+    );
+  }
+}
+
+type AbortContext = Readonly<{
+  callerSignal: AbortSignal | undefined;
+  timeoutSignal: AbortSignal;
+  url: string;
+  timeoutMs: number;
+}>;
+
+/**
+ * Classifies a rejection that happened while the request was in flight. Every
+ * await in `apiFetch` — the fetch, the success-path body read, and the
+ * error-path body read — remains subject to the combined abort signal, so all
+ * three must reach this before assuming the rejection describes what they were
+ * nominally doing.
+ *
+ * - Caller cancellation is NOT a failure: the reason is rethrown untouched so
+ *   signal-aware consumers see a genuine abort (see `./errors.ts`,
+ *   docs/DATA_LAYER.md § Cancellation).
+ * - A timeout is a timeout wherever it lands, not a transport or parse error.
+ *
+ * Returns normally when neither signal aborted, leaving the caller to throw the
+ * site-specific `network` / `parse` error.
+ */
+function throwIfAborted(cause: unknown, context: AbortContext): void {
+  if (context.callerSignal?.aborted === true) {
+    throw cause;
+  }
+  if (context.timeoutSignal.aborted) {
+    throw new ApiError({
+      kind: "timeout",
+      message: `Request to ${context.url} timed out after ${context.timeoutMs}ms.`,
+      url: context.url,
+      cause,
+    });
+  }
+}
+
+/**
+ * Best-effort read of an error response's JSON payload.
+ *
+ * A non-2xx response whose body is missing, HTML, or malformed is still an HTTP
+ * failure and not a parse failure — `kind: "http"` carries `body` only "when
+ * there is one" (`./errors.ts`, docs/DATA_LAYER.md § The error contract) — so a
+ * genuine read failure resolves to `undefined` and the caller's `ApiError`
+ * reports the status, exactly as before. This function must never upgrade a bad
+ * error body into a thrown parse error.
+ *
+ * It must, however, classify aborts rather than swallow them: this read is
+ * still subject to the combined signal, so the bare `catch {}` it used to have
+ * turned a cancellation into "HTTP 502 with no body" and a timeout into the
+ * same (docs/audit/2026-07-comprehensive-review.md DATA-02 — the same class as
+ * DATA-01, one catch further down). Both escape through the `throw new ApiError`
+ * argument list before the `"http"` error is constructed, which is the intended
+ * precedence: neither a caller abort nor a blown timeout is describable as an
+ * HTTP failure, and rethrowing the abort untouched is what lets React Query
+ * treat teardown as teardown instead of rendering an error state.
+ */
+async function parseJsonBodyOrUndefined(
+  response: Response,
+  context: AbortContext,
+): Promise<unknown> {
   try {
     return await response.json();
-  } catch {
+  } catch (cause) {
+    throwIfAborted(cause, context);
     return undefined;
   }
 }

@@ -29,6 +29,13 @@ everything else derives from them:
 error pages, and everything else that displays the app's identity — no
 component references the name directly.
 
+**Two exceptions, both showcase-scoped:** `src/app/showcase/layout.tsx`
+hardcodes `"Foundation Showcase"` in its metadata title template, and the
+`site` message namespace (`src/i18n/messages/en.ts`, `ar.ts`) carries
+`site.brand`. Both disappear with the showcase (option 3 below); if you keep
+it, rename them too or a renamed product still shows "Foundation Showcase" in
+showcase tab titles.
+
 **Non-English products translate the message catalogue, not the boundary
 files.** All user-facing copy — the error routes (`not-found.tsx`,
 `error.tsx`, `global-error.tsx`), the `ErrorBoundary` fallback, and every
@@ -96,6 +103,12 @@ historical reviews) and `docs/ROADMAP.md` (or repurpose it as your own).
   `NEXT_PUBLIC_API_BASE_URL` if your backend is not same-origin
   (`src/config/env.ts` is the validated contract; empty = same-origin).
 - `src/config/app.ts` — locale (see §3a for the language a product ships in).
+- `next.config.ts` — **`allowedDevOrigins` is a per-developer value.** It
+  carries this repo's author's LAN IP so the dev server accepts requests from
+  a phone or tablet on the same network. Replace it with your own machine's
+  address, or delete the entry if you only ever browse `localhost`. It affects
+  the dev server only — there is no production exposure — but it is a security
+  control, so an inherited allowlist entry should not be left unexamined.
 - CI works with zero configuration: `.github/workflows/ci.yml` needs no
   secrets, no environment, no registry access — it runs on the first PR of
   a fresh clone as-is.

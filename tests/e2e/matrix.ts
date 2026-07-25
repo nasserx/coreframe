@@ -41,6 +41,28 @@ export async function gotoMatrixCell(
   await page.evaluate((directionValue) => {
     document.documentElement.setAttribute("dir", directionValue);
   }, direction);
-  // One paint's worth of settling so errors triggered by the flip surface.
-  await page.waitForTimeout(250);
+  /*
+   * Wait on the CONDITION, not a duration. 96 of the suite's tests route
+   * through this line, so a fixed sleep was the highest-leverage flake vector
+   * in the matrix: too short under CI load and a console message lands after
+   * the assertion window (false pass), too short for a heavier future page and
+   * settling is incomplete (false fail).
+   *
+   * Two steps, because the attribute landing is not the same as the app having
+   * reacted to it: first observe `dir` actually applied, then yield one frame
+   * so the direction-dependent effects and the paint they trigger have run and
+   * anything they log is on the console before the caller judges it.
+   */
+  await page.waitForFunction(
+    (directionValue) => document.documentElement.dir === directionValue,
+    direction,
+  );
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      }),
+  );
 }

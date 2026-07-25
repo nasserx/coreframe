@@ -66,7 +66,7 @@ Data layer (`docs/DATA_LAYER.md`; live demo `/showcase/data`): all HTTP goes thr
 
 ## Design Philosophy (for primitives)
 
-Small, accessible, composable primitives in `src/components/ui`; domain-neutral names; token-driven styling; controlled/uncontrolled APIs documented; refs forwarded only when consumers need the DOM node; `asChild` only for element replacement; primitives own UI interaction state only — never server state, auth, or workflows. `DESIGN_SYSTEM.md` has the full checklist — run it before calling a primitive done.
+Small, accessible, composable primitives in `src/components/ui`; domain-neutral names; token-driven styling; controlled/uncontrolled APIs documented; refs forwarded only when consumers need the DOM node; Base UI's `render` prop (this stack's `asChild` equivalent) only for element replacement; primitives own UI interaction state only — never server state, auth, or workflows. `DESIGN_SYSTEM.md` has the full checklist — run it before calling a primitive done.
 
 ## Coding Standards (lint-enforced where possible)
 
