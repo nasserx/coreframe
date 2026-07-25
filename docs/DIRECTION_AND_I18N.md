@@ -208,6 +208,24 @@ Two related conventions:
   LCP path). To switch to an Arabic-primary deployment: set the RTL default
   locale **and** set Noto `preload: true` in `src/app/fonts.ts` (the guard
   will remind you).
+- **The cost of `adjustFontFallback: false` is Arabic-run CLS — accepted, not
+  overlooked.** Because Noto's metric-adjusted fallback is disabled (see
+  _fallback interception_ above), Noto is the only one of the three faces with
+  no companion fallback: verified in the built CSS, `Public Sans Fallback`
+  (`size-adjust: 104.87%`) and `Geist Mono Fallback` (`134.59%`) exist, Noto's
+  does not. All ten faces are `font-display: swap`. So on a Latin-default
+  deployment — where Noto is correctly not preloaded — an Arabic run first
+  paints in an unmatched system font and then **shifts** when Noto swaps in.
+  The trade is deliberate and the right way round: re-enabling the fallback
+  would reintroduce a defect that actually shipped (Arial's Arabic glyphs
+  intercepting the face entirely, so Noto never renders at all), which is
+  strictly worse than a layout shift. **Do not re-enable it.** Scope and
+  mitigations: the shift affects LTR deployments only, in proportion to how
+  much Arabic a Latin page carries; an Arabic-primary deployment preloads Noto
+  (see _Font preloading_) and has no unmatched first paint; and `size-adjust`
+  keeps the metrics of the face once swapped to stable, so nothing shifts a
+  second time. A Latin page carrying substantial Arabic user content can
+  preload Noto deliberately, paying 162 KB to remove the shift.
 - **License:** Noto Sans Arabic is licensed under the SIL Open Font License,
   Version 1.1; the license accompanies the font at
   `src/assets/fonts/OFL.txt`, as the OFL requires, and must stay next to the
