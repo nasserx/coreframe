@@ -34,7 +34,7 @@ npm run dev        # http://localhost:3000 — /showcase is the living demo
 | `docs/DESIGN_TOKENS.md`      | The full token contract, verified contrast, rebranding procedure         |
 | `docs/LAYOUT.md`             | Layout vocabulary: measure, rhythm, PageHeader, AppShell                 |
 | `docs/DATA_LAYER.md`         | `apiFetch`, `ApiError`, React Query contract, route-level error handling |
-| `docs/DIRECTION_AND_I18N.md` | RTL/Arabic support, logical properties, i18n integration points          |
+| `docs/DIRECTION_AND_I18N.md` | RTL/Arabic support, logical properties, the message translation layer    |
 | `docs/TESTING.md`            | Both test layers, what is deliberately untested, CI                      |
 | `docs/UI_LIBRARY.md`         | The shadcn/Base UI adaptation standard for `src/components/ui`           |
 | `DESIGN_SYSTEM.md`           | Primitive design philosophy and completion checklist                     |
@@ -57,12 +57,14 @@ when a product first needs them, not preinstalled. Every dependency has a
 
 - `src/app`: App Router files only (routes, layouts, route-level error files).
 - `src/core`: cross-cutting infrastructure — provider composition (theme,
-  query, error boundary, toaster) and shared error UI; logger/monitoring/
-  analytics/guards/accessibility are chartered placeholders.
+  locale, query, error boundary, toaster) and shared error UI; logger/
+  monitoring/analytics/guards/accessibility are chartered placeholders.
 - `src/components`: intentionally cross-feature presentation components;
   primitives in `src/components/ui`.
 - `src/features`: feature-first product modules (currently only `showcase`).
 - `src/api`: the API boundary — `apiFetch` and the typed `ApiError` contract.
+- `src/i18n`: the message layer — typed catalogues and the pure translation
+  resolver; its client runtime is `LocaleProvider` in `src/core/providers`.
 - `src/services`: application service boundaries (chartered placeholder).
 - `src/store`: shared client state (empty by design; see `docs/DATA_LAYER.md`).
 - `src/styles`: the CSS token system — the single source of truth for theming.
@@ -140,6 +142,25 @@ The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
 logical properties (lint-enforced), and the sans stack lists Noto Sans Arabic
 first — scoped to Arabic code points via `unicode-range`, so Latin renders in
 Public Sans while Arabic can never be intercepted by a metric fallback.
-Locale/direction/numeral configuration lives in `src/config/app.ts`. Message
-translation is deliberately not included — `docs/DIRECTION_AND_I18N.md` has
-the architecture and the integration points for adding an i18n library.
+Locale/direction/numeral configuration lives in `src/config/app.ts`.
+
+**Message translation ships.** It is a typed in-repo layer — `src/i18n`
+(catalogues typed against canonical English, so a missing key fails
+`typecheck`, plus a pure `{placeholder}` resolver) with `LocaleProvider` in
+`src/core/providers` as its client runtime and `LocaleControl` as the
+switcher. Two decisions shaped it, both recorded in `DECISIONS.md`:
+
+- **Static locale per deployment, no locale routing.** Every route stays
+  statically prerendered, which rules out cookie, domain, and sub-path
+  strategies; a multi-locale deployment layers a client-side switch modelled
+  on the theme runtime (localStorage + cross-tab sync + a pre-paint
+  `lang`/`dir` script). Direction always follows the selected language — it is
+  never an independent toggle.
+- **No i18n library.** Since the foundation does not use locale routing or
+  negotiation, what remained is ~150 lines; shipping a library's runtime on
+  the single-locale common path to use a fraction of it is the opposite of the
+  discipline that removed axios and zustand.
+
+The default catalogue is bundled and every other locale is code-split, so a
+single-locale deployment pays effectively nothing and never downloads a second
+locale's bytes. Full architecture: `docs/DIRECTION_AND_I18N.md`.
