@@ -116,9 +116,11 @@ Reason: Cross-cutting concerns such as providers, guards, errors, logging, monit
 
 Alternatives considered: Placing infrastructure in `src/lib`, distributing infrastructure across features, or keeping separate top-level folders for each concern.
 
-## shadcn/ui runtime pieces (Base UI, sonner, Tailwind v4 CSS-first, shadcn as a dependency)
+## shadcn/ui runtime pieces (Base UI, sonner, Tailwind v4 CSS-first, shadcn as a devDependency)
 
-Decision (backfilled 2026-07): The primitive runtime is `@base-ui/react` (the shadcn `base-nova` style's runtime), toasts are `sonner`, Tailwind v4 runs CSS-first (no `tailwind.config`), and the `shadcn` package is a regular dependency because `globals.css` imports `shadcn/tailwind.css` — the current shadcn v4 pattern makes the registry package part of the styling pipeline.
+Decision (backfilled 2026-07; placement corrected 2026-07): The primitive runtime is `@base-ui/react` (the shadcn `base-nova` style's runtime), toasts are `sonner`, Tailwind v4 runs CSS-first (no `tailwind.config`), and the `shadcn` package is a **devDependency**, consistent with `tailwindcss` and `@tailwindcss/postcss`.
+
+`globals.css` importing `shadcn/tailwind.css` does **not** make it a runtime dependency: CSS is compiled at build time, so the registry package is part of the build toolchain and nothing of it reaches the runtime tree. The whole CSS toolchain is build-time, and none of it belongs in `dependencies`. Verified empirically (`docs/audit/2026-07-comprehensive-review.md`): a prod-only install cannot build in this stack at all — it fails on `@tailwindcss/postcss` long before `shadcn` is reached — so building from `--omit=dev` is not a supported path anywhere here, by ordinary Next.js convention. Do not "fix" this by moving the package back; the 2026-07 template-hardening pass moved it here deliberately.
 
 Reason: These all follow from the shadcn/ui decision above — they are the stack that style ships with, and diverging from it would break the documented generation workflow (`docs/UI_LIBRARY.md`). Recorded explicitly because each is a real dependency someone will question later.
 
