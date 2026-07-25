@@ -182,6 +182,41 @@ describe("apiFetch error normalization", () => {
   });
 });
 
+describe("apiFetch path contract", () => {
+  /*
+   * The base URL is the only thing allowed to decide the request's origin. A
+   * path starting "//" (or "/\", which browsers normalize to "//") would make
+   * the concatenated URL protocol-relative and send the request — eventually
+   * with whatever credentials the auth extension point attaches — to an origin
+   * the path chose.
+   */
+  it.each(["//evil.example.com/records", "/\\evil.example.com/records"])(
+    "rejects the origin-hijacking path %j before any request is made",
+    async (path) => {
+      const fetchSpy = vi.fn<typeof fetch>();
+      stubFetch(fetchSpy);
+
+      await expect(apiFetch(path)).rejects.toThrow(TypeError);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    },
+  );
+
+  it("rejects a path that is not root-relative", async () => {
+    const fetchSpy = vi.fn<typeof fetch>();
+    stubFetch(fetchSpy);
+
+    await expect(apiFetch("https://evil.example.com/records")).rejects.toThrow(TypeError);
+    await expect(apiFetch("records")).rejects.toThrow(TypeError);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("accepts an ordinary root-relative path", async () => {
+    stubFetch(() => Promise.resolve(Response.json({ ok: true })));
+
+    await expect(apiFetch("/api/showcase/records")).resolves.toEqual({ ok: true });
+  });
+});
+
 describe("apiFetch success paths", () => {
   it("returns the schema's parsed output when a schema is provided", async () => {
     stubFetch(() => Promise.resolve(Response.json([{ id: 1 }])));

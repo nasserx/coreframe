@@ -49,6 +49,8 @@ export async function apiFetch<T>(
   path: string,
   options: ApiFetchOptions & { schema?: ZodType<T> } = {},
 ): Promise<unknown> {
+  assertRootRelativePath(path);
+
   // Empty base URL (the default) means same-origin paths — correct for the
   // browser and for this repo's own route handlers. Server-side callers
   // need an absolute NEXT_PUBLIC_API_BASE_URL (docs/DATA_LAYER.md).
@@ -143,6 +145,31 @@ export async function apiFetch<T>(
     });
   }
   return parsed.data;
+}
+
+/**
+ * `path` must be root-relative, so the configured base URL is the only thing
+ * that can decide the request's origin.
+ *
+ * The URL is built by concatenation, and with the default empty base a `path`
+ * starting `//` (or `/\`, which browsers normalize to `//`) becomes a
+ * PROTOCOL-RELATIVE url — `fetch` would send the request to an origin the path
+ * chose. Every call site today passes a developer-written literal, so this is
+ * latent, but the auth extension point documented at the top of this file lives
+ * in this same function: once credentials are attached here, a path built from
+ * user or CMS input becomes credential exfiltration. Guarding is free now
+ * (docs/audit/2026-07-comprehensive-review.md SEC-01).
+ *
+ * A `TypeError`, deliberately not an `ApiError`: this is a caller contract
+ * violation, not a transport failure, and it must not be swallowed by the
+ * `isApiError` handling that wraps ordinary request errors.
+ */
+function assertRootRelativePath(path: string): void {
+  if (!path.startsWith("/") || path.startsWith("//") || path.startsWith("/\\")) {
+    throw new TypeError(
+      `apiFetch path must be root-relative and start with a single "/", got ${JSON.stringify(path)}. Set the request's origin through NEXT_PUBLIC_API_BASE_URL, never through the path.`,
+    );
+  }
 }
 
 type AbortContext = Readonly<{
