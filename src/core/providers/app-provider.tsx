@@ -23,9 +23,11 @@ type AppProviderProps = Readonly<{
  * owns `<html lang/dir>` and the active message catalogue (single-locale
  * deployments pay essentially nothing; see locale-provider.tsx).
  *
- * This file is a Server Component by design — each provider owns its client
- * boundary, keeping the app shell server-rendered (see FOUNDATION_REVIEW.md,
- * Runtime Review).
+ * This file is a Server Component by design: each provider carries its own
+ * `"use client"` boundary, so composing them here does NOT make the tree it
+ * wraps a client tree — the root layout and every page below stay
+ * server-rendered. Adding `"use client"` to this file would pull all of them
+ * across the boundary at once.
  */
 export function AppProvider({ children }: AppProviderProps) {
   // TODO: Add Authentication provider.
