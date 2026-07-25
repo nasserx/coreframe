@@ -173,7 +173,9 @@ export function AppShellSidebar({
             finalFocus={triggerRef}
             className="fixed inset-y-0 start-0 z-50 flex h-dvh w-72 max-w-[calc(100%-3rem)] flex-col border-e bg-sidebar text-sidebar-foreground duration-(--motion-moderate) outline-none md:hidden data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
           >
-            <div className="flex h-12 shrink-0 items-center justify-end border-b px-2">
+            {/* h-16 matches the header this drawer replaces, so the close
+                button lands where the trigger was — same rule as SiteShell. */}
+            <div className="flex h-16 shrink-0 items-center justify-end border-b px-2">
               <DialogPrimitive.Close
                 render={<Button variant="ghost" size="icon-sm" />}
                 data-slot="app-shell-drawer-close"
