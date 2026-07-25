@@ -20,8 +20,11 @@ function stubFetch(implementation: typeof fetch): void {
  * the body, erroring the stream with the signal's reason when it aborts. This
  * is how a real abort or timeout DURING the body read surfaces — the fetch
  * itself already succeeded, so the rejection lands at `response.json()`.
+ *
+ * `status` selects which body read is exercised: 2xx for the success path,
+ * non-2xx for the error-payload read behind the `"http"` failure.
  */
-function stubFetchWithNeverEndingBody(): void {
+function stubFetchWithNeverEndingBody(status = 200): void {
   stubFetch((_input, init) =>
     Promise.resolve(
       new Response(
@@ -32,7 +35,7 @@ function stubFetchWithNeverEndingBody(): void {
             });
           },
         }),
-        { status: 200, headers: { "content-type": "application/json" } },
+        { status, headers: { "content-type": "application/json" } },
       ),
     ),
   );
@@ -168,6 +171,35 @@ describe("apiFetch error normalization", () => {
 
     expect(error.kind).toBe("timeout");
     expect(error.message).toContain("10ms");
+  });
+
+  /*
+   * The error-payload read behind an "http" failure is subject to the same
+   * signal, and it is best-effort — it swallows read failures so a 502 with an
+   * HTML body still reports as HTTP 502. Regression guard for DATA-02: that
+   * swallowing must not extend to aborts, or a cancellation became "HTTP 502
+   * with no body" and a timeout became the same.
+   */
+  it("rethrows caller cancellation that lands while reading a non-2xx body", async () => {
+    stubFetchWithNeverEndingBody(502);
+
+    const controller = new AbortController();
+    const promise = apiFetch("/failing-slow-body", { signal: controller.signal });
+    await Promise.resolve();
+    controller.abort();
+
+    await expect(promise).rejects.toSatisfy(
+      (reason) => !isApiError(reason) && (reason as DOMException).name === "AbortError",
+    );
+  });
+
+  it('reports a timeout while reading a non-2xx body as kind "timeout"', async () => {
+    stubFetchWithNeverEndingBody(502);
+
+    const error = await captureApiError(apiFetch("/failing-slow-body", { timeoutMs: 10 }));
+
+    expect(error.kind).toBe("timeout");
+    expect(error.status).toBeNull();
   });
 
   it('normalizes a schema rejection into kind "parse" naming the offending field', async () => {

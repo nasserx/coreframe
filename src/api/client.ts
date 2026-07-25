@@ -98,7 +98,7 @@ export async function apiFetch<T>(
       message: `Request to ${url} failed with HTTP ${response.status}.`,
       url,
       status: response.status,
-      body: await parseJsonBodyOrUndefined(response),
+      body: await parseJsonBodyOrUndefined(response, abortContext),
     });
   }
 
@@ -180,10 +180,11 @@ type AbortContext = Readonly<{
 }>;
 
 /**
- * Classifies a rejection that happened while the request was in flight. Both
- * awaits in `apiFetch` — the fetch and the response-body read — remain subject
- * to the combined abort signal, so both must reach this before assuming the
- * rejection describes what they were nominally doing.
+ * Classifies a rejection that happened while the request was in flight. Every
+ * await in `apiFetch` — the fetch, the success-path body read, and the
+ * error-path body read — remains subject to the combined abort signal, so all
+ * three must reach this before assuming the rejection describes what they were
+ * nominally doing.
  *
  * - Caller cancellation is NOT a failure: the reason is rethrown untouched so
  *   signal-aware consumers see a genuine abort (see `./errors.ts`,
@@ -207,11 +208,34 @@ function throwIfAborted(cause: unknown, context: AbortContext): void {
   }
 }
 
-/** Best-effort read of an error response's JSON payload; never throws. */
-async function parseJsonBodyOrUndefined(response: Response): Promise<unknown> {
+/**
+ * Best-effort read of an error response's JSON payload.
+ *
+ * A non-2xx response whose body is missing, HTML, or malformed is still an HTTP
+ * failure and not a parse failure — `kind: "http"` carries `body` only "when
+ * there is one" (`./errors.ts`, docs/DATA_LAYER.md § The error contract) — so a
+ * genuine read failure resolves to `undefined` and the caller's `ApiError`
+ * reports the status, exactly as before. This function must never upgrade a bad
+ * error body into a thrown parse error.
+ *
+ * It must, however, classify aborts rather than swallow them: this read is
+ * still subject to the combined signal, so the bare `catch {}` it used to have
+ * turned a cancellation into "HTTP 502 with no body" and a timeout into the
+ * same (docs/audit/2026-07-comprehensive-review.md DATA-02 — the same class as
+ * DATA-01, one catch further down). Both escape through the `throw new ApiError`
+ * argument list before the `"http"` error is constructed, which is the intended
+ * precedence: neither a caller abort nor a blown timeout is describable as an
+ * HTTP failure, and rethrowing the abort untouched is what lets React Query
+ * treat teardown as teardown instead of rendering an error state.
+ */
+async function parseJsonBodyOrUndefined(
+  response: Response,
+  context: AbortContext,
+): Promise<unknown> {
   try {
     return await response.json();
-  } catch {
+  } catch (cause) {
+    throwIfAborted(cause, context);
     return undefined;
   }
 }
