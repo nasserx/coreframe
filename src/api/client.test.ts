@@ -15,6 +15,29 @@ function stubFetch(implementation: typeof fetch): void {
   vi.stubGlobal("fetch", implementation);
 }
 
+/**
+ * A fetch that resolves its Response immediately but never finishes streaming
+ * the body, erroring the stream with the signal's reason when it aborts. This
+ * is how a real abort or timeout DURING the body read surfaces — the fetch
+ * itself already succeeded, so the rejection lands at `response.json()`.
+ */
+function stubFetchWithNeverEndingBody(): void {
+  stubFetch((_input, init) =>
+    Promise.resolve(
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            init?.signal?.addEventListener("abort", () => {
+              controller.error((init.signal as AbortSignal).reason);
+            });
+          },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    ),
+  );
+}
+
 async function captureApiError(promise: Promise<unknown>): Promise<ApiError> {
   try {
     await promise;
@@ -116,6 +139,35 @@ describe("apiFetch error normalization", () => {
 
     expect(error.kind).toBe("parse");
     expect(error.status).toBeNull();
+  });
+
+  /*
+   * The body read stays subject to the abort signal, so it must classify
+   * aborts exactly as the fetch does. Regression guard for DATA-01, where
+   * every body-read rejection was reported as malformed JSON — turning an
+   * ordinary React Query teardown into a rendered error state.
+   */
+  it("rethrows caller cancellation that lands during the body read, untouched", async () => {
+    stubFetchWithNeverEndingBody();
+
+    const controller = new AbortController();
+    const promise = apiFetch("/streaming", { signal: controller.signal });
+    // Let the fetch resolve first, so the abort can only land in the body read.
+    await Promise.resolve();
+    controller.abort();
+
+    await expect(promise).rejects.toSatisfy(
+      (reason) => !isApiError(reason) && (reason as DOMException).name === "AbortError",
+    );
+  });
+
+  it('reports a timeout during the body read as kind "timeout", not "parse"', async () => {
+    stubFetchWithNeverEndingBody();
+
+    const error = await captureApiError(apiFetch("/slow-body", { timeoutMs: 10 }));
+
+    expect(error.kind).toBe("timeout");
+    expect(error.message).toContain("10ms");
   });
 
   it('normalizes a schema rejection into kind "parse" naming the offending field', async () => {

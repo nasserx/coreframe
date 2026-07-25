@@ -63,6 +63,15 @@ export async function apiFetch<T>(
     headers.set("content-type", "application/json");
   }
 
+  // The combined signal stays armed for the WHOLE exchange — the fetch and the
+  // body read alike — so both rejection sites classify aborts the same way.
+  const abortContext: AbortContext = {
+    callerSignal: options.signal,
+    timeoutSignal,
+    url,
+    timeoutMs: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+  };
+
   let response: Response;
   try {
     response = await fetch(url, {
@@ -72,19 +81,7 @@ export async function apiFetch<T>(
       ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
     });
   } catch (cause) {
-    // Caller cancellation is not a failure — rethrow untouched so
-    // signal-aware consumers (React Query) see a genuine abort.
-    if (options.signal?.aborted === true) {
-      throw cause;
-    }
-    if (timeoutSignal.aborted) {
-      throw new ApiError({
-        kind: "timeout",
-        message: `Request to ${url} timed out after ${options.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms.`,
-        url,
-        cause,
-      });
-    }
+    throwIfAborted(cause, abortContext);
     throw new ApiError({
       kind: "network",
       message: `Request to ${url} failed before a response was received.`,
@@ -111,6 +108,10 @@ export async function apiFetch<T>(
   try {
     payload = await response.json();
   } catch (cause) {
+    // Streaming the body can still be cancelled or time out. Without this, an
+    // ordinary React Query teardown mid-body would surface as malformed JSON
+    // (docs/audit/2026-07-comprehensive-review.md DATA-01).
+    throwIfAborted(cause, abortContext);
     throw new ApiError({
       kind: "parse",
       message: `Response from ${url} is not valid JSON.`,
@@ -142,6 +143,41 @@ export async function apiFetch<T>(
     });
   }
   return parsed.data;
+}
+
+type AbortContext = Readonly<{
+  callerSignal: AbortSignal | undefined;
+  timeoutSignal: AbortSignal;
+  url: string;
+  timeoutMs: number;
+}>;
+
+/**
+ * Classifies a rejection that happened while the request was in flight. Both
+ * awaits in `apiFetch` — the fetch and the response-body read — remain subject
+ * to the combined abort signal, so both must reach this before assuming the
+ * rejection describes what they were nominally doing.
+ *
+ * - Caller cancellation is NOT a failure: the reason is rethrown untouched so
+ *   signal-aware consumers see a genuine abort (see `./errors.ts`,
+ *   docs/DATA_LAYER.md § Cancellation).
+ * - A timeout is a timeout wherever it lands, not a transport or parse error.
+ *
+ * Returns normally when neither signal aborted, leaving the caller to throw the
+ * site-specific `network` / `parse` error.
+ */
+function throwIfAborted(cause: unknown, context: AbortContext): void {
+  if (context.callerSignal?.aborted === true) {
+    throw cause;
+  }
+  if (context.timeoutSignal.aborted) {
+    throw new ApiError({
+      kind: "timeout",
+      message: `Request to ${context.url} timed out after ${context.timeoutMs}ms.`,
+      url: context.url,
+      cause,
+    });
+  }
 }
 
 /** Best-effort read of an error response's JSON payload; never throws. */
