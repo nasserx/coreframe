@@ -26,9 +26,9 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-3 p-6 text-center">
-      <p className="text-sm font-medium text-muted-foreground">{t("code")}</p>
-      <h1 className="text-base font-medium text-foreground">{t("title")}</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">{t("description")}</p>
+      <p className="text-small font-medium text-muted-foreground">{t("code")}</p>
+      <h1 className="text-body font-medium text-foreground">{t("title")}</h1>
+      <p className="max-w-prose text-small text-muted-foreground">{t("description")}</p>
       {/* Navigation styled as a button: buttonVariants on a real Link, so
           the element keeps link semantics (role, middle-click, focus
           behavior). Button + render would re-brand it role="button". */}
