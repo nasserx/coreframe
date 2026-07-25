@@ -11,6 +11,32 @@ Judged against the repository's own rules: `ARCHITECTURE.md`,
 `CODE_STYLE.md`, `docs/*`, `eslint.config.mjs`, `tsconfig.json`,
 `commitlint.config.mjs`, and `.claude/skills/foundation-rules/SKILL.md`.
 
+> **Status: fixes applied (2026-07, branch `chore/foundation-audit-fixes`).**
+> This report is a point-in-time snapshot and, per `docs/audit/README.md`, is
+> not edited after the fact — this note is the one exception, recording what
+> was actioned so a later reader does not re-litigate closed findings. **19 of
+> the 22 findings are fixed**, one commit each, every commit citing its ID:
+>
+> - **Bugs, with tests:** `DATA-01` (aborts during the body read are now
+>   classified, not reported as malformed JSON), `CORR-01` (a failed catalogue
+>   chunk reverts the locale instead of leaving English prose in an RTL
+>   document), `SEC-01` (origin-hijacking paths rejected at the boundary),
+>   `A11Y-01` (the ellipsis fallbacks are reachable in Pagination, removed in
+>   Breadcrumb).
+> - **Layout / consistency:** `LAY-01`, `NIT-01`.
+> - **Tests:** `TEST-01` (placeholder parity, `useDocumentDirection`, token→bridge
+>   reachability), `TEST-02` (the matrix waits on a condition, not a sleep).
+> - **Docs / config:** `DOC-01`…`DOC-10`, `CFG-01`, `CFG-02`, `PERF-01`,
+>   `DEP-01`, `NIT-02`.
+>
+> **Deliberately not actioned** (unchanged recommendations, see "Deferred"):
+> the dependency majors held by `eslint-config-next` (deferred item 6), the CI
+> action pins that need a real CI run to confirm (item 7), and the two
+> typographic systems across the 28 primitives (item 2 — only the two
+> page-level surfaces in `LAY-01` were in scope). `DEP-01` was investigated for
+> a safe patch and there is none: `next@16.2.11` is the latest 16.x and
+> hard-pins `postcss@8.4.31`, so only the audit record was refreshed.
+
 ---
 
 ## Executive summary
