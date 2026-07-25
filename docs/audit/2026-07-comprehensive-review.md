@@ -15,7 +15,8 @@ Judged against the repository's own rules: `ARCHITECTURE.md`,
 > This report is a point-in-time snapshot and, per `docs/audit/README.md`, is
 > not edited after the fact — this note is the one exception, recording what
 > was actioned so a later reader does not re-litigate closed findings. **19 of
-> the 22 findings are fixed**, one commit each, every commit citing its ID:
+> the 22 findings are fixed, plus one follow-up (`DATA-02`) that this report
+> missed**, one commit each, every commit citing its ID:
 >
 > - **Bugs, with tests:** `DATA-01` (aborts during the body read are now
 >   classified, not reported as malformed JSON), `CORR-01` (a failed catalogue
@@ -23,6 +24,15 @@ Judged against the repository's own rules: `ARCHITECTURE.md`,
 >   document), `SEC-01` (origin-hijacking paths rejected at the boundary),
 >   `A11Y-01` (the ellipsis fallbacks are reachable in Pagination, removed in
 >   Breadcrumb).
+> - **`DATA-02` — one finding this report missed**, surfaced while fixing
+>   `DATA-01` and assigned a follow-up ID. `parseJsonBodyOrUndefined`
+>   (`client.ts`, the error-payload read behind an `"http"` failure) had a bare
+>   `catch {}`, so a caller abort or timeout landing there was swallowed and
+>   reported as "HTTP 502 with no body" — the same class as `DATA-01`, one catch
+>   further down, outside the lines cited at `DATA-01`. Fixed with the same
+>   helper. The best-effort behaviour is deliberately unchanged otherwise: a
+>   non-2xx response with a missing or malformed body still surfaces as the HTTP
+>   error, since `kind: "http"` carries `body` only "when there is one".
 > - **Layout / consistency:** `LAY-01`, `NIT-01`.
 > - **Tests:** `TEST-01` (placeholder parity, `useDocumentDirection`, token→bridge
 >   reachability), `TEST-02` (the matrix waits on a condition, not a sleep).
