@@ -29,6 +29,13 @@ everything else derives from them:
 error pages, and everything else that displays the app's identity — no
 component references the name directly.
 
+**Two exceptions, both showcase-scoped:** `src/app/showcase/layout.tsx`
+hardcodes `"Foundation Showcase"` in its metadata title template, and the
+`site` message namespace (`src/i18n/messages/en.ts`, `ar.ts`) carries
+`site.brand`. Both disappear with the showcase (option 3 below); if you keep
+it, rename them too or a renamed product still shows "Foundation Showcase" in
+showcase tab titles.
+
 **Non-English products translate the message catalogue, not the boundary
 files.** All user-facing copy — the error routes (`not-found.tsx`,
 `error.tsx`, `global-error.tsx`), the `ErrorBoundary` fallback, and every
