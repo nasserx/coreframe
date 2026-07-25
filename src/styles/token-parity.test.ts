@@ -36,4 +36,18 @@ describe("theme token parity", () => {
     expect(light.size).toBeGreaterThan(30);
     expect(dark.size).toBeGreaterThan(30);
   });
+
+  /*
+   * Parity across the two themes is not enough on its own: a --color-* defined
+   * in both, in perfect parity, but never referenced by the theme.css bridge
+   * generates NO Tailwind utility. The token then looks correct in every review
+   * of the theme files while being unreachable from a component.
+   */
+  it("references every semantic color token from the theme.css bridge", () => {
+    const bridge = readFileSync(join(import.meta.dirname, "theme.css"), "utf8");
+    const colors = Array.from(light).filter((name) => name.startsWith("--color-"));
+
+    expect(colors.length).toBeGreaterThan(20);
+    expect(colors.filter((name) => !bridge.includes(`var(${name})`))).toEqual([]);
+  });
 });
