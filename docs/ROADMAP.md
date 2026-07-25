@@ -315,11 +315,17 @@ surprise.
    a feature-level example, not into the shell.
 
 3. **Frozen primitive strings and variant sets require forking to extend.**
-   `DialogContent`'s close label is hardcoded English (known issue #2),
-   Button's variant/size set is explicitly "do not extend per-product", and
-   several primitives hardcode English affordance copy. A product that needs
-   a localized close button, or one more button variant, edits the primitive
-   rather than composing around it. **Trigger:** the next localized product
-   (adds `closeLabel` and audits the other hardcoded strings together) and
-   the first product with a genuine variant need the official set cannot
-   express.
+   The pattern is settled and partly applied: `DialogContent`/`DialogFooter`
+   take `closeLabel`, the shells take `skipLinkLabel`/`label`/`closeLabel`/
+   `unavailableLabel`, and `ThemeControl` takes `optionLabels` — an optional
+   label prop defaulting to English (known issue #2, resolved). What remains
+   is the primitives that have **no such prop**: `Pagination`'s
+   `aria-label="pagination"` and its `"Go to previous/next page"` labels,
+   `PaginationEllipsis`'s `"More pages"`, `Breadcrumb`'s
+   `aria-label="breadcrumb"`, and `Spinner`'s `aria-label="Loading"` are
+   hardcoded, so a localized product edits the primitive instead of composing
+   around it. Separately, Button's variant/size set is explicitly "do not
+   extend per-product". **Trigger:** a localized product that surfaces
+   pagination or a spinner (extend the same optional-label pattern to those
+   primitives in one pass), and the first product with a genuine variant need
+   the official set cannot express.
