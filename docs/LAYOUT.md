@@ -114,23 +114,22 @@ and continues to apply.
 <PageHeader>
   <Breadcrumb>…</Breadcrumb> {/* optional, caller-composed */}
   <PageHeaderTitle>Title</PageHeaderTitle> {/* the page's single h1, text-heading */}
-  <PageHeaderDescription>…</PageHeaderDescription>{" "}
-  {/* prose measure, text-body-lg lead paragraph — foreground, not muted */}
+  <PageHeaderDescription>…</PageHeaderDescription> {/* lead paragraph — see below */}
 </PageHeader>
 ```
 
 The primitive owns the scaffold's rhythm (breadcrumb → lockup) and the
 description's measure. Slots compose in reading order; anything a page does
-not need is simply omitted.
-
-`PageHeaderDescription` is the **lead-paragraph role**, one ramp step above
-body at `text-body-lg`, and it is the deliberate exception to the muted rule:
-it is definitionally the page's lead prose, so it stays `foreground`. Greying
-it back re-creates the flat "everything at one tone" page the 2026-09
-body-contrast pass fixed. See `docs/DESIGN_TOKENS.md` §2 "Text colour: body vs
-secondary" and "Type hierarchy". The showcase binds its breadcrumb root once in
+not need is simply omitted. The showcase binds its breadcrumb root once in
 `ShowcasePageHeader` (feature layer) — a product does the same with its own
 breadcrumb source.
+
+`PageHeaderDescription` carries the **prose measure and the lead-paragraph
+role**: one ramp step above body at `text-body-lg`, and the deliberate
+exception to the muted rule — it is definitionally the page's lead prose, so
+it stays `foreground`. Greying it back re-creates the flat "everything at one
+tone" page the 2026-09 body-contrast pass fixed. See `docs/DESIGN_TOKENS.md`
+§2 "Text colour: body vs secondary" and "Type hierarchy".
 
 ## 5. Application shell
 
