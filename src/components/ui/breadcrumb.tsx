@@ -103,6 +103,16 @@ export function BreadcrumbSeparator({ children, className, ...props }: Breadcrum
   );
 }
 
+/**
+ * Marks a collapsed run of trail items.
+ *
+ * Registry divergence (docs/UI_LIBRARY.md §8): upstream nests an `sr-only`
+ * label inside this `aria-hidden` wrapper, where it is unreachable — the two
+ * are mutually exclusive on one subtree. The dead label is removed rather than
+ * exposed: a breadcrumb trail is supplementary navigation, and the consumer
+ * that decides WHICH items to collapse is also the one that can name them, so
+ * announcing a bare "More" here would add noise, not information.
+ */
 export function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisProps) {
   return (
     <span
@@ -113,7 +123,6 @@ export function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisPr
       {...props}
     >
       <MoreHorizontalIcon />
-      <span className="sr-only">More</span>
     </span>
   );
 }
