@@ -237,18 +237,40 @@ visible, not silent.
 
 > **Current state (since removed):** `LICENSE` and `SECURITY.md` no longer exist — the repo is now private with no project licence. The record above of what the hardening pass did stays true; for the reversal see `DECISIONS.md` → _Private repository, no project license_.
 
-1. **Three production `npm audit` findings remain (all unreachable).** After
-   moving `shadcn` to devDependencies, the production tree carries `next`→`postcss`
-   (moderate, build-time only), and `next`→`sharp` / `sharp` (high, libvips
-   CVEs). **Not fixed because the only `npm audit fix` is `--force`, which
-   downgrades `next` to 9.x — unacceptable.** None is reachable here: `sharp`
-   is Next's image optimizer and `next/image` is used **0 times**; `postcss`
-   runs at build, never in the client or request path. `next@16.2.11` (bumped
-   this pass) still pins the same transitive versions. **Re-evaluate the moment
-   a product adds `next/image`** (sharp becomes reachable) or a new build
-   plugin. The four dev-only findings (`shadcn`/`@modelcontextprotocol/sdk`/
-   `@hono/node-server`/`fast-uri`) are CLI tooling, absent from `npm ci
---omit=dev` production installs.
+1. **Three production `npm audit` findings remain (all unreachable).**
+   _Posture refreshed 2026-07 against measured output._ The production tree
+   (`npm audit --omit=dev`) reports **3 high, 0 moderate**:
+
+   - `next`→`postcss` (`<=8.5.17`), now **high**, not the moderate this entry
+     first recorded, and carrying three advisories of a different class than
+     the original one: XSS via an unescaped `</style>` in stringify output,
+     **arbitrary file read** via an attacker-controlled `sourceMappingURL` in a
+     CSS comment, and **path traversal** in previous-source-map auto-loading.
+   - `next`→`sharp` and `sharp` (`<0.35.0`), high, inherited libvips CVEs.
+
+   **No safe patch exists.** `next@16.2.11` is the latest 16.x and hard-pins
+   `postcss@8.4.31` as a bundled dependency, so no patch release moves it; the
+   only `npm audit fix` is `--force`, which installs `next@9.3.3` — a breaking
+   downgrade, still unacceptable.
+
+   **The reachability argument holds, with one precondition now made explicit.**
+   `sharp` is Next's image optimizer and `next/image` is used **0 times**
+   (verified), so it cannot be reached. `postcss` runs only at build. But the
+   two new advisories are reached through **the CSS postcss is given**, not
+   through when it runs — so "build-time only" is no longer the whole argument.
+   The complete one: every stylesheet in this build is first-party or a vetted
+   package (`src/styles/*`, `shadcn/tailwind.css`, `tw-animate-css`), none is
+   user-supplied, and nothing generates CSS from input. **Re-evaluate the moment
+   a product adds `next/image`** (sharp becomes reachable), **a new build
+   plugin**, or — new trigger — **any build step that processes CSS the product
+   does not author**: a CMS-supplied theme, a plugin stylesheet, or
+   user-authored styles.
+
+   The dev tree now reports **15 findings (12 high, 3 moderate)**, up from the
+   4 recorded here, mostly `minimatch`/`brace-expansion` reached through
+   `eslint-config-next`'s bundled plugins, plus
+   `shadcn`→`@modelcontextprotocol/sdk`→`@hono/node-server`. All are CLI and
+   lint tooling, absent from `npm ci --omit=dev` production installs.
 
 2. **No `browserslist` was added** (audit §2.3 suggested one). Argued against:
    `browserslist` governs JS **syntax** downleveling, not Web-API availability,
