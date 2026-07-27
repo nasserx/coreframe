@@ -126,6 +126,16 @@ Reason: These all follow from the shadcn/ui decision above — they are the stac
 
 Alternatives considered: Radix-based shadcn styles (older runtime), a custom toast implementation, Tailwind config-file mode (v4 deprecates it as the primary path).
 
+## npm dependency lifecycle-script policy
+
+Decision (2026-07): The project `.npmrc` enables `strict-allow-scripts=true`, and `package.json#allowScripts` is the source of truth for dependency install-time lifecycle scripts. `sharp@0.34.5` and `unrs-resolver@1.12.2` are explicitly approved after review. `fsevents` is denied by package name because the locked `2.3.2` and `2.3.3` releases are optional, Darwin-only dependencies whose published packages already ship their native artifacts. Root lifecycle scripts remain enabled (`ignore-scripts=false`).
+
+Reason: Installs fail closed when a dependency introduces an unreviewed lifecycle script while preserving the root `prepare` script and the two reviewed native-package paths. Exact approvals must be reviewed whenever dependency versions change. The name-level `fsevents` denial also requires reassessment if its packaging changes; current behavior was not executed directly on macOS.
+
+Scope: This policy governs dependency lifecycle execution only. It neither remediates nor accepts npm vulnerability advisories.
+
+Alternatives considered: `ignore-scripts=true` (rejected: disables root lifecycle scripts and reviewed native fallbacks), broad or unpinned approvals (rejected: future package versions would inherit execution permission without review).
+
 ## Showcase gating (build-time environment flag)
 
 Decision (2026-07): `/showcase` and its `/api/showcase/records` endpoint are gated by `NEXT_PUBLIC_ENABLE_SHOWCASE` (default `"true"`). With the flag `"false"` at build time, the showcase layout calls `notFound()` during prerender, so every showcase route ships as a static 404.
