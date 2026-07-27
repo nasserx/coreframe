@@ -155,8 +155,8 @@ routing decision.
 
 Do these in order; each step states what proves it worked.
 
-1. **Toolchain** — install Node 20+ (`nvm use` reads `.nvmrc`). `node -v`
-   prints ≥ 20.
+1. **Toolchain** — install Node 24.18.0 (`nvm use` reads `.nvmrc`). `node -v`
+   prints `v24.18.0`.
 2. **Install** — `npm ci`. Exits 0; `prepare` installs the git hooks.
 3. **First run** — `npm run dev`, open `http://localhost:3000`. The home
    page shows the app name from `APP_CONFIG`; `/showcase` renders the

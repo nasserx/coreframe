@@ -16,8 +16,8 @@ is the entry point; every deeper topic links to its owning document.
    **[`docs/ROADMAP.md`](docs/ROADMAP.md)** for what is intentionally absent
    and what signal triggers building it.
 
-Requirements: **Node ≥ 20** (`.nvmrc` pins 20; `package.json#engines`
-enforces the floor) and npm.
+Requirements: **Node 24.18.0** (`.nvmrc` pins the CI and local runtime;
+`package.json#engines` supports Node `>=24.18.0 <25`) and npm.
 
 ```bash
 npm install
