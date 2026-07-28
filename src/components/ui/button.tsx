@@ -30,7 +30,7 @@ export const buttonVariants = cva(
         outline:
           "border-border bg-background hover:bg-accent hover:text-accent-foreground hover:not-aria-[haspopup]:-translate-y-0.5 focus-visible:not-aria-[haspopup]:-translate-y-0.5 aria-expanded:bg-accent aria-expanded:text-accent-foreground motion-reduce:hover:not-aria-[haspopup]:translate-none motion-reduce:focus-visible:not-aria-[haspopup]:translate-none",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground",
         ghost:
           "hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground",
         // Tint alphas are contrast-bound on the lifted charcoal surface: dark

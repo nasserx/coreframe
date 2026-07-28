@@ -21,4 +21,21 @@ describe("Badge", () => {
 
     expect(screen.getByRole("link", { name: "Documentation" })).toHaveClass("text-link");
   });
+
+  it.each(["secondary", "outline", "ghost"] as const)(
+    "uses neutral accent for the %s interactive state",
+    (variant) => {
+      render(
+        <Badge variant={variant} render={<a href="/docs" />}>
+          Documentation
+        </Badge>,
+      );
+
+      expect(screen.getByRole("link", { name: "Documentation" })).toHaveClass(
+        variant === "secondary" || variant === "outline"
+          ? "[a]:hover:bg-accent"
+          : "hover:bg-accent",
+      );
+    },
+  );
 });

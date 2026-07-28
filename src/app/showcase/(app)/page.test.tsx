@@ -19,5 +19,6 @@ describe("Showcase index linked cards", () => {
       "focus-visible:ring-ring",
       "focus-visible:ring-offset-2",
     );
+    expect(link.querySelector('[data-slot="card"]')).toHaveClass("group-hover:bg-accent");
   });
 });

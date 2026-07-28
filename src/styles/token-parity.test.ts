@@ -165,8 +165,9 @@ describe("semantic color contract", () => {
       "--color-secondary-foreground": "var(--color-foreground)",
       "--color-muted": "oklch(0.97 0.008 250)",
       "--color-muted-foreground": "oklch(0.5 0.02 260)",
-      "--color-accent": "var(--color-secondary)",
-      "--color-accent-foreground": "var(--color-secondary-foreground)",
+      "--color-accent": "oklch(0.96 0 0)",
+      "--color-accent-selected": "oklch(0.92 0 0)",
+      "--color-accent-foreground": "var(--color-foreground)",
       "--color-info": "oklch(0.52 0.101 231)",
       "--color-info-foreground": "oklch(1 0 0)",
       "--color-success": "oklch(0.52 0.12 155)",
@@ -182,8 +183,8 @@ describe("semantic color contract", () => {
       "--color-sidebar-foreground": "var(--color-foreground)",
       "--color-sidebar-primary": "var(--color-primary)",
       "--color-sidebar-primary-foreground": "var(--color-primary-foreground)",
-      "--color-sidebar-accent": "var(--color-secondary)",
-      "--color-sidebar-accent-foreground": "var(--color-secondary-foreground)",
+      "--color-sidebar-accent": "var(--color-accent)",
+      "--color-sidebar-accent-foreground": "var(--color-accent-foreground)",
       "--color-sidebar-border": "var(--color-border)",
       "--color-sidebar-ring": "var(--color-ring)",
       "--color-overlay": "oklch(0 0 0 / 0.8)",
@@ -204,8 +205,9 @@ describe("semantic color contract", () => {
       "--color-secondary-foreground": "var(--color-foreground)",
       "--color-muted": "oklch(0.258 0 0)",
       "--color-muted-foreground": "oklch(0.78 0 0)",
-      "--color-accent": "var(--color-secondary)",
-      "--color-accent-foreground": "var(--color-secondary-foreground)",
+      "--color-accent": "oklch(0.34 0 0)",
+      "--color-accent-selected": "oklch(0.39 0 0)",
+      "--color-accent-foreground": "var(--color-foreground)",
       "--color-info": "oklch(0.72 0.14 231)",
       "--color-info-foreground": "oklch(0.15 0 0)",
       "--color-success": "oklch(0.7 0.13 155)",
@@ -221,8 +223,8 @@ describe("semantic color contract", () => {
       "--color-sidebar-foreground": "var(--color-foreground)",
       "--color-sidebar-primary": "var(--color-primary)",
       "--color-sidebar-primary-foreground": "var(--color-primary-foreground)",
-      "--color-sidebar-accent": "var(--color-secondary)",
-      "--color-sidebar-accent-foreground": "var(--color-secondary-foreground)",
+      "--color-sidebar-accent": "var(--color-accent)",
+      "--color-sidebar-accent-foreground": "var(--color-accent-foreground)",
       "--color-sidebar-border": "var(--color-border)",
       "--color-sidebar-ring": "var(--color-ring)",
       "--color-overlay": "oklch(0 0 0 / 0.8)",
@@ -368,10 +370,32 @@ describe("semantic color contract", () => {
     const token = (name: string): Oklch => parseOklch(resolveToken(tokens, name));
     const color = (name: string): LinearSrgb => oklchToLinearSrgb(token(name));
     const surface = color("--color-surface");
+    const accent = token("--color-accent");
+    const selectedAccent = token("--color-accent-selected");
     const primary = color("--color-primary");
     const selectedFill = compositeInSrgb(primary, surface, file === "dark.css" ? 0.1 : 0.05);
     const selectedBorder = compositeInSrgb(primary, surface, file === "dark.css" ? 0.2 : 0.3);
     const disabledFill = compositeInSrgb(primary, surface, 0.5);
+
+    expect(accent.chroma, "generic interaction accent chroma").toBe(0);
+    expect(selectedAccent.chroma, "persistent selected accent chroma").toBe(0);
+    expect(resolveToken(tokens, "--color-sidebar-accent")).toBe(
+      resolveToken(tokens, "--color-accent"),
+    );
+    for (const surfaceName of ["--color-background", "--color-surface", "--color-card"] as const) {
+      expect(
+        contrast(color("--color-accent"), color(surfaceName)),
+        `neutral interaction fill vs ${surfaceName}`,
+      ).toBeGreaterThanOrEqual(1.07);
+      expect(
+        contrast(color("--color-accent-selected"), color(surfaceName)),
+        `persistent selected fill vs ${surfaceName}`,
+      ).toBeGreaterThanOrEqual(1.2);
+    }
+    expect(
+      contrast(color("--color-accent-foreground"), color("--color-accent-selected")),
+      "persistent selected text",
+    ).toBeGreaterThanOrEqual(4.5);
 
     expect(contrast(selectedFill, surface), "selected tint vs surface").toBeGreaterThan(1.02);
     expect(contrast(selectedBorder, selectedFill), "selected boundary vs tint").toBeGreaterThan(

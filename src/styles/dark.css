@@ -34,8 +34,10 @@
   --color-secondary-foreground: var(--color-foreground);
   --color-muted: oklch(0.258 0 0);
   --color-muted-foreground: oklch(0.78 0 0);
-  --color-accent: var(--color-secondary);
-  --color-accent-foreground: var(--color-secondary-foreground);
+  /* Generic interaction is an elevated neutral plane, never a brand tint. */
+  --color-accent: oklch(0.34 0 0);
+  --color-accent-selected: oklch(0.39 0 0);
+  --color-accent-foreground: var(--color-foreground);
   --color-info: oklch(0.72 0.14 231);
   --color-info-foreground: oklch(0.15 0 0);
   --color-success: oklch(0.7 0.13 155);
@@ -59,8 +61,8 @@
   --color-sidebar-foreground: var(--color-foreground);
   --color-sidebar-primary: var(--color-primary);
   --color-sidebar-primary-foreground: var(--color-primary-foreground);
-  --color-sidebar-accent: var(--color-secondary);
-  --color-sidebar-accent-foreground: var(--color-secondary-foreground);
+  --color-sidebar-accent: var(--color-accent);
+  --color-sidebar-accent-foreground: var(--color-accent-foreground);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-ring);
   --color-overlay: oklch(0 0 0 / 0.8);

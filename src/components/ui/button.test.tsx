@@ -130,6 +130,23 @@ describe("Button", () => {
     }
   });
 
+  it("uses the neutral interaction token for secondary and disclosure states", () => {
+    render(
+      <>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="ghost">Menu trigger</Button>
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "Secondary" })).toHaveClass(
+      "hover:bg-accent",
+      "aria-expanded:bg-accent",
+    );
+    expect(screen.getByRole("button", { name: "Menu trigger" })).toHaveClass(
+      "hover:bg-accent",
+      "aria-expanded:bg-accent",
+    );
+  });
+
   it("uses the contrast-safe semantic link color for the link variant", () => {
     render(<Button variant="link">Documentation</Button>);
     expect(screen.getByRole("button", { name: "Documentation" })).toHaveClass("text-link");

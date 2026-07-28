@@ -18,10 +18,9 @@ const BRAND_MARK_PATH =
 
 /**
  * The foundation's brand mark: a flat, single-color rounded square with an
- * abstract two-bar glyph, legible from 16px up. Fills with `currentColor`,
- * so it follows the text color of wherever it is composed (a shell brand
- * slot, a footer) and inverts between themes through the token layer with
- * no theme logic of its own.
+ * abstract two-bar glyph, legible from 16px up. Fills with `currentColor` and
+ * owns `text-primary` by default, so every foundation identity lockup follows
+ * the approved cobalt pair without theme logic or per-shell color duplication.
  *
  * Accessibility: decorative by default (`aria-hidden`); a brand lockup's
  * accessible name belongs to the adjacent text or the wrapping link. Pass
@@ -40,7 +39,7 @@ export function BrandMark({ className, ...props }: BrandMarkProps) {
       data-slot="brand-mark"
       viewBox="0 0 64 64"
       aria-hidden="true"
-      className={cn("size-5 shrink-0", className)}
+      className={cn("size-5 shrink-0 text-primary", className)}
       {...props}
     >
       <path fill="currentColor" fillRule="nonzero" d={BRAND_MARK_PATH} />

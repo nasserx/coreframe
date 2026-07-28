@@ -38,11 +38,11 @@ export function ShowcaseNav() {
                 className={cn(
                   // Idle nav sits at font-medium (500), matching the SiteShell
                   // nav rule that a primary nav element should not read thin;
-                  // the active row is carried by the sidebar-accent fill (not a
-                  // weight change), so it stays 500 too (docs/DESIGN_TOKENS.md
-                  // § Weight scale).
+                  // the active row is carried by the stronger neutral
+                  // accent-selected fill (not a weight change), so it stays
+                  // 500 too (docs/DESIGN_TOKENS.md § Weight scale).
                   "flex h-8 items-center rounded-md px-3 text-small font-medium text-sidebar-foreground/80 outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-                  isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
+                  isActive && "bg-accent-selected text-sidebar-accent-foreground",
                 )}
               >
                 {section.title}

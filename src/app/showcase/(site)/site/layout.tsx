@@ -72,7 +72,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
           href="/showcase"
           className="me-4 flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
         >
-          <BrandMark className="size-7 text-primary sm:size-8" />
+          <BrandMark className="size-7 sm:size-8" />
           {t("brand")}
         </Link>
         <SiteShellNav label={t("navLabel")} closeLabel={tShell("closeNav")}>

@@ -78,6 +78,11 @@ const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly Col
       },
       { name: "accent", variable: "--color-accent", swatchClassName: "bg-accent" },
       {
+        name: "accent-selected",
+        variable: "--color-accent-selected",
+        swatchClassName: "bg-accent-selected",
+      },
+      {
         name: "accent-foreground",
         variable: "--color-accent-foreground",
         swatchClassName: "bg-accent-foreground",
@@ -259,7 +264,7 @@ export default async function TokensPage() {
               </div>
               <div className="rounded-lg border bg-popover p-4 text-popover-foreground shadow-md">
                 <p className="font-medium">Popover</p>
-                <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-small text-accent-foreground">
+                <p className="mt-2 rounded-lg bg-accent-selected px-3 py-2 text-small text-accent-foreground">
                   Neutral selected state
                 </p>
               </div>

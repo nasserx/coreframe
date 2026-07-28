@@ -160,7 +160,7 @@ export default function DisplayPage() {
         <ScrollArea className="h-40 max-w-form rounded-lg border">
           <Stack gap="xs" className="p-3">
             {Array.from({ length: 20 }, (_, index) => (
-              <p key={index} className="rounded-md px-2 py-1 text-sm hover:bg-muted">
+              <p key={index} className="rounded-md px-2 py-1 text-sm hover:bg-accent">
                 Scrollable row {index + 1}
               </p>
             ))}

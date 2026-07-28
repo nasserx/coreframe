@@ -47,55 +47,61 @@ reference fails sRGB gamut, WCAG contrast, or an established semantic boundary.
 The reference calls cyan `accent`, but on its rendered landing page cyan acts
 as a decorative signal. In this foundation `accent` globally owns generic
 hover, selected, and disclosure states. Recoloring all of those cyan would
-collapse an established distinction, so neutral `accent` aliases `secondary`
-and cyan maps to `info`. Likewise, action fill and text link have separate
-semantic tokens: in dark mode no single cobalt can contrast 4.5:1 both with a
-light button foreground and with the lightest charcoal card.
+collapse an established distinction, so `accent` is independently authored as
+a zero-chroma interaction neutral and cyan maps to `info`. Persistent selected
+states that lack another visual cue use the stronger, still-zero-chroma
+`accent-selected`; transient hover and expanded states with an open panel keep
+the quieter `accent`. `secondary` and `muted` keep their content-surface
+responsibilities instead of also owning interaction feedback. Likewise, action
+fill and text link have separate semantic tokens: in dark mode no single cobalt
+can contrast 4.5:1 both with a light button foreground and with the lightest
+charcoal card.
 
-| Token                                | Light                               | Dark                                |
-| ------------------------------------ | ----------------------------------- | ----------------------------------- |
-| `--color-background`                 | `oklch(1 0 0)`                      | `oklch(0.205 0 0)`                  |
-| `--color-foreground`                 | `oklch(0.21 0.04 265)`              | `oklch(0.96 0 0)`                   |
-| `--color-surface`                    | `oklch(0.985 0.005 250)`            | `oklch(0.258 0 0)`                  |
-| `--color-surface-foreground`         | `var(--color-foreground)`           | `var(--color-foreground)`           |
-| `--color-card`                       | `oklch(1 0 0)`                      | `oklch(0.295 0 0)`                  |
-| `--color-card-foreground`            | `var(--color-foreground)`           | `var(--color-foreground)`           |
-| `--color-popover`                    | `oklch(1 0 0)`                      | `oklch(0.295 0 0)`                  |
-| `--color-popover-foreground`         | `var(--color-foreground)`           | `var(--color-foreground)`           |
-| `--color-primary`                    | `oklch(0.531 0.219 262.6)`          | `oklch(0.57 0.19 262)`              |
-| `--color-primary-foreground`         | `oklch(1 0 0)`                      | `oklch(1 0 0)`                      |
-| `--color-link`                       | `oklch(0.568 0.219 262.6)`          | `oklch(0.673 0.172 262)`            |
-| `--color-secondary`                  | `oklch(0.97 0.008 250)`             | `oklch(0.258 0 0)`                  |
-| `--color-secondary-foreground`       | `var(--color-foreground)`           | `var(--color-foreground)`           |
-| `--color-muted`                      | `oklch(0.97 0.008 250)`             | `oklch(0.258 0 0)`                  |
-| `--color-muted-foreground`           | `oklch(0.5 0.02 260)`               | `oklch(0.78 0 0)`                   |
-| `--color-accent`                     | `var(--color-secondary)`            | `var(--color-secondary)`            |
-| `--color-accent-foreground`          | `var(--color-secondary-foreground)` | `var(--color-secondary-foreground)` |
-| `--color-info`                       | `oklch(0.52 0.101 231)`             | `oklch(0.72 0.14 231)`              |
-| `--color-info-foreground`            | `oklch(1 0 0)`                      | `oklch(0.15 0 0)`                   |
-| `--color-success`                    | `oklch(0.52 0.12 155)`              | `oklch(0.7 0.13 155)`               |
-| `--color-success-foreground`         | `oklch(0.985 0.005 155)`            | `oklch(0.145 0.01 155)`             |
-| `--color-warning`                    | `oklch(0.82 0.14 80)`               | `oklch(0.8 0.13 80)`                |
-| `--color-warning-foreground`         | `oklch(0.28 0.05 80)`               | `oklch(0.15 0.012 80)`              |
-| `--color-destructive`                | `oklch(0.516 0.21 27)`              | `oklch(0.766 0.138 27)`             |
-| `--color-destructive-foreground`     | `oklch(1 0 0)`                      | `oklch(0.15 0.01 25)`               |
-| `--color-border`                     | `oklch(0.93 0.01 255)`              | `oklch(0.355 0 0)`                  |
-| `--color-input`                      | `oklch(0.658 0.01 255)`             | `oklch(0.57 0 0)`                   |
-| `--color-ring`                       | `oklch(0.585 0.219 262.6)`          | `oklch(0.659 0.181 262)`            |
-| `--color-chart-1`                    | `oklch(0.55 0.15 262)`              | `oklch(0.68 0.13 262)`              |
-| `--color-chart-2`                    | `oklch(0.62 0.1 195)`               | `oklch(0.7 0.11 195)`               |
-| `--color-chart-3`                    | `oklch(0.6 0.12 155)`               | `oklch(0.72 0.12 155)`              |
-| `--color-chart-4`                    | `oklch(0.75 0.13 85)`               | `oklch(0.8 0.12 85)`                |
-| `--color-chart-5`                    | `oklch(0.58 0.15 25)`               | `oklch(0.68 0.14 25)`               |
-| `--color-sidebar`                    | `var(--color-background)`           | `var(--color-background)`           |
-| `--color-sidebar-foreground`         | `var(--color-foreground)`           | `var(--color-foreground)`           |
-| `--color-sidebar-primary`            | `var(--color-primary)`              | `var(--color-primary)`              |
-| `--color-sidebar-primary-foreground` | `var(--color-primary-foreground)`   | `var(--color-primary-foreground)`   |
-| `--color-sidebar-accent`             | `var(--color-secondary)`            | `var(--color-secondary)`            |
-| `--color-sidebar-accent-foreground`  | `var(--color-secondary-foreground)` | `var(--color-secondary-foreground)` |
-| `--color-sidebar-border`             | `var(--color-border)`               | `var(--color-border)`               |
-| `--color-sidebar-ring`               | `var(--color-ring)`                 | `var(--color-ring)`                 |
-| `--color-overlay`                    | `oklch(0 0 0 / 0.8)`                | `oklch(0 0 0 / 0.8)`                |
+| Token                                | Light                             | Dark                              |
+| ------------------------------------ | --------------------------------- | --------------------------------- |
+| `--color-background`                 | `oklch(1 0 0)`                    | `oklch(0.205 0 0)`                |
+| `--color-foreground`                 | `oklch(0.21 0.04 265)`            | `oklch(0.96 0 0)`                 |
+| `--color-surface`                    | `oklch(0.985 0.005 250)`          | `oklch(0.258 0 0)`                |
+| `--color-surface-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
+| `--color-card`                       | `oklch(1 0 0)`                    | `oklch(0.295 0 0)`                |
+| `--color-card-foreground`            | `var(--color-foreground)`         | `var(--color-foreground)`         |
+| `--color-popover`                    | `oklch(1 0 0)`                    | `oklch(0.295 0 0)`                |
+| `--color-popover-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
+| `--color-primary`                    | `oklch(0.531 0.219 262.6)`        | `oklch(0.57 0.19 262)`            |
+| `--color-primary-foreground`         | `oklch(1 0 0)`                    | `oklch(1 0 0)`                    |
+| `--color-link`                       | `oklch(0.568 0.219 262.6)`        | `oklch(0.673 0.172 262)`          |
+| `--color-secondary`                  | `oklch(0.97 0.008 250)`           | `oklch(0.258 0 0)`                |
+| `--color-secondary-foreground`       | `var(--color-foreground)`         | `var(--color-foreground)`         |
+| `--color-muted`                      | `oklch(0.97 0.008 250)`           | `oklch(0.258 0 0)`                |
+| `--color-muted-foreground`           | `oklch(0.5 0.02 260)`             | `oklch(0.78 0 0)`                 |
+| `--color-accent`                     | `oklch(0.96 0 0)`                 | `oklch(0.34 0 0)`                 |
+| `--color-accent-selected`            | `oklch(0.92 0 0)`                 | `oklch(0.39 0 0)`                 |
+| `--color-accent-foreground`          | `var(--color-foreground)`         | `var(--color-foreground)`         |
+| `--color-info`                       | `oklch(0.52 0.101 231)`           | `oklch(0.72 0.14 231)`            |
+| `--color-info-foreground`            | `oklch(1 0 0)`                    | `oklch(0.15 0 0)`                 |
+| `--color-success`                    | `oklch(0.52 0.12 155)`            | `oklch(0.7 0.13 155)`             |
+| `--color-success-foreground`         | `oklch(0.985 0.005 155)`          | `oklch(0.145 0.01 155)`           |
+| `--color-warning`                    | `oklch(0.82 0.14 80)`             | `oklch(0.8 0.13 80)`              |
+| `--color-warning-foreground`         | `oklch(0.28 0.05 80)`             | `oklch(0.15 0.012 80)`            |
+| `--color-destructive`                | `oklch(0.516 0.21 27)`            | `oklch(0.766 0.138 27)`           |
+| `--color-destructive-foreground`     | `oklch(1 0 0)`                    | `oklch(0.15 0.01 25)`             |
+| `--color-border`                     | `oklch(0.93 0.01 255)`            | `oklch(0.355 0 0)`                |
+| `--color-input`                      | `oklch(0.658 0.01 255)`           | `oklch(0.57 0 0)`                 |
+| `--color-ring`                       | `oklch(0.585 0.219 262.6)`        | `oklch(0.659 0.181 262)`          |
+| `--color-chart-1`                    | `oklch(0.55 0.15 262)`            | `oklch(0.68 0.13 262)`            |
+| `--color-chart-2`                    | `oklch(0.62 0.1 195)`             | `oklch(0.7 0.11 195)`             |
+| `--color-chart-3`                    | `oklch(0.6 0.12 155)`             | `oklch(0.72 0.12 155)`            |
+| `--color-chart-4`                    | `oklch(0.75 0.13 85)`             | `oklch(0.8 0.12 85)`              |
+| `--color-chart-5`                    | `oklch(0.58 0.15 25)`             | `oklch(0.68 0.14 25)`             |
+| `--color-sidebar`                    | `var(--color-background)`         | `var(--color-background)`         |
+| `--color-sidebar-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
+| `--color-sidebar-primary`            | `var(--color-primary)`            | `var(--color-primary)`            |
+| `--color-sidebar-primary-foreground` | `var(--color-primary-foreground)` | `var(--color-primary-foreground)` |
+| `--color-sidebar-accent`             | `var(--color-accent)`             | `var(--color-accent)`             |
+| `--color-sidebar-accent-foreground`  | `var(--color-accent-foreground)`  | `var(--color-accent-foreground)`  |
+| `--color-sidebar-border`             | `var(--color-border)`             | `var(--color-border)`             |
+| `--color-sidebar-ring`               | `var(--color-ring)`               | `var(--color-ring)`               |
+| `--color-overlay`                    | `oklch(0 0 0 / 0.8)`              | `oklch(0 0 0 / 0.8)`              |
 
 Design notes:
 
@@ -112,9 +118,17 @@ Design notes:
   fill/foreground pair and as readable text on a restrained `/10` tint. It
   does not create an `info` component variant; components earn variants from
   repeated semantic behavior, not from the existence of a color role.
-- **Accent remains neutral.** Generic hover, selection, and disclosure states
-  alias the exact reference secondary fill; they do not borrow cyan and
-  compete with actions or information.
+- **Accent is an independent neutral interaction plane.** Transient hover,
+  focus, and expanded disclosure states use exact zero-chroma values (`0.96`
+  light, `0.34` dark). Persistent selection without another visible cue uses
+  `accent-selected` (`0.92` light, `0.39` dark), whose source-level contract
+  remains at least 1.2:1 against background, surface, and card. Showcase current
+  navigation and selected table rows consume that stronger plane. SiteShell
+  current menu items instead use bold weight, while expanded buttons keep the
+  quiet plane because the open panel/dialog/drawer is the independent cue. No
+  neutral interaction borrows cyan, cobalt, or the slightly cool content
+  surfaces. `sidebar-accent` aliases the transient token so sidebar hover
+  follows the same rule without a duplicate value.
 - **`chart-1` remains an independent data color.** Its historical indigo is
   preserved because the reference authors no chart palette. Neither token is
   a color scale or a source for the other.
@@ -191,8 +205,12 @@ foreground.
 
 The two themes preserve the reference's different material models rather than
 forcing numeric symmetry. Light uses a nearly flat white ladder; dark uses
-three visible charcoal planes. Primary fill stays medium/deep cobalt in both,
-while link and ring move lighter where their context requires contrast. Input
+three visible charcoal planes. Generic interaction steps down to a light-gray
+`0.96` plane in light and up to an elevated-neutral `0.34` plane in dark;
+persistent selection without another cue advances one step further to `0.92`
+light / `0.39` dark. All four values have zero chroma. Primary fill stays
+medium/deep cobalt in both, while link and ring move lighter where their
+context requires contrast. Input
 boundaries move away from the exact quiet border in opposite directions to
 clear 3:1. Muted text is darker than the canvas in light and lighter than the
 canvas in dark. The rule for future changes is semantic parity and comparable
@@ -657,10 +675,11 @@ Steps, sharpened by all three migrations:
    contrast on every route × theme × direction, and the overflow sweep
    re-checks the new type metrics at every width.
 8. **Brand assets (beyond tokens, by nature):** the mark is
-   `src/components/ui/brand-mark.tsx` (one `currentColor` path — it
-   inherits theme inversion) and `src/app/icon.svg` (same geometry, hex
-   fills computed from the foreground tokens, `prefers-color-scheme` for
-   dark browser UI). Keep the two in sync; both carry a comment saying so.
+   `src/components/ui/brand-mark.tsx` (one `currentColor` path with
+   `text-primary` as its component-owned default) and `src/app/icon.svg`
+   (same geometry, static hex fills computed from the light/dark primary
+   tokens, `prefers-color-scheme` for dark browser UI). Keep the two in sync;
+   both carry a comment saying so.
 9. Open `/showcase/tokens` in both themes — every swatch shows its authored
    value exactly as written in `src/styles`, and the ramp/elevation/radius
    sections reflect your edits live. Then look at `/` and `/showcase/site`:

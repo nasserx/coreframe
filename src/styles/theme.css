@@ -48,6 +48,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-selected: var(--accent-selected);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
@@ -201,6 +202,7 @@
   --muted: var(--color-muted);
   --muted-foreground: var(--color-muted-foreground);
   --accent: var(--color-accent);
+  --accent-selected: var(--color-accent-selected);
   --accent-foreground: var(--color-accent-foreground);
   --success: var(--color-success);
   --success-foreground: var(--color-success-foreground);
