@@ -237,7 +237,7 @@ export function AppShellHeader({ className, ...props }: AppShellHeaderProps) {
       // border is always present (transparent at top), so its arrival
       // never shifts layout; only border-color transitions.
       className={cn(
-        "sticky top-0 z-40 flex h-16 min-w-0 items-center gap-3 border-b border-transparent bg-background px-4 transition-colors data-scrolled:border-border sm:px-5",
+        "sticky top-0 z-40 flex h-16 min-w-0 items-center gap-3 border-b border-transparent bg-background px-4 transition-colors data-scrolled:border-border sm:px-6 lg:px-8",
         className,
       )}
       {...props}

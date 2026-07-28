@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { PlusIcon } from "lucide-react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "./button";
@@ -49,11 +50,84 @@ describe("Button", () => {
     const button = screen.getByRole("button", { name: "Delete" });
     expect(button).toHaveClass("text-destructive");
     expect(button).toHaveClass("h-7");
+    expect(button).toHaveClass("px-2.5");
+    expect(button).toHaveClass("text-xs");
+  });
+
+  it.each([
+    ["default", "h-8", "px-3"],
+    ["sm", "h-7", "px-2.5"],
+    ["lg", "h-9", "px-6"],
+  ] as const)("pins the %s text-button geometry", (size, height, padding) => {
+    render(<Button size={size}>Localized action label</Button>);
+    const button = screen.getByRole("button", { name: "Localized action label" });
+    expect(button).toHaveClass(height);
+    expect(button).toHaveClass(padding);
+    expect(button).toHaveClass("gap-2");
+    expect(button).toHaveClass("rounded-md");
+  });
+
+  it.each([
+    ["icon", "size-8"],
+    ["icon-sm", "size-7"],
+    ["icon-lg", "size-9"],
+  ] as const)("pins the %s icon-button geometry", (size, dimension) => {
+    render(
+      <Button size={size} aria-label={`Add ${size}`}>
+        <PlusIcon />
+      </Button>,
+    );
+    expect(screen.getByRole("button", { name: `Add ${size}` })).toHaveClass(dimension);
+  });
+
+  it("keeps disabled and loading compositions on the default geometry", () => {
+    render(
+      <>
+        <Button disabled>Disabled action</Button>
+        <Button disabled>
+          <span data-icon="inline-start" aria-hidden="true" />
+          Saving a localized record…
+        </Button>
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "Disabled action" })).toHaveClass("h-8", "px-3");
+    expect(screen.getByRole("button", { name: "Saving a localized record…" })).toHaveClass(
+      "h-8",
+      "px-3",
+      "gap-2",
+    );
   });
 
   it("keeps the primary hover fill at the contrast-tested opacity", () => {
     render(<Button>Save</Button>);
     expect(screen.getByRole("button", { name: "Save" })).toHaveClass("hover:bg-primary/90");
+  });
+
+  it("uses the exact lift contract without blanket transitions", () => {
+    render(<Button>Save</Button>);
+    const button = screen.getByRole("button", { name: "Save" });
+    expect(button).toHaveClass(
+      "hover:not-aria-[haspopup]:-translate-y-0.5",
+      "focus-visible:not-aria-[haspopup]:-translate-y-0.5",
+      "motion-reduce:hover:not-aria-[haspopup]:translate-none",
+      "motion-reduce:focus-visible:not-aria-[haspopup]:translate-none",
+      "transition-[color,background-color,border-color,box-shadow,translate]",
+    );
+    expect(button).not.toHaveClass("transition-all");
+    expect(button.className).not.toMatch(/active:.*translate/);
+  });
+
+  it("keeps color-only variants motionless", () => {
+    render(
+      <>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="link">Link</Button>
+      </>,
+    );
+    for (const name of ["Secondary", "Ghost", "Link"]) {
+      expect(screen.getByRole("button", { name }).className).not.toContain("-translate-y-0.5");
+    }
   });
 
   it("uses the contrast-safe semantic link color for the link variant", () => {

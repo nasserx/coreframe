@@ -428,17 +428,19 @@ the bridge derives from it by multiplication:
 | ----- | ---------- | --- | -------------------------------------- |
 | `sm`  | ×0.5       | 4   | smallest nested elements               |
 | `md`  | ×0.75      | 6   | nested elements (toggle items, badges) |
-| `lg`  | ×1         | 8   | controls (buttons, inputs, textareas)  |
+| `lg`  | ×1         | 8   | controls (inputs, textareas)           |
 | `xl`  | ×1.5       | 12  | surfaces (cards, dialogs)              |
 | `2xl` | ×2         | 16  | —                                      |
 | `3xl` | ×2.5       | 20  | —                                      |
 | `4xl` | ×3         | 24  | —                                      |
 
-Controls sit at `lg`, nested elements step down to stay concentric, and
-surfaces step up so cards and dialogs stay recognisably rounded above the
-tighter controls. The Badge is deliberately `rounded-md`, not the
-registry's `rounded-4xl` pill — a full-round badge is a shape decision
-that fights this scale.
+Controls generally sit at `lg`, nested elements step down to stay
+concentric, and surfaces step up so cards and dialogs stay recognisably
+rounded above the tighter controls. Button is the targeted exception:
+`rounded-md` resolves to the reference-authored 6px radius without changing
+the global 8px base. The Badge is also deliberately `rounded-md`, not the
+registry's `rounded-4xl` pill — a full-round badge is a shape decision that
+fights this scale.
 
 ### Control height
 
@@ -446,29 +448,26 @@ Interactive controls sit on a four-step height scale (the shadcn Button
 `size` set; `h-N` = `N × 0.25rem`). Each step has a job, so a control's
 height is a role decision, not a per-instance nudge:
 
-| Step      | Height   | For                                                           |
-| --------- | -------- | ------------------------------------------------------------- |
-| `xs`      | h-6 (24) | dense/inline actions — table-row controls, tag removes        |
-| `sm`      | h-7 (28) | compact toolbars and dense forms                              |
-| `default` | h-8 (32) | **the baseline** — standard buttons, inputs, most UI          |
-| `lg`      | h-9 (36) | **prominent** actions and touch targets — larger primary CTAs |
+| Step      | Height   | For                                                    |
+| --------- | -------- | ------------------------------------------------------ |
+| `xs`      | h-6 (24) | dense/inline actions — table-row controls, tag removes |
+| `sm`      | h-7 (28) | compact toolbars and dense forms                       |
+| `default` | h-8 (32) | **the baseline** — standard buttons, inputs, most UI   |
+| `lg`      | h-9 (36) | large primitive actions and navigation CTAs            |
 
-**The header action cluster uses `default` (h-8) — the baseline.** This
-reverses the 2026-08 settling pass, which put the cluster at `lg` (h-9)
-reasoning that a tall (h-16) bar wants prominent controls. The 2026-09 pass
-brought it back down a step: h-9 read a touch oversized for the flat
-identity's restraint, and `default`/h-8 is the documented baseline for
-"standard buttons" — it sits comfortably in the tall bar with generous
-vertical breathing room. The scale itself is unchanged; only the header's
-_assignment_ moved (lg remains available for a surface that genuinely wants
-the prominent step). **The utility toggles in the same cluster (ThemeControl,
-LocaleControl) align to h-8** so the whole cluster shares one optical
-height; they render at 32px by construction (a 26px inner toggle + the group's
-`p-0.5` padding and 1px border). CTA padding stays at the size's own `px-2.5`
-(the earlier `px-3.5` override is gone — with h-8 it is not needed and only
-widened the bar). Within a cluster, keep one gap between peers and a larger
-gap between sub-groups (utilities vs actions); centre-align so unequal
-intrinsic widths still read as one row.
+The primitive geometry copies the reference exactly: default is `h-8 px-3
+gap-2`, small is `h-7 px-2.5 gap-2 text-xs`, large is `h-9 px-6 gap-2`, and
+icon is `size-8`; text uses 14/20 at weight 500 except small at 12/16.
+Foundation-only `xs` and paired icon sizes remain available for dense
+application controls.
+
+Public-site compositions can override only geometry while reusing the
+primitive: navigation CTA `h-9 px-5`, hero CTA `h-10 px-6`, pricing CTA
+`h-11 px-5`, and prominent CTA `h-12 px-7`, all 14/20 at weight 600. These
+are composition treatments, not new Button size names. The Showcase header
+uses the navigation treatment; the hero uses the hero treatment. Utility
+toggles keep their own h-8 geometry, so the control cluster remains aligned
+by its centre rather than pretending every control has one role.
 
 ### Focus and invalid states
 
@@ -512,11 +511,11 @@ confirms it changed; a layer shows where it came from. Anything beyond
 that is noise in a flat, editorial identity. The whole vocabulary is
 three tokens:
 
-| Token               | Value                         | For                                                                                                                                             |
-| ------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--motion-quick`    | `120ms`                       | State feedback (hover, focus, pressed color shifts): fast enough to feel instant, slow enough not to flicker.                                   |
-| `--motion-moderate` | `200ms`                       | Orientation (dialogs, drawers, backdrops entering/leaving): long enough to track, short enough to never delay.                                  |
-| `--ease-out-soft`   | `cubic-bezier(0.25, 0, 0, 1)` | The one curve: decelerate — motion arrives and settles gently. Exits reuse it (at the same durations); a second curve has not earned its place. |
+| Token               | Value                          | For                                                                                                            |
+| ------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `--motion-quick`    | `150ms`                        | Reference-authored state feedback (hover, focus, pressed color/transform shifts).                              |
+| `--motion-moderate` | `200ms`                        | Orientation (dialogs, drawers, backdrops entering/leaving): long enough to track, short enough to never delay. |
+| `--ease-standard`   | `cubic-bezier(0.4, 0, 0.2, 1)` | The reference/Tailwind standard interaction curve.                                                             |
 
 The durations live in `base.css` (theme-neutral); the bridge (`theme.css`)
 sets `--default-transition-duration`/`-timing-function` to them, so **every
@@ -524,24 +523,28 @@ sets `--default-transition-duration`/`-timing-function` to them, so **every
 duration classes** — plain `transition-colors` is already on-system.
 Explicit durations (overlay `animate-in/out`) use
 `duration-(--motion-moderate)`; a raw `duration-150` in a component is
-drift. `--ease-out-soft` generates the `ease-out-soft` utility via the
+drift. `--ease-standard` generates the `ease-standard` utility via the
 Tailwind `--ease-*` namespace.
 
-**Reduced motion is handled once, globally** (`globals.css`): under
-`prefers-reduced-motion: reduce`, all transitions and animations collapse
-to a single imperceptible frame — end states still apply, movement
-disappears. Never add per-component reduced-motion handling, and never
-make motion the sole carrier of meaning (every animated state change here
-also changes color, border, or content).
+**Reduced-motion timing is handled once globally** (`globals.css`): under
+`prefers-reduced-motion: reduce`, transitions and animations collapse to a
+single imperceptible frame. Components that opt into nonessential transform
+movement also opt out explicitly with `motion-reduce:translate-none`; a
+global `transform: none` rule would break structural transforms used to
+position dialogs and overlays. Motion is never the sole carrier of meaning:
+every animated state also changes color, border, or content.
 
 **When not to animate:** nothing on page load; nothing that delays
 interaction (motion runs alongside, never in front of, the response);
 nothing layout-affecting where a compositor-friendly property (transform,
-opacity, color) does the job — the header boundary transitions only
-`border-color`, overlays animate opacity and scale, and the button press is
-a 1px `translate-y`. (Nav hover is deliberately color-only — no underline,
-no moving element — so a nav item can later host a dropdown trigger without
-the affordance fighting the menu; see `docs/LAYOUT.md` §6.)
+opacity, color) does the job. The header boundary transitions only
+`border-color`; overlays animate opacity and scale. Primary and outline
+buttons lift 2px on hover and keyboard focus, except disclosure triggers
+(`aria-haspopup`), whose stable anchor matters more than lift. The reference
+authors no separate active transform, so a pressed pointer state retains the
+hover position. Linked overview cards lift 4px on hover and focus; static
+Cards remain motionless. Nav hover remains color-only so a dropdown trigger
+does not fight the panel (see `docs/LAYOUT.md` §6).
 
 ## 3. Verified contrast (WCAG AA)
 

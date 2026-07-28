@@ -28,11 +28,10 @@ import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
  * looks interactive must behave interactively, so UnavailableCta renders a
  * real <button> with full hover/active/focus that toasts an explanation on
  * click — never a dead no-op. They also render at real widths, keeping the
- * collapse-breakpoint measurement honest. Header CTAs sit at the baseline
- * `default` size (h-8): the 2026-09 pass brought the cluster down a step from
- * lg/h-9 (docs/DESIGN_TOKENS.md § Control height) — h-9 read a touch oversized
- * for the flat identity, and h-8, the documented baseline, sits comfortably in
- * the tall (h-16) bar with the utility toggles aligned to the same height.
+ * collapse-breakpoint measurement honest. Header CTAs use the authored
+ * navigation treatment (`lg`/h-9 with px-5); drawer copies use the authored
+ * mobile treatment (h-10). Utility toggles retain their compact h-8 geometry
+ * and the mixed-role cluster is centre-aligned.
  */
 
 /*
@@ -73,7 +72,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
           href="/showcase"
           className="me-4 flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
         >
-          <BrandMark className="size-6" />
+          <BrandMark className="size-7 text-primary sm:size-8" />
           {t("brand")}
         </Link>
         <SiteShellNav label={t("navLabel")} closeLabel={tShell("closeNav")}>
@@ -121,15 +120,24 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
               breakpoint — the same live, self-explaining CTAs as the bar
               (full-width in the column). */}
           <div className="mt-2 flex flex-col gap-2 border-t pt-2 lg:hidden">
-            <UnavailableCta variant="outline" label={t("logIn")} className="w-full" />
-            <UnavailableCta label={t("getStarted")} className="w-full" />
+            <UnavailableCta
+              variant="outline"
+              size="lg"
+              label={t("logIn")}
+              className="h-10 w-full px-5 font-semibold"
+            />
+            <UnavailableCta
+              size="lg"
+              label={t("getStarted")}
+              className="h-10 w-full px-5 font-semibold"
+            />
           </div>
         </SiteShellNav>
         <div className="ms-auto flex items-center gap-3">
           {/* Two coherent sub-groups, centre-aligned in one cluster: the
-              utility controls (language + theme) then the auth pair. The whole
-              cluster shares the baseline h-8 (docs/DESIGN_TOKENS.md § Control
-              height). Reveal breakpoints are measured, not uniform: the
+              h-8 utility controls (language + theme) then the h-9 navigation
+              CTA pair (docs/DESIGN_TOKENS.md § Control height). Reveal
+              breakpoints are measured, not uniform: the
               controls fit beside the brand from `sm`; the CTA pair only from
               `lg` — the collapse breakpoint — since the wider language switcher
               (autonym labels, always both) plus the pair overflows the bar
@@ -148,8 +156,13 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
             />
           </div>
           <div className="flex items-center gap-2 max-lg:hidden">
-            <UnavailableCta variant="outline" label={t("logIn")} />
-            <UnavailableCta label={t("getStarted")} />
+            <UnavailableCta
+              variant="outline"
+              size="lg"
+              label={t("logIn")}
+              className="px-5 font-semibold"
+            />
+            <UnavailableCta size="lg" label={t("getStarted")} className="px-5 font-semibold" />
           </div>
           <SiteShellNavTrigger aria-label={tShell("openNav")} />
         </div>

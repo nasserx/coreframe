@@ -21,8 +21,9 @@
        long enough to track where a layer came from, short enough to
        never delay interaction.
      Consumed via the transition/animation defaults in theme.css and
-     the duration-(--motion-*) arbitrary syntax. Reduced motion is
-     handled globally in globals.css, never per component. */
-  --motion-quick: 120ms;
+     the duration-(--motion-*) arbitrary syntax. Reduced-motion timing is
+     handled globally in globals.css; components that own nonessential
+     spatial motion neutralize that movement at the same state selector. */
+  --motion-quick: 150ms;
   --motion-moderate: 200ms;
 }

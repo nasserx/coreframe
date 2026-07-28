@@ -20,7 +20,7 @@ export default function ShowcaseIndexPage() {
           <Link
             key={section.href}
             href={section.href}
-            className="group rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="group rounded-xl transition-[translate] outline-none hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-none motion-reduce:focus-visible:translate-none"
           >
             <Card size="sm" className="h-full transition-colors group-hover:bg-muted/50">
               <CardHeader>

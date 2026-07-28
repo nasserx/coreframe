@@ -1,16 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <!-- Same geometry as src/components/ui/brand-mark.tsx — keep in sync.
-       Colors are the theme foreground inks (oklch converted to sRGB hex;
-       CSS variables don't exist inside a favicon): warm near-black for
-       light browser UI, warm off-white for dark, via the SVG-favicon
-       prefers-color-scheme technique (supported by Chromium and Firefox;
-       Safari falls back to the light fill, which stays legible on dark
-       tab strips thanks to the mark's own contrast). -->
+       Colors are the semantic primary tokens converted from OKLCH to sRGB
+       hex (CSS variables don't exist inside a favicon). The SVG-favicon
+       prefers-color-scheme technique follows the light/dark primary pair in
+       Chromium and Firefox; Safari falls back to the light cobalt, which
+       remains legible on dark tab strips. -->
   <style>
-    path { fill: #15120d; }
+    path { fill: #1d5ee8; }
     @media (prefers-color-scheme: dark) {
-      path { fill: #f2f0ec; }
+      path { fill: #336fe5; }
     }
   </style>
-  <path fill-rule="evenodd" d="M14 0h36a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H14A14 14 0 0 1 0 50V14A14 14 0 0 1 14 0ZM20.5 21h23a4.5 4.5 0 0 1 0 9h-23a4.5 4.5 0 0 1 0-9ZM20.5 36h12a4.5 4.5 0 0 1 0 9h-12a4.5 4.5 0 0 1 0-9Z"/>
+  <path fill-rule="nonzero" d="M14 0h36a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H14A14 14 0 0 1 0 50V14A14 14 0 0 1 14 0ZM20.5 21h23a4.5 4.5 0 0 1 0 9h-23a4.5 4.5 0 0 1 0-9ZM20.5 36h12a4.5 4.5 0 0 1 0 9h-12a4.5 4.5 0 0 1 0-9Z"/>
 </svg>

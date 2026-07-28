@@ -6,9 +6,9 @@ export type BrandMarkProps = ComponentProps<"svg">;
 
 /*
  * Geometry shared with the favicon (src/app/icon.svg) — keep the two in
- * sync. One evenodd path (no <mask>/<defs> ids: shell navigation content
+ * sync. One nonzero path (no <mask>/<defs> ids: shell navigation content
  * renders twice — persistent sidebar + drawer — and duplicate SVG ids
- * would collide): a rounded square with two knocked-out text-line bars,
+ * would collide): a rounded square with two same-color text-line bars,
  * an abstract shorthand for a typographic, editorial identity.
  */
 const BRAND_MARK_PATH =
@@ -43,7 +43,7 @@ export function BrandMark({ className, ...props }: BrandMarkProps) {
       className={cn("size-5 shrink-0", className)}
       {...props}
     >
-      <path fill="currentColor" fillRule="evenodd" d={BRAND_MARK_PATH} />
+      <path fill="currentColor" fillRule="nonzero" d={BRAND_MARK_PATH} />
     </svg>
   );
 }

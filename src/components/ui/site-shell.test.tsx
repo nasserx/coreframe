@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -43,6 +43,33 @@ function installMatchMedia(): void {
   );
 }
 
+function installIntersectionObserver(): (isIntersecting: boolean) => void {
+  let callback: IntersectionObserverCallback | undefined;
+
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      constructor(nextCallback: IntersectionObserverCallback) {
+        callback = nextCallback;
+      }
+
+      observe(): void {}
+      unobserve(): void {}
+      disconnect(): void {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return [];
+      }
+    },
+  );
+
+  return (isIntersecting: boolean): void => {
+    if (callback === undefined) {
+      throw new Error("SiteShell did not register its scroll sentinel observer.");
+    }
+    callback([{ isIntersecting } as IntersectionObserverEntry], {} as IntersectionObserver);
+  };
+}
+
 function renderShell() {
   return render(
     <SiteShell>
@@ -71,6 +98,39 @@ describe("SiteShell", () => {
     expect(screen.getByRole("banner")).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+  });
+
+  it("switches from the clean top surface to geometry-stable semantic glass after the threshold", async () => {
+    const setSentinelIntersecting = installIntersectionObserver();
+    renderShell();
+
+    const header = screen.getByRole("banner");
+    const row = header.querySelector('[data-slot="site-shell-header-row"]');
+    const sentinel = document.querySelector('[data-slot="site-shell"] > [aria-hidden="true"]');
+
+    expect(header).not.toHaveAttribute("data-scrolled");
+    expect(header).toHaveClass("bg-background");
+    expect(header).not.toHaveClass("border-b", "border-border", "data-scrolled:border-transparent");
+    expect(header).toHaveClass(
+      "supports-backdrop-filter:data-scrolled:bg-background/80",
+      "supports-backdrop-filter:data-scrolled:backdrop-blur-xl",
+    );
+    expect(header).toHaveClass(
+      "transition-[background-color,backdrop-filter]",
+      "motion-reduce:transition-none",
+    );
+    expect(row).toHaveClass("h-16");
+    expect(sentinel).toHaveClass("absolute", "h-2");
+
+    act(() => setSentinelIntersecting(false));
+
+    await waitFor(() => expect(header).toHaveAttribute("data-scrolled", ""));
+    expect(header).toHaveClass("bg-background");
+    expect(header).not.toHaveClass("border-b");
+    expect(row).toHaveClass("h-16");
+
+    act(() => setSentinelIntersecting(true));
+    await waitFor(() => expect(header).not.toHaveAttribute("data-scrolled"));
   });
 
   it("makes the skip link the first focusable element and moves focus to main", async () => {

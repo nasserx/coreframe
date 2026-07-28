@@ -67,19 +67,18 @@ surfaces gain nothing from a cap — they take the full `Container` width,
 which is the fourth and outermost width decision and is made once per
 layout, not per page.
 
-**The Container cap is `max-w-6xl` (1152px)**: wide enough that the dense
-surfaces — card grids and tables — reach its edges, while keeping content
-comfortably centred with generous side gutters on wide displays (a wider
-1280px cap was tried and reverted — it made the layout read loose). It is
-NOT a reading measure: prose inside a Container must carry `max-w-prose` —
-the wider the container, the easier the measure contract is to violate, so
-treat uncapped paragraphs as defects. Gutters are responsive and unaffected
-by the cap: `px-4` (16px per side) below `sm`, `px-5` (20px) from `sm` up —
-the 2026-08 settling pass tightened the wide-screen gutter one step from
-`px-6` (24px), which read marginally wide, bringing dense surfaces (tables,
-card grids) a touch closer to the edge without crowding. The cap only
-engages once the viewport exceeds 1152px + gutters, so phone and tablet
-edges are untouched.
+**The Container cap is `max-w-7xl` (1280px)**: the shared public-reference
+contract used by shell headers, main content, and footers. Dense surfaces —
+card grids, tables, and dashboards — can use the available width; prose
+inside a Container must still carry `max-w-prose`. The wider cap does not
+weaken the measure rule: uncapped running text remains a defect.
+
+Gutters are `px-4` (16px per side) below `sm`, `px-6` (24px) from `sm`, and
+`px-8` (32px) from `lg`. The 1280px cap includes that padding, matching the
+reference's authored `max-w-7xl px-4 sm:px-6 lg:px-8` contract exactly.
+Narrower marketing sections remain local compositions (`max-w-prose`,
+`max-w-form`, or a section-owned width); they do not create another global
+container.
 
 Both utilities are `max-width` — a logical, direction-agnostic constraint;
 nothing direction-specific is needed for RTL.
@@ -156,19 +155,19 @@ that height as `scroll-padding-block-start` on `html`, so anchor jumps and
 programmatic focus land below the sticky bar rather than behind it — the two
 values are a hand-kept matched pair.
 
-**The header boundary is scroll-dependent** (both shells): at scroll
-position zero the bar has no bottom hairline — bar and page read as one
-surface; once the page scrolls, the hairline appears so content passing
-under the bar reads as designed, not as a rendering bug. Mechanism: an
-IntersectionObserver on a 1px sentinel at the document top
-(`src/hooks/use-scrolled.ts`) toggles `data-scrolled` on the header — no
-scroll listener (fires only when the boundary is crossed, no per-frame
-work), no layout shift (the border is always present, only its color
-changes), and the header's box never changes, so nothing that depends on
-its height moves. The color transition runs on the motion tokens and
-collapses under `prefers-reduced-motion` via the global rule. Without
-IntersectionObserver (jsdom, ancient browsers) the boundary degrades to
-always-visible — the pre-existing behavior.
+**The header boundary is scroll-dependent** (both shells), with presentation
+owned by each shell. `AppShell` keeps its integrated-at-top / hairline-when-
+scrolled boundary. `SiteShell` is separator-free at every position, then turns
+its opaque semantic background into a translucent `background`-token glass
+surface after an 8px threshold; backdrop-capable browsers add blur, while the
+opaque semantic background remains the readable fallback. Mechanism: an
+IntersectionObserver on an absolutely positioned sentinel at the document top
+(`src/hooks/use-scrolled.ts`) toggles `data-scrolled` on the header — no scroll
+listener (it fires only when the boundary is crossed), no layout reads, and no
+per-frame React work. The 64px row height is invariant and only background color
+and backdrop filter transition, so the change causes no layout shift. Motion collapses under
+`prefers-reduced-motion`. Without IntersectionObserver (jsdom, ancient
+browsers), the boundary degrades to its always-on state.
 
 ### Responsive behavior
 
@@ -252,8 +251,11 @@ application chrome.
 
 **Hierarchy: the brand dominates the bar.** Give the brand real presence
 as its own cluster — the demo runs `text-subheading` bold (two steps above
-the nav) with a larger mark and clear breathing room (`me-4`) before
-navigation begins. Nav items are secondary wayfinding at `text-small`,
+the nav), a semantic-primary 32px mark (28px below `sm`, preserving narrow-
+mobile fit), and clear breathing room (`me-4`) before navigation begins. The
+mark stays `currentColor` and receives `text-primary` from the composition; its
+inset glyph makes that outer box read in balance with the 36px header CTA
+without resizing the CTA. Nav items are secondary wayfinding at `text-small`,
 medium weight, on a three-step ladder that inverts the usual "light up on
 hover":
 
@@ -273,8 +275,8 @@ hover":
 
 Hover is color-only — no growing underline or moving element — precisely
 so a nav item can later host a dropdown trigger without the affordance
-fighting the menu. The same scroll-dependent header boundary as the
-AppShell applies (§5).
+fighting the menu. The SiteShell-specific scrolled glass boundary described in
+§5 applies.
 
 **Actions below the collapse line** are the caller's decision, made by
 measuring (same rule as the breakpoint): if the compact action set fits

@@ -47,8 +47,33 @@ export default function ActionsPage() {
           <Button size="icon" aria-label="Add">
             <PlusIcon />
           </Button>
+          <Button size="icon-xs" variant="ghost" aria-label="Add compact item">
+            <PlusIcon />
+          </Button>
           <Button size="icon-sm" variant="outline" aria-label="Delete">
             <TrashIcon />
+          </Button>
+          <Button size="icon-lg" aria-label="Add prominent item">
+            <PlusIcon />
+          </Button>
+        </div>
+      </ShowcaseSection>
+      <ShowcaseSection
+        title="Public-site CTA geometry"
+        description="Reference-authored navigation, hero, pricing, and prominent heights remain composition-level treatments over the frozen Button size vocabulary. They are specimens, not new primitive sizes."
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <Button size="lg" className="px-5 font-semibold">
+            Navigation CTA
+          </Button>
+          <Button size="lg" className="h-10 px-6 font-semibold">
+            Hero CTA
+          </Button>
+          <Button size="lg" className="h-11 px-5 font-semibold">
+            Pricing CTA
+          </Button>
+          <Button size="lg" className="h-12 px-7 font-semibold">
+            Prominent CTA
           </Button>
         </div>
       </ShowcaseSection>
@@ -65,6 +90,16 @@ export default function ActionsPage() {
           <Button variant="outline">
             <PlusIcon data-icon="inline-start" />
             With icon
+          </Button>
+          <Button className="h-auto min-h-8 max-w-full py-1.5 whitespace-normal">
+            Continue with a deliberately long English action label
+          </Button>
+          <Button
+            dir="rtl"
+            lang="ar"
+            className="h-auto min-h-8 max-w-full py-1.5 whitespace-normal"
+          >
+            متابعة باستخدام تسمية إجراء عربية طويلة للاختبار
           </Button>
         </div>
       </ShowcaseSection>

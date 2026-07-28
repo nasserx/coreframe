@@ -123,6 +123,88 @@ test.describe("site shell — mobile navigation", () => {
   });
 });
 
+test.describe("site shell — scroll-responsive header", () => {
+  test("keeps its height while the clean top surface becomes semantic glass", async ({ page }) => {
+    const cells = [
+      { viewport: { width: 1280, height: 900 }, theme: "light", direction: "ltr" },
+      { viewport: { width: 1280, height: 900 }, theme: "dark", direction: "rtl" },
+      { viewport: { width: 390, height: 844 }, theme: "light", direction: "rtl" },
+      { viewport: { width: 390, height: 844 }, theme: "dark", direction: "ltr" },
+    ] as const;
+
+    for (const { viewport, theme, direction } of cells) {
+      await page.setViewportSize(viewport);
+      await gotoMatrixCell(page, "/showcase/site", theme, direction);
+
+      const header = page.locator('[data-slot="site-shell-header"]');
+      const brandMark = header.locator('[data-slot="brand-mark"]');
+      await expect(header).not.toHaveAttribute("data-scrolled", "");
+
+      const top = await header.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          height: element.getBoundingClientRect().height,
+          borderWidth: style.borderBottomWidth,
+          backgroundColor: style.backgroundColor,
+          backdropFilter: style.backdropFilter,
+        };
+      });
+      expect(top.borderWidth).toBe("0px");
+      expect(top.backdropFilter).toBe("none");
+
+      await page.evaluate(() => window.scrollTo(0, 4));
+      await expect(header).not.toHaveAttribute("data-scrolled", "");
+
+      await page.evaluate(() => window.scrollTo(0, 16));
+      await expect(header).toHaveAttribute("data-scrolled", "");
+
+      const scrolled = await header.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          height: element.getBoundingClientRect().height,
+          borderWidth: style.borderBottomWidth,
+          backgroundColor: style.backgroundColor,
+          backdropFilter: style.backdropFilter,
+        };
+      });
+      expect(scrolled.height).toBe(top.height);
+      expect(scrolled.borderWidth).toBe("0px");
+      expect(scrolled.backgroundColor).not.toBe(top.backgroundColor);
+      expect(scrolled.backdropFilter).toContain("blur");
+
+      const markBox = await brandMark.boundingBox();
+      expect(markBox?.width).toBe(viewport.width < 640 ? 28 : 32);
+      expect(markBox?.height).toBe(viewport.width < 640 ? 28 : 32);
+      if (viewport.width >= 1024) {
+        const ctaBox = await header.getByRole("button", { name: "Get started" }).boundingBox();
+        expect(ctaBox?.height).toBe(36);
+      }
+
+      await header.getByRole("link").first().focus();
+      await expect(header.getByRole("link").first()).toBeFocused();
+      const focusedShadow = await header
+        .getByRole("link")
+        .first()
+        .evaluate((element) => getComputedStyle(element).boxShadow);
+      expect(focusedShadow).not.toBe("none");
+
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect(header).not.toHaveAttribute("data-scrolled", "");
+    }
+  });
+
+  test("removes the glass transition under reduced motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/showcase/site");
+
+    const header = page.locator('[data-slot="site-shell-header"]');
+    await page.evaluate(() => window.scrollTo(0, 16));
+    await expect(header).toHaveAttribute("data-scrolled", "");
+    await expect(header).toHaveCSS("transition-property", "none");
+  });
+});
+
 test.describe("site shell — desktop", () => {
   test("horizontal nav is visible and skips the unavailable bar item", async ({ page }) => {
     await page.goto("/showcase/site");

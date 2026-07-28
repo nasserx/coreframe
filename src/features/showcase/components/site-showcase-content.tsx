@@ -46,10 +46,20 @@ export function SiteShowcaseContent() {
           {/* Navigation styled as buttons: buttonVariants on real Links, so
               the elements keep link semantics. Button + render would re-brand
               them role="button". */}
-          <Link href="/showcase/layout" className={buttonVariants({ size: "lg" })}>
+          <Link
+            href="/showcase/layout"
+            className={buttonVariants({ size: "lg", className: "h-10 px-6 font-semibold" })}
+          >
             {t("heroPrimaryCta")}
           </Link>
-          <Link href="/showcase" className={buttonVariants({ variant: "outline", size: "lg" })}>
+          <Link
+            href="/showcase"
+            className={buttonVariants({
+              variant: "outline",
+              size: "lg",
+              className: "h-10 px-6 font-semibold",
+            })}
+          >
             {t("heroSecondaryCta")}
           </Link>
         </div>

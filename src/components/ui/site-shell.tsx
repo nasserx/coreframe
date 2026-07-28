@@ -203,8 +203,9 @@ export function SiteShell({
         {...props}
       >
         {/* Scroll sentinel for the header boundary (see SiteShellHeader):
-            absolutely positioned at the document top, zero layout impact. */}
-        <div ref={sentinelRef} aria-hidden="true" className="absolute top-0 h-px w-px" />
+            8px tall to avoid toggling on tiny scroll/bounce changes around
+            the document top, and absolutely positioned for zero layout impact. */}
+        <div ref={sentinelRef} aria-hidden="true" className="absolute top-0 h-2 w-px" />
         <SkipLink>{skipLinkLabel}</SkipLink>
         {children}
       </div>
@@ -219,12 +220,13 @@ export function SiteShellHeader({ className, children, ...props }: SiteShellHead
     <header
       data-slot="site-shell-header"
       data-scrolled={scrolled ? "" : undefined}
-      // The hairline under the bar appears only once the page has
-      // scrolled: at position zero, bar and page are one surface. The
-      // border is always present (transparent at top), so its arrival
-      // never shifts layout; only border-color transitions.
+      // The bar is intentionally separator-free at every scroll position.
+      // Once the page is meaningfully scrolled, its opaque semantic surface
+      // becomes glass. The opaque background remains the no-backdrop-filter
+      // fallback; capable browsers layer transparency + blur. The invariant
+      // h-16 row keeps the state change geometry-stable.
       className={cn(
-        "sticky top-0 z-40 border-b border-transparent bg-background transition-colors data-scrolled:border-border",
+        "sticky top-0 z-40 bg-background transition-[background-color,backdrop-filter] duration-(--motion-quick) supports-backdrop-filter:data-scrolled:bg-background/80 supports-backdrop-filter:data-scrolled:backdrop-blur-xl motion-reduce:transition-none",
         className,
       )}
       {...props}
