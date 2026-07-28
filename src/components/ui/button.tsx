@@ -6,14 +6,15 @@ import { cn } from "@/lib/utils";
 export const buttonVariants = cva(
   // Focus language (docs/DESIGN_TOKENS.md §2): a solid 2px ring-token line,
   // offset by 2px of background so it reads against any fill (including the
-  // near-black primary). Invalid = a destructive hairline border; focused
-  // AND invalid = the focus geometry in the destructive color, so thickness
-  // says "focused" and color says "invalid".
+  // primary, which intentionally shares the ring color). Invalid = a
+  // destructive hairline border; focused AND invalid = the focus geometry in
+  // the destructive color, so thickness says "focused" and color says
+  // "invalid".
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
         // Outline, ghost and secondary all sit ON the page in both themes —
         // the flat identity defines them by border (outline) or a quiet
         // in-plane fill (secondary), never a fill lighter than the page that
@@ -37,7 +38,7 @@ export const buttonVariants = cva(
         // (docs/DESIGN_TOKENS.md §3).
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/18 dark:bg-destructive/15",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-link underline-offset-4 hover:underline",
       },
       size: {
         default:

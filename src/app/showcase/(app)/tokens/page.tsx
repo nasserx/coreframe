@@ -40,10 +40,16 @@ const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly Col
     tokens: [
       { name: "background", variable: "--color-background", swatchClassName: "bg-background" },
       { name: "foreground", variable: "--color-foreground", swatchClassName: "bg-foreground" },
-      { name: "surface", variable: "--color-surface", swatchClassName: "bg-card" },
+      { name: "surface", variable: "--color-surface", swatchClassName: "bg-surface" },
       {
         name: "surface-foreground",
         variable: "--color-surface-foreground",
+        swatchClassName: "bg-surface-foreground",
+      },
+      { name: "card", variable: "--color-card", swatchClassName: "bg-card" },
+      {
+        name: "card-foreground",
+        variable: "--color-card-foreground",
         swatchClassName: "bg-card-foreground",
       },
       { name: "popover", variable: "--color-popover", swatchClassName: "bg-popover" },
@@ -63,6 +69,7 @@ const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly Col
         variable: "--color-primary-foreground",
         swatchClassName: "bg-primary-foreground",
       },
+      { name: "link", variable: "--color-link", swatchClassName: "bg-link" },
       { name: "secondary", variable: "--color-secondary", swatchClassName: "bg-secondary" },
       {
         name: "secondary-foreground",
@@ -86,6 +93,12 @@ const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly Col
   {
     group: "Status",
     tokens: [
+      { name: "info", variable: "--color-info", swatchClassName: "bg-info" },
+      {
+        name: "info-foreground",
+        variable: "--color-info-foreground",
+        swatchClassName: "bg-info-foreground",
+      },
       { name: "success", variable: "--color-success", swatchClassName: "bg-success" },
       {
         name: "success-foreground",
@@ -112,6 +125,7 @@ const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly Col
       { name: "border", variable: "--color-border", swatchClassName: "bg-border" },
       { name: "input", variable: "--color-input", swatchClassName: "bg-input" },
       { name: "ring", variable: "--color-ring", swatchClassName: "bg-ring" },
+      { name: "overlay", variable: "--color-overlay", swatchClassName: "bg-overlay" },
     ],
   },
   {
@@ -228,6 +242,50 @@ export default async function TokensPage() {
           </div>
         </ShowcaseSection>
       ))}
+      <ShowcaseSection
+        title="Rendered color hierarchy"
+        description="Equivalent semantic roles are nested together so canvas, surface, card, popover, border, primary, link, muted copy, and selection can be judged as a system rather than isolated swatches."
+      >
+        <div className="rounded-xl border bg-background p-4 text-foreground">
+          <p className="text-small text-muted-foreground">Background and muted copy</p>
+          <div className="mt-3 rounded-xl border bg-surface p-4 text-surface-foreground">
+            <p className="text-small text-muted-foreground">Surface</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border bg-card p-4 text-card-foreground">
+                <p className="font-medium">Card</p>
+                <a className="mt-2 inline-block text-link underline underline-offset-4" href="#">
+                  Accessible primary link
+                </a>
+              </div>
+              <div className="rounded-lg border bg-popover p-4 text-popover-foreground shadow-md">
+                <p className="font-medium">Popover</p>
+                <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-small text-accent-foreground">
+                  Neutral selected state
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ShowcaseSection>
+      <ShowcaseSection
+        title="Information color"
+        description="Info is a semantic signal, not a component variant: use the foreground pair on a solid fill, or info itself as text on a restrained tint."
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg bg-info p-4 text-info-foreground">
+            <p className="font-medium">Solid information surface</p>
+            <p className="text-small">
+              The paired foreground is reserved for the authored info fill.
+            </p>
+          </div>
+          <div className="rounded-lg border border-info/25 bg-info/10 p-4 text-info">
+            <p className="font-medium">Tinted information surface</p>
+            <p className="text-small">
+              Info text remains readable without promoting cyan to an action.
+            </p>
+          </div>
+        </div>
+      </ShowcaseSection>
       <ShowcaseSection
         title="Type ramp"
         description="The foundation's typographic voice: headings differ from body by weight and negative tracking, not typeface. Metrics are measured from the rendered element, so they cannot drift from the tokens."

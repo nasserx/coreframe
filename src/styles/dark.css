@@ -1,107 +1,69 @@
 /*
  * Dark theme semantic variable set.
  *
- * A comfortable dark CHARCOAL, not near-black, and neutral, not a warm-paper
- * inversion. The 2026-08 pass moved off "same paper with the lights off"
- * (warmth reads as paper in light but as dirt/brown in dark, and the trace
- * warm chroma tinted the light-on-dark TEXT yellowish); the 2026-09 refinement
- * pass then lifted the base off near-black — a charcoal is easier on the eye
- * over long sessions than a near-black field, and the extra base luminance
- * lets the whole in-plane ladder breathe. Neutrals now carry only a whisper of
- * the warm hue (chroma 0.004–0.008, hue 84) — just enough that light and dark
- * read as one token family, not enough to tint. Light-on-dark tokens
- * (foreground and every *-foreground pair) sit at L 0.985 / chroma 0.001:
- * neutral near-white, with essentially all chroma removed so text reads white,
- * not warm — but a few % below L 1.0 on purpose, since pure white on a dark
- * field halates and strains the eye over long reading (docs/DESIGN_TOKENS.md
- * §2, "Dark foreground"). Charts and status colors keep their hue — hue is
- * still reserved for data. The primary action inverts to near-white ink on
- * ink, keeping "no saturated hue on the chrome".
+ * Reference-derived dark identity: neutral charcoal ladder, near-white ink,
+ * deep cobalt action, and bright cyan information signal. Exact values are
+ * retained where they satisfy the foundation contracts. Primary and link are
+ * separated because no single mid-blue can contrast 4.5:1 both with white
+ * button text and with the lightest charcoal surface. Input and destructive
+ * are the closest in-gamut alternatives that preserve control/status contrast.
  *
- * Elevation: a flat dark theme cannot use shadows for in-plane depth, so
- * surfaces separate by TWO cues together — a lightness step AND a visible
- * hairline border. Near black, the lightness step alone carries almost no
- * luminance contrast (surface/background ~1.1:1 however wide the ladder is
- * drawn), so the border does the work. Its weight follows the hairline RULE,
- * re-derived for the charcoal base (docs/DESIGN_TOKENS.md §2): lifting the base
- * raised the absolute luminance under a hairline, so the SAME perceived
- * quietness now lands at a LOWER ratio than the old near-black theme used. 0.385
- * sits at 1.70:1 vs background / 1.50:1 vs surface — quieter than 2026-08's
- * 1.86/1.71 (borders were reading heavy), still clearly above the vanish floor
- * on this lighter base. Cards/popovers/dialogs draw that border token
- * (ring-border). The --elevation-* shadows still exist only from md up. Full
- * write-up: docs/DESIGN_TOKENS.md §2–3.
+ * Elevation stays flat in-plane: the exact reference charcoal steps and
+ * border separate surfaces; --elevation-* shadows remain reserved for
+ * floating layers at md and above (docs/DESIGN_TOKENS.md §2).
  */
 .dark {
   color-scheme: dark;
-  --color-background: oklch(0.235 0.004 84);
-  --color-foreground: oklch(0.985 0.001 84);
-  --color-surface: oklch(0.278 0.004 84);
-  --color-surface-foreground: oklch(0.985 0.001 84);
-  /* popover lowered 0.315 → 0.295 in the 2026-10 body-legibility pass to buy
-     AA headroom so muted-foreground (secondary text) can be dimmed further —
-     see --color-muted-foreground below. It remains the top of the in-plane
-     ladder (surface 0.278 → popover 0.295); the step compresses to ΔL 0.017,
-     carried together with the hairline (popovers draw ring-border) per the
-     "lightness step AND hairline" rule. background/surface/border/input/ring
-     were deliberately left fixed, so the hairline rule does not re-derive. */
-  --color-popover: oklch(0.295 0.005 84);
-  --color-popover-foreground: oklch(0.985 0.001 84);
-  /* Near-white action color: slightly below foreground so hover/pressed
-     alpha states still shift visibly. */
-  --color-primary: oklch(0.955 0.001 84);
-  --color-primary-foreground: oklch(0.18 0.004 84);
-  --color-secondary: oklch(0.31 0.005 84);
-  --color-secondary-foreground: oklch(0.985 0.001 84);
-  --color-muted: oklch(0.295 0.004 84);
-  /* 0.665 (was 0.69): the secondary-text role must RECEDE from BODY, and at
-     0.69 body and secondary still read alike in dark — the 2.66:1 separation
-     that matched light's 2.62:1 numerically was not enough perceptually,
-     because light-on-dark irradiation blooms mid-greys toward the near-white
-     body. The 2026-10 body-legibility pass raised body presence (heavier face,
-     17px), widening the gap secondary must clear. 0.69 was the old AA floor
-     over popover (4.66:1), so dimming further REQUIRED buying headroom: popover
-     and muted were lowered to 0.295 (above), which lets muted-foreground drop
-     to 0.665 → separation 2.92:1 (well above light's 2.62; higher on purpose to
-     offset irradiation, per the §2 cross-theme rule) while still holding 4.5:1
-     on the lightest surface it renders over (popover/muted 0.295 → 4.55:1). */
-  --color-muted-foreground: oklch(0.665 0.004 84);
-  --color-accent: oklch(0.34 0.006 84);
-  --color-accent-foreground: oklch(0.985 0.001 84);
+  --color-background: oklch(0.205 0 0);
+  --color-foreground: oklch(0.96 0 0);
+  --color-surface: oklch(0.258 0 0);
+  --color-surface-foreground: var(--color-foreground);
+  --color-card: oklch(0.295 0 0);
+  --color-card-foreground: var(--color-foreground);
+  --color-popover: oklch(0.295 0 0);
+  --color-popover-foreground: var(--color-foreground);
+  /* Reference 0.62/0.19/262 is 3.74:1 with white. Lowering only lightness
+     to 0.57 preserves the deep cobalt identity and clears AA with enough
+     rendering margin for browser accessibility checks. */
+  --color-primary: oklch(0.57 0.19 262);
+  --color-primary-foreground: oklch(1 0 0);
+  /* Brighter link-only cobalt passes on card/popover while remaining close to
+     the reference primary; chroma is reduced only to stay inside sRGB. */
+  --color-link: oklch(0.673 0.172 262);
+  --color-secondary: oklch(0.258 0 0);
+  --color-secondary-foreground: var(--color-foreground);
+  --color-muted: oklch(0.258 0 0);
+  --color-muted-foreground: oklch(0.78 0 0);
+  --color-accent: var(--color-secondary);
+  --color-accent-foreground: var(--color-secondary-foreground);
+  --color-info: oklch(0.72 0.14 231);
+  --color-info-foreground: oklch(0.15 0 0);
   --color-success: oklch(0.7 0.13 155);
   --color-success-foreground: oklch(0.145 0.01 155);
   --color-warning: oklch(0.8 0.13 80);
   --color-warning-foreground: oklch(0.15 0.012 80);
-  /* 0.78 lightness (raised from 0.73 in the charcoal pass): dark-mode
-     destructive text also renders over destructive tints and the input fill,
-     and lifting the surface lightened those composited backdrops. The tint
-     alpha also dropped to /15 in the Button/Badge destructive variants; at
-     0.78 + /15 both composites hold 4.5:1 (docs/DESIGN_TOKENS.md §3). */
-  --color-destructive: oklch(0.78 0.17 25);
+  --color-destructive: oklch(0.766 0.138 27);
   --color-destructive-foreground: oklch(0.15 0.01 25);
-  /* border is the structural hairline of the flat system — decorative in
-     WCAG terms (1.4.11 does not apply); at 0.385 it sits in the charcoal-base
-     hairline band (1.70:1 vs background, 1.50:1 vs surface — see the §2 rule),
-     quieter than the old near-black theme's border, and carries
-     card/popover/dialog edges. input is a control boundary and holds 3:1
-     against background and surface. */
-  --color-border: oklch(0.385 0.005 84);
-  --color-input: oklch(0.555 0.008 84);
-  --color-ring: oklch(0.76 0.006 84);
-  /* Charts keep hue: in a monochrome chrome, hue is reserved for data. */
+  --color-border: oklch(0.355 0 0);
+  --color-input: oklch(0.57 0 0);
+  /* Reference ring 0.62/0.19/262 falls below 3:1 on the input fill. */
+  --color-ring: oklch(0.659 0.181 262);
+  /* Charts retain their existing independent data hues; chart-1 is not a
+     primary scale even though its historical indigo sits nearby. */
   --color-chart-1: oklch(0.68 0.13 262);
   --color-chart-2: oklch(0.7 0.11 195);
   --color-chart-3: oklch(0.72 0.12 155);
   --color-chart-4: oklch(0.8 0.12 85);
   --color-chart-5: oklch(0.68 0.14 25);
-  --color-sidebar: oklch(0.255 0.005 84);
+  --color-sidebar: var(--color-background);
   --color-sidebar-foreground: var(--color-foreground);
   --color-sidebar-primary: var(--color-primary);
   --color-sidebar-primary-foreground: var(--color-primary-foreground);
-  --color-sidebar-accent: oklch(0.31 0.005 84);
-  --color-sidebar-accent-foreground: oklch(0.985 0.001 84);
+  --color-sidebar-accent: var(--color-secondary);
+  --color-sidebar-accent-foreground: var(--color-secondary-foreground);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-ring);
+  --color-overlay: oklch(0 0 0 / 0.8);
   /* Flat elevation: xs/sm empty (the lightness ladder and hairlines carry
      in-plane structure); md+ are grounding shadows for floating layers
      only — heavier than the light set because they must read against

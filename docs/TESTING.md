@@ -49,8 +49,10 @@ are meant to be copied:
 - `src/core/providers/theme-provider.test.tsx` — module-singleton state
   (`vi.resetModules()` + dynamic import per test), a controllable
   `matchMedia` stub, storage failure, and cross-tab sync.
-- `src/styles/token-parity.test.ts` — source-level contract checking where
-  jsdom's missing CSS cascade doesn't matter.
+- `src/styles/token-parity.test.ts` — exact authored values, source-level
+  parity and bridge checks, plus whole-palette OKLCH gamut, WCAG contrast, and
+  selected/disabled/invalid state checks (including alpha composites), where
+  jsdom's missing CSS cascade does not matter.
 
 Accessibility at this layer: query by role and accessible name
 (`getByRole("button", { name: … })`), assert state through ARIA-visible

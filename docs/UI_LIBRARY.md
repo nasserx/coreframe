@@ -69,7 +69,7 @@ This split exists so registry syncs and styling refinements stay possible withou
 
 ## 6. Styling Rules
 
-- **Semantic tokens only.** All colors resolve through the theme bridge (`bg-primary`, `border-input`, `text-muted-foreground`). Never hardcode colors. Known sanctioned exception: the overlay scrim (`bg-black/10`) is intentionally theme-independent.
+- **Semantic tokens only.** All colors resolve through the theme bridge (`bg-primary`, `border-input`, `text-muted-foreground`, `bg-overlay`). Never hardcode colors; the overlay scrim is owned by `--color-overlay` like every other runtime color.
 - **`cn` must know custom utilities.** `cn` (`src/lib/utils.ts`) runs tailwind-merge with an extended config that classifies the type-ramp steps (`text-display` … `text-caption`) as font-size classes — without it they read as text colors and a later color class silently deletes the size (a real shipped defect, regression-tested in `utils.test.ts`). Any future custom utility whose name collides with a tailwind-merge class group must be registered there too.
 - **Private CSS variables vs theme tokens.** Component-scoped variables (`--card-spacing`, `--ratio`) coordinate layout inside one primitive and are fine; they are not theme tokens and must never carry color or be referenced across components.
 - **cva when there are multiple variants to select between** (Button, Badge, TabsList) — and export the helper. **Plain class strings plus a typed union** when a single `size`/`variant` axis just maps to `data-*` attributes (Card, Avatar, AlertDialogContent). Don't introduce cva for one axis with two values.

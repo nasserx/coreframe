@@ -12,6 +12,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
   /* Noto Sans Arabic comes FIRST but is scoped to Arabic code points via
      its @font-face unicode-range (root layout), so Latin skips it and
      renders in Public Sans. It cannot be listed after the Latin face: that
@@ -36,8 +38,11 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-overlay: var(--overlay);
   --color-success-foreground: var(--success-foreground);
   --color-success: var(--success);
+  --color-info-foreground: var(--info-foreground);
+  --color-info: var(--info);
   --color-warning-foreground: var(--warning-foreground);
   --color-warning: var(--warning);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -50,6 +55,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-link: var(--link);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -182,12 +188,15 @@
 :root {
   --background: var(--color-background);
   --foreground: var(--color-foreground);
-  --card: var(--color-surface);
-  --card-foreground: var(--color-surface-foreground);
+  --surface: var(--color-surface);
+  --surface-foreground: var(--color-surface-foreground);
+  --card: var(--color-card);
+  --card-foreground: var(--color-card-foreground);
   --popover: var(--color-popover);
   --popover-foreground: var(--color-popover-foreground);
   --primary: var(--color-primary);
   --primary-foreground: var(--color-primary-foreground);
+  --link: var(--color-link);
   --secondary: var(--color-secondary);
   --secondary-foreground: var(--color-secondary-foreground);
   --muted: var(--color-muted);
@@ -196,6 +205,8 @@
   --accent-foreground: var(--color-accent-foreground);
   --success: var(--color-success);
   --success-foreground: var(--color-success-foreground);
+  --info: var(--color-info);
+  --info-foreground: var(--color-info-foreground);
   --warning: var(--color-warning);
   --warning-foreground: var(--color-warning-foreground);
   --destructive: var(--color-destructive);
@@ -203,6 +214,7 @@
   --border: var(--color-border);
   --input: var(--color-input);
   --ring: var(--color-ring);
+  --overlay: var(--color-overlay);
   --chart-1: var(--color-chart-1);
   --chart-2: var(--color-chart-2);
   --chart-3: var(--color-chart-3);

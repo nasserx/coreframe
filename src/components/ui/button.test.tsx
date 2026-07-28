@@ -51,6 +51,16 @@ describe("Button", () => {
     expect(button).toHaveClass("h-7");
   });
 
+  it("keeps the primary hover fill at the contrast-tested opacity", () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveClass("hover:bg-primary/90");
+  });
+
+  it("uses the contrast-safe semantic link color for the link variant", () => {
+    render(<Button variant="link">Documentation</Button>);
+    expect(screen.getByRole("button", { name: "Documentation" })).toHaveClass("text-link");
+  });
+
   it("stamps data-slot on the default element only", () => {
     render(<Button>Save</Button>);
     expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute("data-slot", "button");

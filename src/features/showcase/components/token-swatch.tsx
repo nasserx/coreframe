@@ -36,7 +36,7 @@ export function TokenSwatch({ name, swatchClassName, lightValue, darkValue }: To
       />
       <div className="flex min-w-0 flex-col gap-0.5">
         <code className="font-mono text-xs font-medium">{name}</code>
-        <code className="truncate font-mono text-caption text-muted-foreground">{value}</code>
+        <code className="font-mono text-caption break-all text-muted-foreground">{value}</code>
       </div>
     </div>
   );

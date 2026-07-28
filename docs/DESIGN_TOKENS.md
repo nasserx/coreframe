@@ -37,132 +37,104 @@ defines no z-index tokens.
 
 ### Colors (semantic, per theme)
 
-The identity is **flat, editorial, high-contrast**: a warm off-white paper
-canvas (oklch hue 84 — perceptibly warm but close to neutral paper, not a
-saturated cream, not grey, not pure white) with near-black ink as the
-primary action color. There is no saturated brand hue on the chrome —
-near-black IS the interactive signal; hue survives only where hue is
-information (status colors, charts). The **light** neutrals carry trace
-chroma (0.003–0.018) of the warm hue so the theme reads as one material; the
-light paper family (background + near-white surfaces) was de-warmed in the
-2026-07 polish pass — chroma roughly halved — because the earlier values read
-too saturated, then **lifted toward white** in the 2026-09 body-contrast pass
-(`background 0.968 → 0.978`, `surface 0.988 → 0.996`, moved together so the
-surface-lift held) because at 0.968 the canvas read as cream rather than bright
-paper. The warm cast is carried by the chroma (background stays 0.005), not by
-holding the luminance down, so the paper stays perceptibly warm even nearer
-white; the border was re-derived from the hairline rule for the lighter base
-(0.9 → 0.91, below).
+The visual identity follows the approved reference palette: a white canvas and
+cool near-white surface ladder in light, a neutral `0.205 → 0.258 → 0.295`
+charcoal ladder in dark, blue-black/light-neutral text, cobalt action, and cyan
+information signal. Values are copied exactly when the reference role satisfies
+the foundation's wider contracts. A value is adjusted only where the exact
+reference fails sRGB gamut, WCAG contrast, or an established semantic boundary.
 
-**The dark theme is a NEUTRAL dark CHARCOAL, not near-black, and not a
-warm-paper inversion.** The 2026-08 pass abandoned the earlier "same paper
-with the lights off" decision (warmth reads as paper in light but as
-brown/dirt in dark, and the trace warm chroma tinted the light-on-dark _text_
-yellowish); the **2026-09 refinement pass** then lifted the base off
-near-black — `background 0.185 → 0.235`. A charcoal is easier on the eye over
-long sessions than a near-black field, and the extra base luminance lets the
-in-plane ladder above it breathe. Lifting the base compresses the room above,
-so the whole ladder was re-derived from the documented rules rather than
-nudged (surface, popover, and the hairline all moved — see the ladder bullet
-and the hairline rule below). Dark neutrals still carry only a whisper of the
-warm hue (chroma 0.004–0.008), and the light-on-dark tokens (foreground and
-every `*-foreground` pair) sit at **chroma 0.001** — essentially neutral, so
-text reads white rather than warm. Both themes still share hue 84, so they
-read as one token family without the dark theme reading warm.
+The reference calls cyan `accent`, but on its rendered landing page cyan acts
+as a decorative signal. In this foundation `accent` globally owns generic
+hover, selected, and disclosure states. Recoloring all of those cyan would
+collapse an established distinction, so neutral `accent` aliases `secondary`
+and cyan maps to `info`. Likewise, action fill and text link have separate
+semantic tokens: in dark mode no single cobalt can contrast 4.5:1 both with a
+light button foreground and with the lightest charcoal card.
 
-**Dark foreground — neutral near-white, deliberately not pure white.** The
-light-on-dark foreground family sits at **L 0.985 / chroma 0.001** (the
-2026-09 pass took the last trace of warmth out — 0.002 → 0.001 — so the white
-reads neutral, not cream). It is _not_ pushed to L 1.0: pure white on a dark
-field is a well-documented eye-strain source — at peak monitor luminance it
-halates and leaves afterimages over long reading lengths, which is why most
-well-regarded dark themes stop a few percent short. L 0.985 (≈ 96% luminance)
-reads as white and keeps that headroom below peak. The whole family moves
-together (`foreground`, `surface-foreground`, `popover-foreground`,
-`secondary-foreground`, `accent-foreground`, `sidebar-accent-foreground`) —
-one value, applied consistently, never tuned per token.
-`--color-muted-foreground` is the deliberate exception: it stays dimmed (0.665)
-because it is the _secondary_-text role (see the cross-theme "Secondary text"
-row for why 0.665, not a value matching light's 0.46). The near-white _primary_ fill stays
-at 0.955, a hair below the text white, so a filled button reads as a surface
-(and `primary/80` hover still shifts visibly).
-
-| Token                                | Light                             | Dark                              |
-| ------------------------------------ | --------------------------------- | --------------------------------- |
-| `--color-background`                 | `oklch(0.978 0.005 84)`           | `oklch(0.235 0.004 84)`           |
-| `--color-foreground`                 | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.001 84)`           |
-| `--color-surface`                    | `oklch(0.996 0.003 84)`           | `oklch(0.278 0.004 84)`           |
-| `--color-surface-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.001 84)`           |
-| `--color-popover`                    | `oklch(0.996 0.003 84)`           | `oklch(0.295 0.005 84)`           |
-| `--color-popover-foreground`         | `oklch(0.185 0.012 84)`           | `oklch(0.985 0.001 84)`           |
-| `--color-primary`                    | `oklch(0.225 0.014 84)`           | `oklch(0.955 0.001 84)`           |
-| `--color-primary-foreground`         | `oklch(0.985 0.005 84)`           | `oklch(0.18 0.004 84)`            |
-| `--color-secondary`                  | `oklch(0.945 0.006 84)`           | `oklch(0.31 0.005 84)`            |
-| `--color-secondary-foreground`       | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.001 84)`           |
-| `--color-muted`                      | `oklch(0.95 0.005 84)`            | `oklch(0.295 0.004 84)`           |
-| `--color-muted-foreground`           | `oklch(0.46 0.015 84)`            | `oklch(0.665 0.004 84)`           |
-| `--color-accent`                     | `oklch(0.935 0.007 84)`           | `oklch(0.34 0.006 84)`            |
-| `--color-accent-foreground`          | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.001 84)`           |
-| `--color-success`                    | `oklch(0.52 0.12 155)`            | `oklch(0.7 0.13 155)`             |
-| `--color-success-foreground`         | `oklch(0.985 0.005 155)`          | `oklch(0.145 0.01 155)`           |
-| `--color-warning`                    | `oklch(0.82 0.14 80)`             | `oklch(0.8 0.13 80)`              |
-| `--color-warning-foreground`         | `oklch(0.28 0.05 80)`             | `oklch(0.15 0.012 80)`            |
-| `--color-destructive`                | `oklch(0.505 0.17 25)`            | `oklch(0.78 0.17 25)`             |
-| `--color-destructive-foreground`     | `oklch(0.985 0.005 25)`           | `oklch(0.15 0.01 25)`             |
-| `--color-border`                     | `oklch(0.91 0.004 84)`            | `oklch(0.385 0.005 84)`           |
-| `--color-input`                      | `oklch(0.63 0.018 84)`            | `oklch(0.555 0.008 84)`           |
-| `--color-ring`                       | `oklch(0.32 0.015 84)`            | `oklch(0.76 0.006 84)`            |
-| `--color-chart-1`                    | `oklch(0.55 0.15 262)`            | `oklch(0.68 0.13 262)`            |
-| `--color-chart-2`                    | `oklch(0.62 0.1 195)`             | `oklch(0.7 0.11 195)`             |
-| `--color-chart-3`                    | `oklch(0.6 0.12 155)`             | `oklch(0.72 0.12 155)`            |
-| `--color-chart-4`                    | `oklch(0.75 0.13 85)`             | `oklch(0.8 0.12 85)`              |
-| `--color-chart-5`                    | `oklch(0.58 0.15 25)`             | `oklch(0.68 0.14 25)`             |
-| `--color-sidebar`                    | `oklch(0.962 0.006 84)`           | `oklch(0.255 0.005 84)`           |
-| `--color-sidebar-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
-| `--color-sidebar-primary`            | `var(--color-primary)`            | `var(--color-primary)`            |
-| `--color-sidebar-primary-foreground` | `var(--color-primary-foreground)` | `var(--color-primary-foreground)` |
-| `--color-sidebar-accent`             | `oklch(0.92 0.007 84)`            | `oklch(0.31 0.005 84)`            |
-| `--color-sidebar-accent-foreground`  | `oklch(0.26 0.014 84)`            | `oklch(0.985 0.001 84)`           |
-| `--color-sidebar-border`             | `var(--color-border)`             | `var(--color-border)`             |
-| `--color-sidebar-ring`               | `var(--color-ring)`               | `var(--color-ring)`               |
+| Token                                | Light                               | Dark                                |
+| ------------------------------------ | ----------------------------------- | ----------------------------------- |
+| `--color-background`                 | `oklch(1 0 0)`                      | `oklch(0.205 0 0)`                  |
+| `--color-foreground`                 | `oklch(0.21 0.04 265)`              | `oklch(0.96 0 0)`                   |
+| `--color-surface`                    | `oklch(0.985 0.005 250)`            | `oklch(0.258 0 0)`                  |
+| `--color-surface-foreground`         | `var(--color-foreground)`           | `var(--color-foreground)`           |
+| `--color-card`                       | `oklch(1 0 0)`                      | `oklch(0.295 0 0)`                  |
+| `--color-card-foreground`            | `var(--color-foreground)`           | `var(--color-foreground)`           |
+| `--color-popover`                    | `oklch(1 0 0)`                      | `oklch(0.295 0 0)`                  |
+| `--color-popover-foreground`         | `var(--color-foreground)`           | `var(--color-foreground)`           |
+| `--color-primary`                    | `oklch(0.531 0.219 262.6)`          | `oklch(0.57 0.19 262)`              |
+| `--color-primary-foreground`         | `oklch(1 0 0)`                      | `oklch(1 0 0)`                      |
+| `--color-link`                       | `oklch(0.568 0.219 262.6)`          | `oklch(0.673 0.172 262)`            |
+| `--color-secondary`                  | `oklch(0.97 0.008 250)`             | `oklch(0.258 0 0)`                  |
+| `--color-secondary-foreground`       | `var(--color-foreground)`           | `var(--color-foreground)`           |
+| `--color-muted`                      | `oklch(0.97 0.008 250)`             | `oklch(0.258 0 0)`                  |
+| `--color-muted-foreground`           | `oklch(0.5 0.02 260)`               | `oklch(0.78 0 0)`                   |
+| `--color-accent`                     | `var(--color-secondary)`            | `var(--color-secondary)`            |
+| `--color-accent-foreground`          | `var(--color-secondary-foreground)` | `var(--color-secondary-foreground)` |
+| `--color-info`                       | `oklch(0.52 0.101 231)`             | `oklch(0.72 0.14 231)`              |
+| `--color-info-foreground`            | `oklch(1 0 0)`                      | `oklch(0.15 0 0)`                   |
+| `--color-success`                    | `oklch(0.52 0.12 155)`              | `oklch(0.7 0.13 155)`               |
+| `--color-success-foreground`         | `oklch(0.985 0.005 155)`            | `oklch(0.145 0.01 155)`             |
+| `--color-warning`                    | `oklch(0.82 0.14 80)`               | `oklch(0.8 0.13 80)`                |
+| `--color-warning-foreground`         | `oklch(0.28 0.05 80)`               | `oklch(0.15 0.012 80)`              |
+| `--color-destructive`                | `oklch(0.516 0.21 27)`              | `oklch(0.766 0.138 27)`             |
+| `--color-destructive-foreground`     | `oklch(1 0 0)`                      | `oklch(0.15 0.01 25)`               |
+| `--color-border`                     | `oklch(0.93 0.01 255)`              | `oklch(0.355 0 0)`                  |
+| `--color-input`                      | `oklch(0.658 0.01 255)`             | `oklch(0.57 0 0)`                   |
+| `--color-ring`                       | `oklch(0.585 0.219 262.6)`          | `oklch(0.659 0.181 262)`            |
+| `--color-chart-1`                    | `oklch(0.55 0.15 262)`              | `oklch(0.68 0.13 262)`              |
+| `--color-chart-2`                    | `oklch(0.62 0.1 195)`               | `oklch(0.7 0.11 195)`               |
+| `--color-chart-3`                    | `oklch(0.6 0.12 155)`               | `oklch(0.72 0.12 155)`              |
+| `--color-chart-4`                    | `oklch(0.75 0.13 85)`               | `oklch(0.8 0.12 85)`                |
+| `--color-chart-5`                    | `oklch(0.58 0.15 25)`               | `oklch(0.68 0.14 25)`               |
+| `--color-sidebar`                    | `var(--color-background)`           | `var(--color-background)`           |
+| `--color-sidebar-foreground`         | `var(--color-foreground)`           | `var(--color-foreground)`           |
+| `--color-sidebar-primary`            | `var(--color-primary)`              | `var(--color-primary)`              |
+| `--color-sidebar-primary-foreground` | `var(--color-primary-foreground)`   | `var(--color-primary-foreground)`   |
+| `--color-sidebar-accent`             | `var(--color-secondary)`            | `var(--color-secondary)`            |
+| `--color-sidebar-accent-foreground`  | `var(--color-secondary-foreground)` | `var(--color-secondary-foreground)` |
+| `--color-sidebar-border`             | `var(--color-border)`               | `var(--color-border)`               |
+| `--color-sidebar-ring`               | `var(--color-ring)`                 | `var(--color-ring)`                 |
+| `--color-overlay`                    | `oklch(0 0 0 / 0.8)`                | `oklch(0 0 0 / 0.8)`                |
 
 Design notes:
 
-- **Primary is the ink.** Light: near-black on paper; dark: near-white on
-  ink — no saturated hue on interactive chrome. Primary sits slightly off
-  the foreground extreme (0.225 / 0.945) so `primary/80` hover states still
-  shift visibly.
-- **The former brand hue (indigo 262) survives only as `chart-1`** — a data
-  color among five, no longer an identity. Hue in this system is reserved
-  for information: status semantics and chart series.
-- **Surfaces sit close to the background** (light: 0.978 → 0.996) and are
-  separated by hairline borders, not lightness jumps. **Dark surfaces
-  separate by two cues together — a lightness step AND a visible hairline
-  border — because the step alone cannot carry it.** The 2026-07
-  system-review pass established (and screenshots confirmed) that near
-  black, equal OKLCH-L steps produce almost no _luminance_ contrast:
-  `surface / background` sat at ~1.1:1 however wide the ladder was drawn,
-  which is why widening it twice (Δ0.045 → Δ0.06) never fixed the "dark
-  reads flat" complaint. Borders carry it — at the weight fixed by the
-  **hairline rule** (below): dark `0.385` (1.70:1 vs background, 1.50:1 vs
-  surface). Cards, popovers and dialogs draw the **border token**
-  (`ring-border`), so their edges track the same hairline as every other
-  surface. Current dark ladder: `background 0.235 → surface 0.278 → popover
-0.295`; the surface step is ΔL ~0.04, and the popover step compresses to ΔL
-  ~0.017 because the 2026-10 body-legibility pass lowered popover `0.315 →
-0.295` to buy AA headroom for dimmer secondary text (see the "Secondary text"
-  cross-theme row) — the hairline cue carries the tighter popover step per the
-  "step AND hairline" rule.
-- **Status colors in dark invert to light fills with ink text**, matching
-  primary, so every filled status surface keeps AA text contrast.
+- **Primary is a filled-action cobalt.** The exact reference values fail the
+  foundation pair: light `0.585 0.219 262.6` is 4.38:1 with white and 3.75:1
+  at `/90`; dark `0.62 0.19 262` is 3.74:1 with white. The adopted values keep
+  reference hue/chroma and lower lightness only as far as the binding checks
+  require. `/90` remains the filled hover opacity.
+- **Link is a semantic role, not a raw blue scale.** It preserves more of the
+  reference cobalt than the action fill while meeting 4.5:1 on every canvas,
+  surface, card, and popover. Button/Badge link variants and field-help links
+  consume `text-link`.
+- **Info is cyan, not another action color.** It is available as a semantic
+  fill/foreground pair and as readable text on a restrained `/10` tint. It
+  does not create an `info` component variant; components earn variants from
+  repeated semantic behavior, not from the existence of a color role.
+- **Accent remains neutral.** Generic hover, selection, and disclosure states
+  alias the exact reference secondary fill; they do not borrow cyan and
+  compete with actions or information.
+- **`chart-1` remains an independent data color.** Its historical indigo is
+  preserved because the reference authors no chart palette. Neither token is
+  a color scale or a source for the other.
+- **Surfaces preserve the reference ladder.** Light background/card/popover
+  are white and `surface` is the cool near-white section plane. Dark uses
+  background `0.205`, surface/secondary/muted `0.258`, and card/popover
+  `0.295`. `card` is now a distinct semantic token rather than an alias of
+  surface because the reference distinction is visible and reusable.
+- **Status colors retain their semantic duties.** The reference authors only
+  destructive. Its exact red fails the foundation's fill, text, tint, input,
+  and gamut checks, so the adopted red is the closest valid alternative per
+  theme. Existing success/warning and chart colors remain unchanged because
+  no reference value exists to migrate.
 - **`--color-border` is the structural hairline of the flat system** —
   decorative in WCAG terms (it conveys structure, not meaning), so 1.4.11
-  does not apply to it. Its weight is fixed by the **hairline rule** (below),
-  not tuned by feel: light `0.91`, dark `0.385`, and it carries
-  card/popover/dialog edges via `ring-border`. **`--color-input` is a control
-  boundary** and holds ≥3:1 against background and surface in both themes
-  (WCAG 1.4.11), as does `--color-ring` (focus indicator — near-black in
-  light, near-white in dark, matching the primary logic). Which token a
+  does not apply to it. The exact reference values (`0.93 0.01 255` light,
+  `0.355 0 0` dark) are retained. **`--color-input` is a control boundary**
+  and is moved to the closest 3:1 value against every surface. `--color-ring`
+  stays closer to reference cobalt than the darker action fill and is adjusted
+  only enough to remain 3:1 on the composited input fill. Which token a
   control's edge takes turns on 1.4.11's "**required to identify**" test, not
   on whether it is a control: an **empty** field (input, textarea) has nothing
   but its edge to announce it, so that edge is required and uses `input`; a
@@ -170,51 +142,17 @@ Design notes:
   border is decorative and uses the `border` hairline in both themes — a dark
   outline button on the 3:1 `input` band reads as a lit edge, not a quiet one.
 
-**The hairline rule (both themes, a decision not a feel).** A hairline should
-be _quiet but present_: perceptible as an edge, never a drawn line. The
-contrast ratio that achieves this is **not the same in the two themes**,
-because a thin light line on a dark field is harder to see than a thin dark
-line on a light field (near black, equal luminance _ratios_ correspond to
-smaller absolute luminance _steps_, and thin-line perception tracks the
-absolute step). So the rule targets a **perceptual** band, using different
-ratios to land in it:
-
-| Theme | Target vs background | Value     | Ratio vs background | Ratio vs surface |
-| ----- | -------------------- | --------- | ------------------- | ---------------- |
-| Light | 1.2–1.35:1           | L `0.91`  | 1.23:1              | 1.29:1           |
-| Dark  | 1.6–1.75:1           | L `0.385` | 1.70:1              | 1.50:1           |
-
-Light hairlines are easy, so they sit at the whisper end (~1.23:1) — the light
-border was re-derived `0.9 → 0.91` in the 2026-09 pass when the background
-lifted to `0.978`: a higher base raises the ratio under a fixed line, so
-holding the same ~1.23:1-vs-bg percept required lightening the border a step. Dark
-hairlines need a higher ratio than light for the _same perceived_ quietness
-(a light line on a dark field is harder to see) — but the target **band moved
-down** in the 2026-09 charcoal pass, for two reasons the rule anticipates.
-First, lifting the base off near-black raises the absolute luminance beneath a
-hairline, so a given _ratio_ now spans a larger absolute luminance step;
-matching the old perceived quietness therefore lands at a lower ratio. Second,
-the old dark band (1.7–1.9:1) had begun to read heavy — the brief that drove
-this pass reported borders as too strong. So the dark hairline was re-derived
-to `0.385`: **1.70:1 vs background / 1.50:1 vs surface** (the surface side is
-the binding constraint, since a card's fill is the lightest thing a border
-must separate from), quieter than the old `0.38`/1.86 yet still comfortably
-above the vanish point on this lighter base (the old ~1.6:1 "invisible border"
-floor was measured against near-black; the higher base moves it down too). Any
-change to a background or surface lightness re-derives the border value — and,
-if the base moved enough, the target band — from this rule; do not adjust the
-number in isolation.
+**Overlay is semantic.** The reference `black/80` scrim is adopted exactly as
+`--color-overlay` and exposed as `bg-overlay`; Dialog and AlertDialog no longer
+carry the former component-level `bg-black/10` exception. Backdrop blur and all
+overlay behavior remain unchanged.
 
 ### Text colour: body vs secondary
 
 `foreground` is the default ink; `muted-foreground` is a **demotion**, not the
-house body colour. The reference sets running body copy at near-full foreground
-contrast (~16–17:1 light, ~14–16:1 dark) and reserves grey for text that is
-genuinely subordinate. Before the 2026-09 body-contrast pass this had drifted:
-page and section descriptions, hero leads, and prose were all set in
-`muted-foreground` (~6.5:1), which — compounded by grayscale font smoothing —
-read thin and faint. The pass moved body copy back to `foreground` and fixed
-the rule so it is not re-decided per component:
+house body colour. The reference likewise reserves grey for genuinely
+subordinate text. Body copy stays on `foreground`; the automated contract keeps
+muted text at 4.5:1 or better on every supported surface:
 
 **Earns `foreground` (body copy — text a reader reads _as content_):**
 
@@ -251,24 +189,14 @@ foreground.
 
 ### Cross-theme perception (same design, different numbers)
 
-The two themes must _feel_ like one design — same perceived weight, contrast,
-surface separation, and prominence for the same element. Best practice is
-that **matching numeric values across themes produces mismatched
-perception**, because the eye responds to absolute luminance steps, not to
-token symmetry, and a near-black field compresses those steps. So several
-tokens are deliberately _asymmetric_ to land the same percept:
-
-| What must feel equal         | Light                       | Dark                             | Why different numbers                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ---------------------------- | --------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hairline "quiet but present" | border 1.23:1 vs bg         | border 1.70:1 vs bg              | a light line on dark needs a higher ratio to be seen (hairline rule above)                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Surface lift off background  | ΔL 0.018 (0.978→0.996)      | ΔL 0.043 (0.235→0.278) + border  | charcoal still compresses luminance, so dark needs a bigger step _and_ the border cue for the same perceived lift                                                                                                                                                                                                                                                                                                                                                                      |
-| Secondary (muted) text       | muted-fg 0.46 (sep 2.62:1)  | muted-fg 0.665 (sep 2.92:1)      | what must feel equal is the _separation from body_, not each theme's contrast vs bg. Light ink↔grey is 2.62:1. Dark was 0.69/2.66:1 (matched numerically) but still read alike, because light-on-dark irradiation blooms mid-greys toward the near-white body — so equal _perception_ needs a bigger numeric gap. Dimming secondary required buying AA headroom first: popover/muted dropped `0.315→0.295`, letting muted-fg drop `0.69→0.665` (sep 2.92:1, holding 4.55:1 on popover) |
-| Floating-layer shadow        | ink wash, alpha 0.05–0.13   | black, alpha 0.4–0.55            | a shadow reads against paper vs mid-dark; equal alpha would vanish in dark                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Control boundary (input)     | input 0.63 (3.2:1)          | input 0.555 (3.5:1)              | both clear 3:1 (WCAG 1.4.11) from opposite sides; matching the number would over- or under-shoot one theme                                                                                                                                                                                                                                                                                                                                                                             |
-| Primary prominence           | ink 0.225 on paper (15.6:1) | near-white 0.955 on ink (14.6:1) | "the primary IS the ink" inverts lightness; both land the same very-high prominence vs background                                                                                                                                                                                                                                                                                                                                                                                      |
-
-The rule for future changes: decide the _perceptual_ target first, then pick
-each theme's value to hit it — never copy a value across themes for symmetry.
+The two themes preserve the reference's different material models rather than
+forcing numeric symmetry. Light uses a nearly flat white ladder; dark uses
+three visible charcoal planes. Primary fill stays medium/deep cobalt in both,
+while link and ring move lighter where their context requires contrast. Input
+boundaries move away from the exact quiet border in opposite directions to
+clear 3:1. Muted text is darker than the canvas in light and lighter than the
+canvas in dark. The rule for future changes is semantic parity and comparable
+prominence, not identical OKLCH coordinates.
 
 ### Elevation (`--elevation-*`, per theme)
 
@@ -286,8 +214,8 @@ dark — never by shadows.
   so component code and the shadcn conventions keep working unchanged.
 - **`md`** — dropdowns, popovers, tooltips: the first level that actually
   floats. **`lg`** — dialogs and drawers. **`xl`** — the largest overlays.
-- **Light** shadows are soft warm-ink washes
-  (`oklch(0.185 0.012 84 / 0.05–0.13)`) with no hard key lines; **dark**
+- **Light** shadows are soft blue-black ink washes
+  (`oklch(0.21 0.04 265 / 0.05–0.13)`) with no hard key lines; **dark**
   shadows are heavier blacks (`oklch(0 0 0 / 0.4–0.55)`) that only ground
   floating layers against the mid-dark behind them.
 
@@ -545,17 +473,17 @@ intrinsic widths still read as one row.
 ### Focus and invalid states
 
 The focus indicator is designed, never the UA default: **a solid 2px line
-of `--color-ring`** (near-black in light, near-white in dark — the same
-ink logic as primary). Its geometry follows the control:
+of `--color-ring`**. Ring is a dedicated reference-cobalt role because the
+action fill must darken for white text while the focus line must remain 3:1 on
+the composited input fill. Its geometry follows the control:
 
 - **Bordered text controls (Input, Textarea):** the border turns to the
   ring token plus an attached 1px ring — a crisp 2px line at the control
   edge, in the flat hairline language.
 - **Standalone controls (buttons, links, badges-as-links):** a 2px ring
-  offset by 2px of `background`. Offset, not attached, because the ring
-  barely contrasts with the near-black primary fill (1.35:1 light /
-  1.83:1 dark) — the background-colored gap is what makes it perceptible
-  on any fill.
+  offset by 2px of `background`. The background-colored gap makes the
+  indicator perceptible on any fill, including the closely related cobalt
+  primary.
 - **Nested controls (toggle-group items, tabs triggers):** attached 2px
   ring — an offset ring would collide with siblings 2px away. Scroll
   viewports use an inset ring to survive overflow clipping.
@@ -617,80 +545,51 @@ the affordance fighting the menu; see `docs/LAYOUT.md` §6.)
 
 ## 3. Verified contrast (WCAG AA)
 
-Computed via OKLCH → linear sRGB → relative luminance (WCAG 2.1 formula).
-Requirement: 4.5:1 for text pairs, 3:1 for UI boundaries/focus. All pairs pass in
-both themes. (Dark column fully recomputed for the 2026-09 charcoal pass, which
-lifted the base `0.185 → 0.235` and re-derived the whole ladder, so every dark
-pair moved: text-on-dark pairs fell as the surfaces rose beneath them, yet all
-stay far above 4.5. As the §4 rebrand guide predicts, the only pairs that
-needed intervention were the **destructive composites** — lifting the surface
-lightened the composited backdrops and dropped both below 4.5 at the old
-values, fixed by raising dark `destructive` 0.73 → 0.78 _and_ dropping the dark
-tint alpha `/20 → /15` (both composites now 4.81 / 4.54). The **light column
-was recomputed for the 2026-09 body-contrast pass**, which lifted the light
-paper (`background 0.968 → 0.978`, `surface/popover → 0.996`, the quiet fills +
-sidebar up one step, `border 0.9 → 0.91`): every light pair moved slightly, all
-comfortably in the pass band, and — as predicted — the destructive composites
-only _rose_ (the lighter surface lightens the composited backdrop under the
-dark red), so no destructive intervention was needed in light.) The **2026-10
-body-legibility pass** touched only three dark tokens — `popover 0.315 → 0.295`,
-`muted 0.305 → 0.295`, `muted-foreground 0.69 → 0.665` — to make secondary text
-recede (see the "Secondary text" cross-theme row). Only the pairs involving
-those three moved: the `muted-foreground` pairs fell (dimmer secondary) but all
-still clear 4.5 (binding case `muted-foreground / popover` = 4.55), and
-`foreground / popover` and `foreground / muted` _rose_ (darker backdrops). No
-composite pair was affected, and `background`/`surface`/`border`/`input`/`ring`
-were deliberately left fixed, so the hairline rule did not re-derive. The face
-swap (Geist → Public Sans) changes no colour, so it triggers no recompute.)
+Computed via OKLCH → linear sRGB → relative luminance (WCAG formula).
+Requirement: 4.5:1 for text pairs and 3:1 for UI boundaries/focus. Alpha states
+are composited in encoded sRGB before luminance is calculated. The source-level
+test pins every migrated authored value, resolves aliases, checks every semantic
+OKLCH token for sRGB gamut, and evaluates the full surface matrix rather than a
+single convenient backdrop.
 
-| Pair                                                          | Requirement | Light | Dark  |
-| ------------------------------------------------------------- | ----------- | ----- | ----- |
-| foreground / background                                       | 4.5         | 17.50 | 15.97 |
-| foreground / surface                                          | 4.5         | 18.43 | 14.07 |
-| foreground / popover                                          | 4.5         | 18.43 | 13.29 |
-| foreground / muted                                            | 4.5         | 16.11 | 13.29 |
-| foreground / secondary                                        | 4.5         | 15.87 | 12.60 |
-| foreground / accent                                           | 4.5         | 15.40 | 11.26 |
-| muted-foreground / background                                 | 4.5         | 6.69  | 5.46  |
-| muted-foreground / surface                                    | 4.5         | 7.05  | 4.81  |
-| muted-foreground / popover                                    | 4.5         | 7.05  | 4.55  |
-| muted-foreground / muted                                      | 4.5         | 6.16  | 4.55  |
-| primary-foreground / primary                                  | 4.5         | 16.39 | 16.50 |
-| secondary-foreground / secondary                              | 4.5         | 13.23 | 12.60 |
-| accent-foreground / accent                                    | 4.5         | 12.84 | 11.26 |
-| success-foreground / success                                  | 4.5         | 4.99  | 7.82  |
-| warning-foreground / warning                                  | 4.5         | 8.29  | 10.41 |
-| destructive-foreground / destructive                          | 4.5         | 6.13  | 8.44  |
-| destructive / background (error text)                         | 4.5         | 6.02  | 7.14  |
-| destructive / surface (error text)                            | 4.5         | 6.34  | 6.29  |
-| destructive / destructive-tint over surface[^tint]            | 4.5         | 5.41  | 4.81  |
-| destructive / input fill over surface[^tint]                  | 4.5         | 4.62  | 4.54  |
-| foreground / sidebar                                          | 4.5         | 16.69 | 15.10 |
-| sidebar-accent-foreground / sidebar-accent                    | 4.5         | 12.27 | 12.60 |
-| ring / background                                             | 3.0         | 11.91 | 7.76  |
-| ring / surface                                                | 3.0         | 12.55 | 6.84  |
-| ring / input fill over surface[^tint] (focus)                 | 3.0         | 9.13  | 4.93  |
-| ring / muted (focus in grouped controls)                      | 3.0         | 10.97 | 6.46  |
-| ring / sidebar (focus on sidebar links)                       | 3.0         | 11.36 | 7.34  |
-| destructive / input fill over surface (invalid border)[^tint] | 3.0         | 4.62  | 4.54  |
-| input / background                                            | 3.0         | 3.29  | 3.51  |
-| input / surface                                               | 3.0         | 3.46  | 3.09  |
-| primary / background                                          | 3.0         | 16.06 | 14.62 |
+The binding cases explain the deviations from the reference. The adopted
+values deliberately clear the source-level threshold rather than landing on
+its rounding boundary: light primary `/90` over white is 4.62:1; dark primary
+with white is 4.61:1; dark link on card is 4.60:1; dark input on card is
+3.11:1; dark ring on the composited input fill is 3.11:1. Thresholds are not
+weakened to admit the palette, and the margin keeps Chromium/axe from rounding
+an authored pass into a rendered failure.
 
-[^tint]:
-    Composite pairs, added after an axe scan caught dark-mode failures the
-    plain pairs missed: destructive text also renders over its own translucent
-    tint (`bg-destructive/10`, dark `/15` — Button/Badge destructive variants)
-    and over the dark input fill (`--color-input` at 30% over surface; an
-    invalid Field cascades `text-destructive` onto the input value). Alpha
-    composited in sRGB space before the luminance computation. These pairs are
-    why dark `--color-destructive` sits at 0.78 lightness and the dark tint
-    alpha at `/15`: the 2026-09 charcoal pass lifted the surface `0.225 →
-0.278`, lightening both composited backdrops, so the old 0.73 + `/20` dropped
-    them below 4.5 (the tint plateaus as `destructive` rises, because a lighter
-    red also lightens its own tinted backdrop — hence the alpha drop as the
-    second lever). The light value stays 0.505 (at 0.52 the light input-fill
-    composite landed at 4.14).
+| Pair                                               | Requirement | Light | Dark  |
+| -------------------------------------------------- | ----------- | ----- | ----- |
+| foreground / background                            | 4.5         | 17.76 | 15.95 |
+| foreground / surface                               | 4.5         | 17.02 | 13.92 |
+| foreground / card                                  | 4.5         | 17.76 | 12.35 |
+| muted-foreground / background                      | 4.5         | 6.00  | 8.95  |
+| muted-foreground / card                            | 4.5         | 6.00  | 6.93  |
+| primary-foreground / primary                       | 4.5         | 5.53  | 4.61  |
+| primary-foreground / primary `/90` over background | 4.5         | 4.62  | 5.30  |
+| primary-foreground / primary `/90` over card       | 4.5         | 4.62  | 5.15  |
+| link / background                                  | 4.5         | 4.71  | 5.94  |
+| link / card                                        | 4.5         | 4.71  | 4.60  |
+| info-foreground / info                             | 4.5         | 5.38  | 8.15  |
+| info / background                                  | 4.5         | 5.38  | 7.42  |
+| info / info `/10` over card                        | 4.5         | 4.69  | 4.89  |
+| destructive-foreground / destructive               | 4.5         | 6.25  | 8.86  |
+| destructive / background                           | 4.5         | 6.25  | 8.06  |
+| destructive / destructive tint over card           | 4.5         | 5.20  | 4.73  |
+| input / background                                 | 3.0         | 3.13  | 4.01  |
+| input / card                                       | 3.0         | 3.13  | 3.11  |
+| ring / background                                  | 3.0         | 4.38  | 5.61  |
+| ring / card                                        | 3.0         | 4.38  | 4.35  |
+| ring / input fill over card                        | 3.0         | 3.26  | 3.11  |
+
+Button, linked-Badge, and ErrorFallback hovers composite primary at 90% over
+the underlying surface. The Showcase information specimen composites info at
+10%. Destructive Button/Badge variants composite at 10% light and 15% dark;
+invalid text is also checked over the 30% dark input fill. These composite
+checks are first-class requirements because opaque pair checks cannot prove
+the rendered state.
 
 `--color-border` is excluded by design: it is a decorative separator, not a
 component boundary, so WCAG 1.4.11 does not apply to it. Anything that must be
@@ -698,41 +597,47 @@ perceived — input borders, focus rings — uses `input`/`ring`, which meet 3:1
 
 ## 4. Rebranding this foundation
 
-Two rebrands have now been executed against this token system, and they
-establish two distinct classes of work — budget for the right one:
+Three migrations have now been executed against this token system, and they
+establish three distinct classes of work — budget for the right one:
 
 - **Hue swap (~15 minutes, verified 2026-07):** brand hue 262 → 330 at the
   existing L/C values, radius, and ramp weights — exactly three token files
   touched, all gates green afterwards. Hue-only changes at fixed lightness
   barely move contrast ratios.
-- **Identity swap (half a day, verified 2026-07, this palette):** new hue
-  family, new lightness architecture (warm paper, near-black primary, flat
+- **Identity swap (half a day, verified 2026-07, the predecessor palette):** new hue
+  family, new lightness architecture (warm paper, then-near-black primary, flat
   elevation), new typeface, new ramp voice, brand mark and favicon. Still
   overwhelmingly token-value editing — but every lightness change pulls in
   the §3 recomputation, and a handful of things live beyond tokens (listed
   in each step below, so the next rebrand knows the full surface).
+- **Reference-palette migration (verified 2026-07):** the complete authored
+  light/dark neutral ladder moved into semantic ownership; card, link, info,
+  and overlay became explicit roles; exact reference values were retained
+  unless gamut or contrast failed. Alpha-composite and state-distinguishability
+  coverage prevent visually plausible but inaccessible parity.
 
-Steps, sharpened by the second rebrand:
+Steps, sharpened by all three migrations:
 
 1. **Pick the palette architecture first, hue second.** Decide what the
    primary action color IS (a saturated hue? the ink itself?) and what
    elevation means (shadows? hairlines? a lightness ladder?) before editing
    values — those two decisions shape every neutral. Current architecture:
-   warm paper (hue 84), ink primary, flat elevation.
+   white/cool-neutral light, charcoal dark, deep cobalt primary, separate
+   accessible link cobalt, neutral accent, cyan info, and flat elevation.
 2. **In `src/styles/light.css` and `dark.css`**, set the values. If you keep
    the L/C architecture and change hue only, you inherit the verified
    contrast. If you change any **lightness**, you owe the full §3
    recompute (step 7) — write the throwaway script (OKLCH → linear sRGB →
    WCAG 2.1; ~60 lines, both prior rebrands used one) rather than checking
-   pairs by hand, because the failures land in the composite pairs a
-   spot-check misses: **both rebrands' only failures were the destructive
-   composites** (text over its own tint / over the input fill).
+   pairs by hand, because failures land in composite states a spot-check
+   misses: primary hover, destructive tint, and focus over input fill.
 3. **Elevation is identity too.** The five `--elevation-*` levels per theme
    are the whole shadow contract; emptying `xs`/`sm` (`0 0 0 0` transparent)
    is how this palette went flat — no component changes required, because
    components consume levels, not values.
-4. **Status hues** (success `155`, warning `80`, destructive `25`) usually
-   stay; keep the L/C bands or re-verify — including the composite pairs.
+4. **Status hues** (info `220`, success `155`, warning `80`, destructive `25`)
+   usually stay; keep the L/C bands or re-verify — including the composite
+   pairs.
 5. **Radius personality:** edit `--radius-base` in `src/styles/base.css` —
    every `rounded-*` step follows.
 6. **Type voice:** edit the `--text-*` steps in `src/styles/theme.css`
