@@ -256,21 +256,19 @@ mobile fit), and clear breathing room (`me-4`) before navigation begins. The
 mark stays `currentColor` and receives `text-primary` from the composition; its
 inset glyph makes that outer box read in balance with the 36px header CTA
 without resizing the CTA. Nav items are secondary wayfinding at `text-small`,
-medium weight, on a three-step ladder that inverts the usual "light up on
+semibold weight, on a three-step ladder that inverts the usual "light up on
 hover":
 
-- **idle** → `text-foreground` + `font-medium`, _lightening_ to
+- **idle** → `text-foreground` + `font-semibold`, _lightening_ to
   `text-muted-foreground` on hover (the item recedes under the cursor).
-  Medium, not normal: a primary interactive element should not read as
-  thin at 14px.
+  Semibold gives a primary interactive label the intended 600 UI weight.
 - **current** → `text-foreground` + `font-bold` (`aria-current`).
   Because idle links already sit at full foreground strength, color cannot
   carry current — **weight does**, and weight (unlike an underline) does
   not fight a dropdown menu opening beneath the item. Current is bold, not
-  semibold, so the gap over a medium idle stays the same 200-unit step the
-  ladder was designed around (medium-vs-semibold alone was too subtle to
-  mark current unambiguously).
-- **unavailable** → `text-muted-foreground` + `font-normal`, muted at rest
+  semibold, preserving a distinct persistent title cue without making normal
+  navigation bold.
+- **unavailable** → `text-muted-foreground` + `font-medium`, muted at rest
   so it reads distinct from a full-strength idle link.
 
 Hover is color-only — no growing underline or moving element — precisely
@@ -330,7 +328,8 @@ exists to prevent.
 ### Dropdown navigation (`SiteShellNavMenu`)
 
 A nav item can host a dropdown panel of sub-destinations — a two-column grid
-of title + one-line-description items — via `SiteShellNavMenu` and its
+of 14px/600 titles + wrapping 13px/500 muted descriptions — via
+`SiteShellNavMenu` and its
 `SiteShellNavMenuItem` children:
 
 ```tsx

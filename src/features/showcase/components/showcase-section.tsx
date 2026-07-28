@@ -17,7 +17,7 @@ export function ShowcaseSection({ title, description, children }: ShowcaseSectio
           // dir="auto": prose direction follows the text's first strong
           // character, so English copy stays LTR with correct punctuation
           // under the RTL inspection toggle (docs/DIRECTION_AND_I18N.md).
-          <p dir="auto" className="max-w-prose text-body">
+          <p dir="auto" className="max-w-prose text-small text-muted-foreground">
             {description}
           </p>
         ) : null}

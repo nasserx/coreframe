@@ -97,7 +97,7 @@ export function FieldLegend({ className, variant = "legend", ...props }: FieldLe
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        "mb-1.5 font-medium data-[variant=label]:text-sm data-[variant=legend]:text-base",
+        "mb-1.5 font-semibold data-[variant=label]:text-sm data-[variant=legend]:text-base",
         className,
       )}
       {...props}
@@ -147,7 +147,7 @@ export function FieldTitle({ className, ...props }: FieldTitleProps) {
     <div
       data-slot="field-label"
       className={cn(
-        "flex w-fit items-center gap-2 text-sm font-medium group-data-[disabled=true]/field:opacity-50",
+        "flex w-fit items-center gap-2 text-sm font-semibold group-data-[disabled=true]/field:opacity-50",
         className,
       )}
       {...props}
@@ -160,7 +160,7 @@ export function FieldDescription({ className, ...props }: FieldDescriptionProps)
     <p
       data-slot="field-description"
       className={cn(
-        "text-start text-sm leading-normal font-normal text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5",
+        "text-start text-small text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5",
         "last:mt-0 nth-last-2:-mt-1",
         "[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-link",
         className,
@@ -227,7 +227,7 @@ export function FieldError({ className, children, errors, ...props }: FieldError
     <div
       role="alert"
       data-slot="field-error"
-      className={cn("text-sm font-normal text-destructive", className)}
+      className={cn("text-small font-medium text-destructive", className)}
       {...props}
     >
       {content}

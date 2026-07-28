@@ -40,7 +40,7 @@ import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
  * a "use client" layout whose chrome reads from `useTranslations`, so
  * selecting Arabic in the LocaleControl swaps every string here, mirrors the
  * whole shell to RTL (direction follows the locale through LOCALE_INFO), and
- * renders Arabic in the Noto face — the top bar included. Unlike the AppShell
+ * renders Arabic in Tajawal — the top bar included. Unlike the AppShell
  * header (a pinned LTR instrument panel), this whole shell IS the inspected
  * canvas, so it mirrors under the selected language like any product site.
  *
@@ -175,7 +175,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
       <SiteShellFooter>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <Stack gap="sm">
-            <h2 className="text-small font-medium">{t("footerExplore")}</h2>
+            <h2 className="text-small font-semibold">{t("footerExplore")}</h2>
             <ul className="flex flex-col gap-1">
               <li>
                 <Link
@@ -196,13 +196,13 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
             </ul>
           </Stack>
           <Stack gap="sm">
-            <h2 className="text-small font-medium">{t("footerProduct")}</h2>
+            <h2 className="text-small font-semibold">{t("footerProduct")}</h2>
             <ul className="flex flex-col gap-1">
               <li>
                 {/* The unavailable pattern works in footer columns too:
                     className strips the bar-item padding and weight. */}
                 <SiteShellNavItem
-                  className="px-0 py-0 font-normal"
+                  className="px-0 py-0 font-medium"
                   unavailableLabel={tShell("unavailable")}
                 >
                   {t("pricing")}
@@ -210,7 +210,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
               </li>
               <li>
                 <SiteShellNavItem
-                  className="px-0 py-0 font-normal"
+                  className="px-0 py-0 font-medium"
                   unavailableLabel={tShell("unavailable")}
                 >
                   {t("footerChangelog")}
@@ -219,7 +219,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
             </ul>
           </Stack>
           <Stack gap="sm">
-            <h2 className="text-small font-medium">{t("footerFoundation")}</h2>
+            <h2 className="text-small font-semibold">{t("footerFoundation")}</h2>
             <p className="max-w-prose text-small text-muted-foreground">
               {t("footerFoundationNote")}
             </p>

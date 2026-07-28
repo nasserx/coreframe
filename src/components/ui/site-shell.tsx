@@ -121,7 +121,7 @@ export type SiteShellNavMenuItemProps = Readonly<{
   href?: string;
   /** The item's label line (reads as the bold title against the description). */
   title: ReactNode;
-  /** One-line muted supporting line beneath the title. */
+  /** Muted supporting copy beneath the title; wraps when the panel has room. */
   description?: ReactNode;
   /** sr-only availability hint for href-less items; localize at the call site. */
   unavailableLabel?: string;
@@ -331,7 +331,7 @@ export function SiteShellNav({
  * pill, no underline — weight and color distinguish states on a three-step
  * ladder that keeps nav items subordinate to the (larger, bolder) brand:
  *
- *   - idle link    → `text-foreground` + `font-medium`; on hover it
+ *   - idle link    → `text-foreground` + `font-semibold`; on hover it
  *                    LIGHTENS to `text-muted-foreground` (the item recedes
  *                    under the cursor rather than lighting up).
  *   - current page → `text-foreground` + `font-bold` (`aria-current`).
@@ -339,11 +339,9 @@ export function SiteShellNav({
  *                    full foreground strength, so color cannot carry
  *                    current — and weight, unlike an underline, does not
  *                    fight a dropdown menu opening beneath the item. Idle is
- *                    medium (500) rather than normal so a primary nav element
- *                    does not read as thin; current is bold (700), keeping the
- *                    same 200-unit weight gap that makes current unambiguous
- *                    (medium-vs-semibold alone was too subtle to carry it).
- *   - unavailable  → `text-muted-foreground` + `font-normal`, muted at
+ *                    semibold (600) so a primary navigation label reads
+ *                    clearly; current remains bold (700) as the persistent cue.
+ *   - unavailable  → `text-muted-foreground` + `font-medium`, muted at
  *                    rest so it reads distinct from a full-strength idle
  *                    link; non-interactive, non-focusable, sr-only hint.
  *
@@ -368,7 +366,7 @@ export function SiteShellNavItem({
         data-unavailable=""
         className={cn(
           base,
-          "cursor-default font-normal text-muted-foreground select-none",
+          "cursor-default font-medium text-muted-foreground select-none",
           className,
         )}
       >
@@ -386,12 +384,12 @@ export function SiteShellNavItem({
       aria-current={isCurrent ? "page" : undefined}
       className={cn(
         base,
-        // Idle: full-strength foreground at medium weight (a primary
+        // Idle: full-strength foreground at semibold weight (a primary
         // interactive element should not read as thin), lightening
         // (receding) on hover. Current: same color, distinguished by weight
         // — see the component doc for why weight, not color or an underline,
         // carries current.
-        "font-medium text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "font-semibold text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         isCurrent && "font-bold hover:text-foreground",
         className,
       )}
@@ -446,7 +444,7 @@ export function SiteShellNavMenu({ label, className, children }: SiteShellNavMen
         {/* Collapsed presentation: the trigger label becomes a group heading
             and the sub-destinations render as an indented list — grouped and
             labelled, so the drawer never receives a flat dump of sub-items. */}
-        <p className="px-3 pt-2 pb-1 text-caption font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="px-3 pt-2 pb-1 text-caption font-semibold tracking-wide text-muted-foreground uppercase">
           {label}
         </p>
         <ul className="flex flex-col">{children}</ul>
@@ -485,7 +483,7 @@ function SiteShellNavMenuBar({
           <NavigationMenu.Item render={<div className="contents" />}>
             <NavigationMenu.Trigger
               className={cn(
-                "flex items-center gap-1 rounded-md px-3 py-2 text-small font-medium text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "flex items-center gap-1 rounded-md px-3 py-2 text-small font-semibold text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 className,
               )}
             >
@@ -522,8 +520,8 @@ function SiteShellNavMenuBar({
 }
 
 /**
- * One sub-destination inside a SiteShellNavMenu: a title with an optional
- * one-line muted description. With `href` it is a link (marking the current
+ * One sub-destination inside a SiteShellNavMenu: a title with optional muted
+ * supporting copy that wraps within the panel. With `href` it is a link (marking the current
  * page); without `href` it is the unavailable-destination pattern —
  * non-interactive, non-focusable muted text with an sr-only hint, so it is
  * also skipped in the tab order. Renders correctly in both the bar panel and
@@ -550,8 +548,8 @@ export function SiteShellNavMenuItem({
             className,
           )}
         >
-          <span className="text-small font-normal">{title}</span>
-          {description !== undefined && <span className="truncate text-small">{description}</span>}
+          <span className="text-sm font-medium">{title}</span>
+          {description !== undefined && <span className="text-supporting">{description}</span>}
           <span className="sr-only"> — {unavailableLabel}</span>
         </span>
       </li>
@@ -565,9 +563,9 @@ export function SiteShellNavMenuItem({
   );
   const lockup = (
     <>
-      <span className="text-small font-medium">{title}</span>
+      <span className={cn("text-sm font-semibold", isCurrent && "font-bold")}>{title}</span>
       {description !== undefined && (
-        <span className="truncate text-small text-muted-foreground">{description}</span>
+        <span className="text-supporting text-muted-foreground">{description}</span>
       )}
     </>
   );
@@ -582,7 +580,7 @@ export function SiteShellNavMenuItem({
           data-slot="site-shell-nav-menu-item"
           href={href}
           aria-current={isCurrent ? "page" : undefined}
-          className={cn(cardClass, "aria-[current=page]:font-bold")}
+          className={cardClass}
         >
           {lockup}
         </Link>
@@ -596,7 +594,7 @@ export function SiteShellNavMenuItem({
         data-slot="site-shell-nav-menu-item"
         render={<Link href={href} />}
         active={isCurrent}
-        className={cn(cardClass, "data-active:font-bold")}
+        className={cardClass}
       >
         {lockup}
       </NavigationMenu.Link>

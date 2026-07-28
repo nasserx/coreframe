@@ -71,12 +71,11 @@ browser can falsify.
   defect: prod stayed green, dev failed with the exact diff). There is no
   message allowlist; a benign message must be filtered by a reviewed code
   change with a comment.
-- `fonts.spec.ts` — asserts the Arabic face is **loaded** (`document.fonts`)
-  and **used** (an Arabic string measured through the page's font stack is
-  pixel-identical to the Noto face and differs from the Arial fallback —
-  `size-adjust: 112%` makes interception measurable). "The page shows
-  Arabic" is not evidence; the original defect rendered plausible fallback
-  text.
+- `fonts.spec.ts` — asserts Inter and all authored Tajawal weights are
+  **loaded** (`document.fonts`) and **used**: Latin and Arabic samples measured
+  through the shared page stack must match the intended family and differ from
+  Arial. "The page shows the right script" is not evidence; a plausible
+  fallback can hide a broken family order.
 - `a11y.spec.ts` — axe-core (WCAG 2.x A/AA) over every route in all four
   theme/direction cells. axe automates roughly the third of WCAG that is
   machine-checkable; treat a clean scan as a floor. False positives must be

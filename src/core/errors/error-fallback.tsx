@@ -57,7 +57,7 @@ export function ErrorFallback({
       <button
         type="button"
         onClick={onAction}
-        className="mt-1 inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-small font-medium text-primary-foreground transition-[color,background-color,translate] outline-none hover:-translate-y-0.5 hover:bg-primary-hover focus-visible:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-none motion-reduce:focus-visible:translate-none"
+        className="mt-1 inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-small font-semibold text-primary-foreground transition-[color,background-color,translate] outline-none hover:-translate-y-0.5 hover:bg-primary-hover focus-visible:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-none motion-reduce:focus-visible:translate-none"
       >
         {actionLabel}
       </button>

@@ -50,7 +50,7 @@ export default function FeedbackPage() {
                   <AvatarFallback>SC</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <p className="text-sm font-medium">Loaded content</p>
+                  <p className="text-sm font-semibold">Loaded content</p>
                   <p className="text-xs text-muted-foreground">The real shape</p>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export default function FeedbackPage() {
               <InboxIcon className="size-5 text-muted-foreground" aria-hidden="true" />
             </div>
             <Stack gap="xs">
-              <p className="text-sm font-medium">Nothing here yet</p>
+              <p className="text-sm font-semibold">Nothing here yet</p>
               <p className="text-sm text-muted-foreground">
                 Entries appear here once they are created.
               </p>

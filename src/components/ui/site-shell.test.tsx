@@ -272,6 +272,21 @@ describe("SiteShellNavMenu", () => {
     );
   });
 
+  it("lets supporting descriptions wrap instead of truncating readable text", async () => {
+    const user = userEvent.setup();
+    renderShellWithMenu();
+
+    await user.click(screen.getByRole("button", { name: /Explore/ }));
+
+    expect(await screen.findByText("Products")).toHaveClass("font-bold");
+    expect(screen.getByText("Pricing")).toHaveClass("font-semibold");
+
+    for (const description of await screen.findAllByText("What we sell.")) {
+      expect(description).not.toHaveClass("truncate");
+      expect(description).toHaveClass("text-supporting");
+    }
+  });
+
   it("renders a collapsed trigger button with a closed disclosure state", () => {
     renderShellWithMenu();
     const trigger = screen.getByRole("button", { name: /Explore/ });

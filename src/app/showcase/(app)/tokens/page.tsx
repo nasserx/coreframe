@@ -262,13 +262,13 @@ export default async function TokensPage() {
             <p className="text-small text-muted-foreground">Surface</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg border bg-card p-4 text-card-foreground">
-                <p className="font-medium">Card</p>
+                <p className="font-semibold">Card</p>
                 <a className="mt-2 inline-block text-link underline underline-offset-4" href="#">
                   Accessible primary link
                 </a>
               </div>
               <div className="rounded-lg border bg-popover p-4 text-popover-foreground shadow-md">
-                <p className="font-medium">Popover</p>
+                <p className="font-semibold">Popover</p>
                 <p className="mt-2 rounded-lg bg-accent-selected px-3 py-2 text-small text-accent-foreground">
                   Neutral selected state
                 </p>
@@ -283,13 +283,13 @@ export default async function TokensPage() {
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg bg-info p-4 text-info-foreground">
-            <p className="font-medium">Solid information surface</p>
+            <p className="font-semibold">Solid information surface</p>
             <p className="text-small">
               The paired foreground is reserved for the authored info fill.
             </p>
           </div>
           <div className="rounded-lg border border-info/25 bg-info/10 p-4 text-info">
-            <p className="font-medium">Tinted information surface</p>
+            <p className="font-semibold">Tinted information surface</p>
             <p className="text-small">
               Info text remains readable without promoting cyan to an action.
             </p>

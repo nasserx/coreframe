@@ -18,7 +18,7 @@ import { en } from "./messages/en";
  * import + `DEFAULT_CATALOGUE_LOCALE` below to it, and prune `CATALOGUE_LOADERS`
  * to that one entry. The guard at the bottom fails the build if the static
  * default and the configured default disagree, so the coupling cannot silently
- * rot (the same discipline as the Noto preload guard in src/app/fonts.ts).
+ * rot (the same discipline as the Tajawal preload guard in src/app/fonts.ts).
  */
 
 /**

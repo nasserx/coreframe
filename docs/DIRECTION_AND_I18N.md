@@ -152,88 +152,44 @@ Two related conventions:
 
 ## Fonts and Arabic metrics
 
-- **Stack:** `--font-sans` is `Noto Sans Arabic, Public Sans` (bridged in
-  `src/styles/theme.css`) — Arabic-first, but the Noto face is scoped to
-  Arabic code points by a `unicode-range` descriptor, so Latin skips it and
-  renders in Public Sans. Mixed content gets both faces, correctly, with no
-  component involvement.
-- **Why the order matters (fallback interception):** `next/font` generates a
-  metric-adjusted fallback face for the Latin face from local Arial — and
-  Arial _contains Arabic glyphs_. If Noto were listed after the Latin face,
-  its fallback would silently intercept every Arabic character and Noto
-  would never render (this exact defect shipped once, when the Latin face
-  was Geist; the loaded-face check in the browser's `document.fonts` is the
-  way to catch it). This hazard is independent of which Latin face is
-  loaded — Arabic-first plus `unicode-range` makes interception impossible
-  in either direction, and the Noto face's own Arial fallback is disabled
-  (`adjustFontFallback: false`) for the same reason.
-- **Optical size:** Arabic renders visibly smaller than Latin at equal em,
-  and loosening line-height does not fix perceived size. The Arabic face
-  carries **`size-adjust: 112%`** (calibrated against the Latin face's
-  x-height at body, small, and heading steps). It held at `115%` across the
-  first two face swaps (Geist → Archivo → Geist) because those faces share a
-  near-identical x-height, but the **2026-10 body-legibility pass** swapped
-  Geist → **Public Sans**, whose x-height is measurably smaller (0.517 vs
-  Geist's 0.530 em), so the value was recalibrated to `115% × 0.517/0.53 ≈
-112%` and re-confirmed empirically by side-by-side screenshot of a mixed
-  Latin/Arabic run at those three steps. The lesson: `size-adjust` is a
-  function of the Latin face's x-height and must be re-measured on any face
-  swap — the font e2e proves Noto still loads AND renders, but not that the
-  optical match is right. `size-adjust` scales only glyphs rendered
-  _by that face_, so Latin rendering and mixed-direction layout metrics are
-  untouched, and Arabic embedded in LTR pages benefits equally. The
-  alternative — direction-scoped `--text-*` font-size overrides — was
-  rejected: it inflates the em box for _everything_ inside an RTL subtree,
-  including embedded Latin, and leaves Arabic-in-LTR unfixed.
-- **Loading:** Noto Sans Arabic is self-hosted from
-  `src/assets/fonts/noto-sans-arabic-variable.woff2` via `next/font/local`
-  (the google loader cannot emit `size-adjust`/`unicode-range` descriptors).
-  Still no runtime dependency; the file is the Google-served Arabic-subset
-  variable font (~162 KB). It loads on demand when Arabic appears (scoped by
-  `unicode-range`), and it is **preloaded only on RTL/Arabic-primary
-  deployments** — see _Font preloading_ below.
-- **Font preloading (locale-aware).** A `<link rel="preload">` for a font is
-  fetched eagerly and **ignores `unicode-range`**, so preloading the ~162 KB
-  Arabic face on a Latin-default deployment downloads bytes English pages can
-  never paint (the fix in `docs/audit/2026-07-health-audit.md` §1.1). The shipped
-  English/LTR default therefore does **not** preload Noto (it loads on demand,
-  discovered the moment Arabic renders); an Arabic/RTL default **should**
-  preload it. This cannot be derived from `APP_CONFIG` automatically —
-  `next/font` requires `preload` to be a written literal — so `src/app/fonts.ts`
-  sets `preload: false` and a **compile-time guard couples that literal to
-  `APP_CONFIG.direction`**: flip `APP_LOCALES.DEFAULT` to an RTL locale without
-  also setting the Noto `preload` to `true` and the build fails at
-  `fonts.ts`'s `_NotoPreloadMatchesLocale` assertion, naming the fix. The mono
-  face is never preloaded (it only renders in `font-mono` code, never on the
-  LCP path). To switch to an Arabic-primary deployment: set the RTL default
-  locale **and** set Noto `preload: true` in `src/app/fonts.ts` (the guard
-  will remind you).
-- **The cost of `adjustFontFallback: false` is Arabic-run CLS — accepted, not
-  overlooked.** Because Noto's metric-adjusted fallback is disabled (see
-  _fallback interception_ above), Noto is the only one of the three faces with
-  no companion fallback: verified in the built CSS, `Public Sans Fallback`
-  (`size-adjust: 104.87%`) and `Geist Mono Fallback` (`134.59%`) exist, Noto's
-  does not. All ten faces are `font-display: swap`. So on a Latin-default
-  deployment — where Noto is correctly not preloaded — an Arabic run first
-  paints in an unmatched system font and then **shifts** when Noto swaps in.
-  The trade is deliberate and the right way round: re-enabling the fallback
-  would reintroduce a defect that actually shipped (Arial's Arabic glyphs
-  intercepting the face entirely, so Noto never renders at all), which is
-  strictly worse than a layout shift. **Do not re-enable it.** Scope and
-  mitigations: the shift affects LTR deployments only, in proportion to how
-  much Arabic a Latin page carries; an Arabic-primary deployment preloads Noto
-  (see _Font preloading_) and has no unmatched first paint; and `size-adjust`
-  keeps the metrics of the face once swapped to stable, so nothing shifts a
-  second time. A Latin page carrying substantial Arabic user content can
-  preload Noto deliberately, paying 162 KB to remove the shift.
-- **License:** Noto Sans Arabic is licensed under the SIL Open Font License,
-  Version 1.1; the license accompanies the font at
-  `src/assets/fonts/OFL.txt`, as the OFL requires, and must stay next to the
-  file in any clone or redistribution of this template.
+- **Stack:** `--font-sans` is `Tajawal, Inter, system fallbacks` (bridged in
+  `src/styles/theme.css`). Tajawal comes first, but the four vendored faces
+  contain only the official Arabic subsets and repeat their `unicode-range`;
+  Latin letters and Western numerals therefore fall through to Inter. Mixed
+  content gets both families without component-level font classes.
+- **Loading and weights:** Inter is loaded through `next/font/google` at the
+  reference's exact authored weights 400, 500, 600, 700, and 800. Its semantic
+  contract uses 500 body/supporting copy, 600 UI labels, navigation, compact
+  titles, and prominent CTAs, and headings/current titles at 700/800. Tajawal is loaded through `next/font/local` from
+  `src/assets/fonts/tajawal-arabic-{400,500,700,800}.woff2`. Tajawal publishes
+  no 600 face: existing authored 600 requests remain semantically 600 and the
+  browser resolves them to its nearest available 700 face. Component APIs and
+  geometry do not change to compensate for that discrete family limitation.
+- **Why the Arabic face stays local and Arabic-only:** the Google Tajawal family
+  also ships Latin faces. Putting the complete family first would render Latin
+  in Tajawal and defeat the bilingual contract; putting it after Inter would
+  let a Latin metric fallback intercept Arabic. The Arabic-only
+  local files avoid both failure modes. Tajawal's own metric fallback remains
+  disabled (`adjustFontFallback: false`) for the same interception reason.
+- **Font preloading (locale-aware):** a font preload is fetched eagerly and
+  ignores `unicode-range`. The English/LTR default therefore loads Tajawal on
+  demand only when Arabic renders; an Arabic-primary deployment should set its
+  literal `preload` option to `true`. `next/font` requires that option to be a
+  written literal, so `_TajawalPreloadMatchesLocale` couples it to
+  `APP_CONFIG.direction` at typecheck time. Geist Mono is also on-demand because
+  code is not an LCP face.
+- **Fallback trade-off:** disabling Tajawal's metric fallback prevents silent
+  interception but means Arabic on an English-primary page can first paint in a
+  system face and shift once Tajawal loads. Arabic-primary deployments avoid
+  that swap by preloading. Do not re-enable the Arial fallback to hide CLS; it
+  would make the intended Arabic face unreachable.
+- **License:** Tajawal is SIL Open Font License 1.1. Its notice at
+  `src/assets/fonts/OFL.txt` must stay beside the vendored subset files.
 - **Vertical metrics:** a Latin-tuned ramp renders Arabic cramped. The type
   ramp compensates **through the token layer**: `[dir="rtl"]` overrides in
-  `src/styles/theme.css` loosen every step's line-height (e.g. display
-  1.1 → 1.25, body 1.6 → 1.75) and zero all letter-spacing — tracking,
+  `src/styles/theme.css` give Tajawal independently reviewed leading (e.g.
+  display 1.05 → 1.2, body 1.5 → 1.65, small 1.45 → 1.6) and zero all
+  letter-spacing — tracking,
   positive or negative, visually breaks the connected Arabic script. The
   generated `text-*` utilities read these custom properties at runtime, so
   the overrides apply to any `dir="rtl"` subtree with no extra classes.
@@ -313,16 +269,16 @@ intentionally empty); when a product adds them, they must read
    typecheck names any key you miss. Register it in `src/i18n/catalogue.ts`'s
    `CATALOGUE_LOADERS` (`() => import("./messages/<code>").then((m) => m.<code>)`);
    the `Record<AppLocale, …>` type fails the build until you do.
-4. If the locale needs a script Public Sans doesn't cover, load a companion face
-   via `next/font` in `src/app/layout.tsx` and append its variable to the
-   `--font-sans` stack in `src/styles/theme.css` (the Noto Sans Arabic wiring
-   is the template).
+4. If the locale needs a script Inter does not cover, load a script-scoped
+   companion face through `next/font` in `src/app/fonts.ts` and append its
+   variable before Inter in `src/styles/theme.css` (the Tajawal wiring is the
+   template). Ensure the companion cannot intercept Latin.
 5. If it is the new deployment **default**, change `APP_LOCALES.DEFAULT` —
    `lang`, `dir`, and numeral configuration follow automatically. Also
    re-point `src/i18n/catalogue.ts`'s static `DEFAULT_CATALOGUE` import (and
    `DefaultCatalogueLocale`) to the new default; the guard there fails the
    build if you forget. If the new default is RTL/Arabic-primary, also set the
-   Noto `preload` to `true` in `src/app/fonts.ts` (font preload cannot
+   Tajawal `preload` to `true` in `src/app/fonts.ts` (font preload cannot
    auto-derive; the compile-time guard there fails the build until you do — see
    _Font preloading_ above).
 6. For an RTL locale, review `/showcase/direction`, `/showcase/site` (the

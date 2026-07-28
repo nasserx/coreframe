@@ -243,104 +243,65 @@ dark — never by shadows.
 ### Type ramp (`--text-*`, theme-neutral, in `theme.css`)
 
 Generates `text-<step>` utilities carrying size, line-height, letter-spacing, and
-weight together. The voice is a tight grotesk speaking with headline
-confidence: display/title are large, heavy, tightly tracked, and compactly
-leaded (consecutive display lines nearly touch); body steps stay at
-comfortable reading metrics.
+weight together. Display/title retain the large marketing voice; the shared
+Latin product/UI roles map the approved reference's authored Inter hierarchy.
+`body` is also the document default. Tajawal keeps its independently reviewed
+compact metrics through `[dir="rtl"]` overrides; the two scripts deliberately do
+not share numeric sizes merely for symmetry.
 
 | Step         | Size      | Line-height | Letter-spacing | Weight |
 | ------------ | --------- | ----------- | -------------- | ------ |
-| `display`    | 3.5rem    | 1.05        | −0.035em       | 800    |
-| `title`      | 2.25rem   | 1.12        | −0.028em       | 800    |
-| `heading`    | 1.875rem  | 1.2         | −0.024em       | 700    |
-| `subheading` | 1.5rem    | 1.3         | −0.016em       | 600    |
-| `body-lg`    | 1.1875rem | 1.6         | 0              | 400    |
-| `body`       | 1.0625rem | 1.6         | 0              | 400    |
-| `small`      | 0.875rem  | 1.5         | 0              | 400    |
+| `display`    | 3.5rem    | 1.05        | −0.025em       | 800    |
+| `title`      | 2.25rem   | 1.12        | −0.025em       | 800    |
+| `heading`    | 1.5rem    | 1.2         | −0.025em       | 700    |
+| `subheading` | 1.125rem  | 1.35        | 0              | 600    |
+| `body-lg`    | 1.125rem  | 1.625       | 0              | 500    |
+| `body`       | 1rem      | 1.5         | 0              | 500    |
+| `small`      | 0.875rem  | 1.45        | 0              | 500    |
+| `supporting` | 0.8125rem | 1.45        | 0              | 500    |
 | `caption`    | 0.75rem   | 1.35        | +0.01em        | 500    |
 
-Body is **17px** (`1.0625rem`) — raised from 16px in the 2026-10
-body-legibility pass. The mid-ramp opened with it (`heading 1.75→1.875rem`,
-`subheading 1.375→1.5rem`, their tracking tightened a notch) so headings keep
-the same size lead over the larger body; `display`/`title` were left alone
-(they already dominate 17px body at 3.3×/2.1×, and resizing risks hero
-overflow). The lead-paragraph step tracks body up (`body-lg 1.125→1.1875rem`),
-staying one clear step above it.
+For Latin, the reference-aligned sizes and leading remain unchanged while the
+foundation's final visual-weight review sets body and supporting copy to 500.
+UI labels, navigation, compact titles, and controls use 600 through their
+component contracts. Page headings are 24px/700 and section headings 18px/600. The
+foundation's marketing `display`/`title` sizes remain unchanged, while
+`body-lg` remains the 18px lead role with relaxed 1.625 leading and weight 500.
+
+For Arabic, the approved Tajawal sizes are unchanged: body 15px, supporting
+13px, and lead 17px, with the existing RTL-specific leading and zero tracking.
+The same semantic hierarchy applies—body/supporting 500, UI 600, current 700—
+without mirroring Latin line-height numbers blindly.
 
 At `text-display`'s size, long single words can exceed a 320px viewport —
 pair it with a smaller step below `sm` (`text-title sm:text-display`, as
 the home page does) when the copy is not under your control.
 
-**The typeface is Public Sans** (`next/font/google`, variable wght 100–900,
-Latin subset, OFL 1.1 — the license ships with Google Fonts' hosting; no font
-file lives in this repo for it). It is a neutral, Helvetica-adjacent grotesk
-(the US Web Design System's workhorse face, Libre Franklin lineage) with
-substantial stems. It was adopted in the 2026-10 body-legibility pass over
-Geist, and the decision was made by **measurement, not eye** — because every
-prior judgement here had been visual and every one was wrong (three weight
-bumps on Geist, culminating in a 450 body, all failed to fix body copy reading
-"thin"). The cause was never weight; it was the **face**: Geist has among the
-lightest 400 stems of any OFL grotesk.
+**The bilingual families are Inter and Tajawal.** Inter is the Latin identity
+face (`next/font/google`, exact authored weights 400/500/600/700/800, Latin subset). Tajawal
+is the Arabic companion (`next/font/local`, Arabic-only 400/500/700/800 WOFF2
+subsets). Both are self-hosted by the built application; no browser request is
+made to an external font service.
 
-**The measurement method** (rerun it before ever second-guessing the body face
-— do not eyeball). Render one identical paragraph at 400 weight, same size, in
-each candidate; screenshot at high DPI; then, per face, measure by
-antialiasing-aware pixel analysis (density-weighted, sub-pixel — a hard
-threshold quantises every face to the same few pixels and cannot discriminate):
+The shared `--font-sans` stack is script-aware: Tajawal comes first but contains
+and declares only Arabic code points, so Latin letters and Western numerals
+fall through to Inter. This is deliberate. Loading Tajawal's complete Google
+family would also expose its Latin glyphs and make mixed-language text render
+Latin in the wrong identity face.
 
-- **stem width** — density-weighted thickness of a clean vertical (`l`/`I`) at
-  a large render size, as a fraction of the em;
-- **ink per character** — total ink density of the paragraph ÷ (glyph count ×
-  size²), i.e. mean ink area per glyph in em² (wrap-independent; captures stem
-  weight _and_ set width — the true "presence" of body text);
-- **x-height** and **cap-height** as fractions of the em.
+**There is deliberately no `--font-heading`.** Each script uses one family for
+headings and body; the heading voice comes from weight and negative tracking in
+the ramp. Inter provides every authored semantic weight.
+Tajawal does not publish a 600 face, so the project loads its available contract
+weights (400, 500, 700, 800); an authored 600 request remains 600 in CSS and
+resolves to the nearest available 700 face. Do not change component weights or
+the type scale to hide that family constraint. **Geist Mono remains the code
+face** (`--font-mono`) as an independent decision.
 
-The eight faces measured (all OFL, all variable, all `next/font/google`, so the
-loader pattern is unchanged), 400 weight, Geist as baseline:
-
-| Face              | stem (`I`, em) | Δ stem vs Geist | x-height | ink/char (em²·10³) | set width (em) | verdict                                                                                                      |
-| ----------------- | -------------- | --------------- | -------- | ------------------ | -------------- | ------------------------------------------------------------------------------------------------------------ |
-| Geist (baseline)  | 0.086          | —               | 0.530    | 105.3              | 0.456          | lightest stems — the problem                                                                                 |
-| **Public Sans**   | **0.092**      | **+7%**         | 0.517    | 103.6              | 0.461          | **chosen**                                                                                                   |
-| Inter             | 0.093          | +8%             | 0.546    | 108.8              | 0.475          | heaviest presence, but the repo reads it humanist + it is the widest (+4% set width → most layout risk)      |
-| Archivo           | 0.095          | +10%            | 0.526    | 106.6              | 0.436          | heaviest stems, but already tried and rejected as too open/editorial; narrow, so ink/char barely beats Geist |
-| Schibsted Grotesk | 0.088          | +2%             | 0.528    | 101.8              | 0.463          | not substantially heavier                                                                                    |
-| Hanken Grotesk    | 0.088          | +2%             | 0.493    | 95.7               | 0.446          | geometric, low x-height                                                                                      |
-| Onest             | 0.087          | +1%             | 0.527    | 105.9              | 0.470          | geometric; stems ≈ Geist                                                                                     |
-| Figtree           | 0.085          | −1%             | 0.500    | 95.2               | 0.447          | geometric; _lighter_ than Geist                                                                              |
-
-Reading the table: the geometric/rounded faces (Figtree, Onest, Hanken) do
-**not** have heavier stems than Geist — proof that letterform roundness is not
-the lever, stem weight is. The heavy neutral grotesques are Archivo (+10%),
-Inter (+8%), and Public Sans (+7%). **Public Sans wins** because it is the only
-one that is heavy-stemmed (heaviest lowercase `l` of the eight) _and_
-unambiguously neutral (not humanist like Inter, not editorial like the
-already-rejected Archivo) _and_ layout-safe (set width only ~1% over Geist vs
-Inter's +4%). Its ink/char reads a hair below Geist only because its x-height
-is slightly shorter; the +7% thicker stems are what the eye reads as presence,
-confirmed visually at 17px in both themes. This is the exact target the brief
-described — "a neutral Helvetica-adjacent grotesque with substantial stems".
-
-The history for context (do not re-litigate on feel — measure): the 2026-07
-flat rebrand ran Archivo, the 2026-08 pass swapped to Geist for a tighter,
-more closed voice, and Geist then turned out to have the lightest stems tested.
-Space Grotesk / Instrument Sans stop at 700 (no true heavy); Fontshare faces
-(General Sans, Cabinet Grotesk) are non-OFL self-host — so they were not
-measured.
-
-**There is deliberately no `--font-heading`.** Headings and body share one
-family (Public Sans, `--font-sans`); the heading voice comes from weight and
-negative tracking in the ramp. Every face swap has kept this: the reference
-voice ("substantial grotesk headlines, same family at reading weight for body")
-is reachable by changing the one family and re-tuning ramp values — the payload
-argument (one Latin woff2, one FOUT source) holds regardless of which grotesk
-is loaded. **Geist Mono remains the code face** (`--font-mono`) — the code face
-is an independent decision from the identity sans, and a monospaced grotesk
-pairs cleanly with Public Sans. Noto Sans Arabic remains the Arabic companion
-(`docs/DIRECTION_AND_I18N.md`); its `size-adjust` was recalibrated `115% → 112%`
-for Public Sans's slightly smaller x-height (measured 0.517 vs Geist's 0.530,
-so 115% × 0.517/0.53 ≈ 112%), confirmed empirically and re-checked by the font
-e2e.
+The system fallback tail is `ui-sans-serif, system-ui, sans-serif`. Tajawal's
+own metric fallback is intentionally disabled because its Arial source contains
+Arabic glyphs and can intercept the intended face. Full loading, preload, and
+mixed-script behavior: `docs/DIRECTION_AND_I18N.md`.
 
 ### Type hierarchy (how a page leads the eye)
 
@@ -353,88 +314,50 @@ larger relative to body than a greyed-body system needs them to be.
 
 The prose/heading **roles** and the ramp step each maps to:
 
-| Role                            | Ramp step                              | Notes                                                                                                                    |
-| ------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Hero / page display             | `display` / `title`                    | the largest voice; heroes lead the viewport                                                                              |
-| Page title                      | `heading` (1.875rem/700)               | `PageHeaderTitle`; clearly outranks section headings                                                                     |
-| Section heading                 | `subheading` (1.5/600)                 | section landmarks; 1.41× body + a 200-unit weight step                                                                   |
-| **Lead paragraph / standfirst** | `body-lg` (1.1875/400)                 | the first paragraph under a page title or hero — one size step above body; `PageHeaderDescription` and hero leads use it |
-| Body                            | `body` (1.0625rem = 17px / 400)        | running prose, section descriptions                                                                                      |
-| Secondary / annotative          | `small` / `caption`, usually **muted** | captions, labels, metadata (per "Body vs secondary text")                                                                |
+| Role                            | Ramp step                              | Notes                                                                                         |
+| ------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Hero / page display             | `display` / `title`                    | the largest voice; heroes lead the viewport                                                   |
+| Page title                      | `heading` (1.5rem/700)                 | `PageHeaderTitle`; compact but clearly above section headings                                 |
+| Section heading                 | `subheading` (1.125rem/600)            | section landmarks and small titles                                                            |
+| **Lead paragraph / standfirst** | `body-lg` (Latin 1.125rem/500)         | the first paragraph under a page title or hero; `PageHeaderDescription` and hero leads use it |
+| Body / default UI               | `body` (Latin 1rem = 16px / 500)       | important running prose and the inherited document default; stays on `foreground`             |
+| Secondary / annotative          | `small` / `caption`, usually **muted** | 14px/500 descriptions and metadata; RTL retains its 13px size; 12px/500 captions              |
+| Compact title support           | `supporting`                           | 13px/500 explanatory copy beneath 14px/600 menu titles; 1.45 Latin leading, 1.6 RTL leading   |
 
-Two decisions the 2026-09 pass settled (after body copy moved to `foreground`),
-both re-scaled with body in the 2026-10 body-legibility pass when it moved to
-17px:
-
-- **The mid-ramp was opened, and re-opened.** The 2026-09 pass raised `heading`
-  `1.5 → 1.75rem` and `subheading` `1.25 → 1.375rem` so a section heading leads
-  by size, not weight alone; the 2026-10 pass moved them again (`heading
-1.75 → 1.875rem`, `subheading 1.375 → 1.5rem`, tracking tightened a notch) to
-  hold that same lead over the now-larger 17px body (heading stays ~1.77× body,
-  subheading ~1.41×). `display`/`title` were left alone both times — they
-  already lead, and resizing them risks hero overflow (the sweep guards the
-  rest).
-- **The lead-paragraph role was formalised at `body-lg`.** Previously
-  `PageHeaderDescription` and section descriptions were `text-small` —
-  _smaller_ than the body they introduce, an inversion that only read as
-  "hierarchy" because they were also greyed. The page/hero standfirst is now
-  `body-lg` (a rung above body); ordinary section descriptions are `body`.
-
-**Weight is a hierarchy axis too, and the relationship holds:** body 400 vs
-headings 600–800 is a large, deliberate gap, and dropping body 450 → 400 last
-pass _widened_ it — so weight now does more of the heading-vs-body work than it
-did against the greyed baseline, not less. The lead paragraph stays 400 and
-leads by **size**, not weight, so it never competes with the 500 UI weight.
+The density rule is role-based: page/hero standfirst remains one step above
+body; ordinary section, card, dialog, form-help, and table-caption descriptions
+use `small`; compact menu explanations use `supporting`. Do not shrink those
+consumers individually. Likewise, a title that needs more authority uses
+600/700 rather than restoring a larger font size.
 
 ### Weight scale
 
-Five weights render across the whole system, and they form a coherent set
-because they split into two jobs (audited 2026-09):
+The active semantic hierarchy uses four weights. The families still load 400
+because it belongs to their authored contract, but no default body role relies
+on it:
 
-| Weight | Role                     | Where it is used                                                                                            |
-| ------ | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| 800    | Ramp display voice       | `text-display`, `text-title` — the heavy headline tier                                                      |
-| 700    | Ramp heading / bold      | `text-heading`; also the component "bold" (brand lockups, `aria-current` nav item)                          |
-| 600    | Ramp subheading          | `text-subheading` **only**                                                                                  |
-| 500    | Ramp caption / UI medium | `text-caption`; and the component UI weight — labels, card/dialog titles, idle nav, table headers           |
-| 400    | Ramp body / base         | `text-body`/`-lg`/`-small` — body copy proper; also the inherited base weight and component help/error text |
+| Weight | Role                      | Where it is used                                                                    |
+| ------ | ------------------------- | ----------------------------------------------------------------------------------- |
+| 800    | Ramp display voice        | `text-display`, `text-title` — the heavy headline tier                              |
+| 700    | Ramp heading / bold       | `text-heading`; also the component "bold" (brand lockups, `aria-current` nav item)  |
+| 600    | UI / small-title emphasis | controls, navigation, labels, `text-subheading`, card/dialog titles, table headers  |
+| 500    | Body / supporting         | prose, descriptions, table data, help text, metadata, captions, unavailable items   |
+| 400    | Loaded family baseline    | available for deliberate local exceptions; not the default body or explanation role |
 
-**Body copy is 400 — and staying 400 is the entire thesis of the body work.**
-Body copy read "thin and faint", and the wrong fix (weight) was reached for
-three times: the 2026-09 body-contrast pass first raised the steps to 450, then
-walked it back to 400 once it found two _contrast_ causes (body set in
-`muted-foreground` not `foreground`; macOS-only `antialiased` grayscale
-smoothing thinning stems). Those fixes were real but incomplete — the copy
-still lacked presence, and the 2026-10 body-legibility pass proved by
-**measurement** that the last cause was the **typeface**: Geist has among the
-lightest 400 stems of any OFL grotesk (see the "Type ramp" specimen table). The
-fix was structural, not a weight bump: swap Geist → **Public Sans** (+7% heavier
-stems, measured) and raise body to **17px**. Presence now comes from the face's
-stems and the size; weight stays 400, keeping the full 100-unit gap below the
-500 UI/label weight (body vs labels/nav stay distinct tiers) and matching the
-component base weight. On charcoal the light-on-dark irradiation bloom gives 400
-enough presence, so it is one value for both themes. `caption` stays 500: it is
-the smallest step and already sat at the substantial end for legibility. **The
-standing rule: if body ever reads thin again, MEASURE the face's stems — do not
-touch the weight.**
+**Body weight is 500 in both scripts.** Important prose stays on `foreground`.
+Descriptions, help text, metadata, captions, and unavailable destinations use
+the same practical weight on `muted-foreground`; color and size preserve their
+secondary status without making their strokes faint. Normal body copy never
+uses 700.
 
-**The ramp uses weight as an optical function of size**: as the step gets
-larger it gets heavier (body 400 → subheading 600 → heading 700 →
-display/title 800), so big type carries more weight and body sits a notch below
-the small-UI weight. Each ramp weight is size-locked to its step, not a free
-choice.
+**The ramp uses weight as an optical function of role**: body/supporting 500 →
+UI, navigation, and compact titles 600 → persistent/current titles and headings
+700 → display/title 800. Each ramp weight is owned by its semantic role, not
+treated as a free choice.
 
-**Components still draw from three explicit weights only — 400 / 500 / 700**
-(base/body / UI medium / bold). The ramp-locked set a component must not reach
-for is **600 / 800** — a component wanting body text uses `text-body`/`-small`,
-not a bare weight, and 600/800 belong only to their ramp steps. Reaching for a
-ramp-locked weight in a component class (as the showcase sidebar nav once did at
-`font-semibold`) is a review smell. The rule that resolves the two nav patterns
-is unchanged: idle nav sits at **500** (a primary interactive element should
-not read thin), and "current" is marked by **700** where weight carries it
-(SiteShell's borderless text nav) or by a **fill** where the surface carries it
-(the AppShell sidebar's `bg-sidebar-accent` row, which then stays 500). No
-component should introduce a new weight without a documented reason.
+Components use 500 for body and supporting copy, 600 for controls, labels,
+ordinary navigation, compact titles, and table headers, and 700 for persistent
+current titles or stronger headings. Weight 800 remains display-only.
 
 ### Radius
 
@@ -665,9 +588,8 @@ Steps, sharpened by all three migrations:
 6. **Type voice:** edit the `--text-*` steps in `src/styles/theme.css`
    (sizes, weights, tracking, leading). To swap the typeface, change the
    loader in `src/app/fonts.ts` and the one `--font-sans` line in
-   `theme.css`. Keep Noto Sans Arabic FIRST in that stack (interception
-   hazard — `docs/DIRECTION_AND_I18N.md`) and sanity-check its
-   `size-adjust` against the new face's x-height. If your display step
+   `theme.css`. Keep Tajawal first and Arabic-only in that stack (interception
+   hazard — `docs/DIRECTION_AND_I18N.md`). If your display step
    grows past ~3rem, guard uncontrolled copy with a responsive pair
    (`text-title sm:text-display`) and trust the overflow sweep to catch
    the rest.

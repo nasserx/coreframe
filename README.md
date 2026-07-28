@@ -72,7 +72,8 @@ when a product first needs them, not preinstalled. Every dependency has a
   CSS variables).
 - `src/config`: app identity, environment validation, flags, route constants.
 - `src/assets`: source-controlled fonts/icons/images; third-party assets ship
-  with their licenses (Noto Sans Arabic: SIL OFL 1.1, `src/assets/fonts/OFL.txt`).
+  with their licenses (Tajawal Arabic subsets: SIL OFL 1.1,
+  `src/assets/fonts/OFL.txt`).
 - `src/hooks`, `src/lib`, `src/utils`, `src/types`, `src/constants`:
   foundation folders — each README states what belongs and what must not.
 
@@ -127,21 +128,20 @@ the checklist that reversal would require).
 
 This says nothing about the fonts, whose licences are third-party obligations
 independent of the repo's own status. The built application self-hosts and
-redistributes **all three** families — **Noto Sans Arabic**, **Public Sans**
-(identity face), and **Geist Mono** (code face) — each under the **SIL Open
-Font License 1.1**. Noto is the only one committed to this repo as a source
-file, so it is the only one whose full OFL text is vendored here
-(`src/assets/fonts/OFL.txt`) and must keep shipping alongside it. Public Sans
-and Geist Mono are fetched by `next/font` at build time, and the woff2 files it
-generates carry their copyright notice and OFL licence reference in the font's
-name-table metadata.
+redistributes **all three** families — **Tajawal** (Arabic), **Inter**
+(Latin identity face), and **Geist Mono** (code face) — each under the **SIL
+Open Font License 1.1**. Tajawal is the only one committed to this repo as
+source files, so its full OFL text is vendored at `src/assets/fonts/OFL.txt` and
+must keep shipping alongside those files. Inter and Geist Mono are fetched
+by `next/font` at build time, and the woff2 files it generates carry their
+copyright notice and OFL licence reference in the font's name-table metadata.
 
 ## Direction & internationalization
 
 The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
-logical properties (lint-enforced), and the sans stack lists Noto Sans Arabic
-first — scoped to Arabic code points via `unicode-range`, so Latin renders in
-Public Sans while Arabic can never be intercepted by a metric fallback.
+logical properties (lint-enforced), and the sans stack lists Tajawal first —
+vendored as Arabic-only subsets and scoped by `unicode-range`, so Latin renders
+in Inter while Arabic cannot be intercepted by the Latin metric fallback.
 Locale/direction/numeral configuration lives in `src/config/app.ts`.
 
 **Message translation ships.** It is a typed in-repo layer — `src/i18n`

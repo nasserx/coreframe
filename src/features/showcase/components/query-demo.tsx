@@ -34,7 +34,7 @@ export function QueryDemo() {
   if (isError) {
     return (
       <div role="alert" className="flex flex-col gap-3 rounded-lg border border-destructive/40 p-4">
-        <p className="text-sm font-medium text-foreground">Couldn&apos;t load records.</p>
+        <p className="text-sm font-semibold text-foreground">Couldn&apos;t load records.</p>
         <p className="text-sm text-muted-foreground">
           {isApiError(error)
             ? `${error.message} (${error.kind}${error.status === null ? "" : ` ${error.status}`})`

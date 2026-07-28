@@ -9,7 +9,7 @@ import { expect, type Page, test } from "@playwright/test";
  * translated end to end — by driving the ACTUAL locale runtime two ways:
  *
  *  1. Returning visitor: a stored `locale` (the real persistence path) →
- *     Arabic copy, RTL, `lang=ar`, Noto loaded, and NO horizontal overflow of
+ *     Arabic copy, RTL, `lang=ar`, Tajawal loaded, and NO horizontal overflow of
  *     the Arabic top bar across the viewport range (the Arabic-width analogue
  *     of overflow.spec.ts, which only sweeps English).
  *  2. Live switch: clicking the language control flips direction and persists.
@@ -55,20 +55,33 @@ test.describe("Arabic locale on /showcase/site", () => {
     expect(doc.lang).toBe("ar");
   });
 
-  test("Noto Sans Arabic is loaded once the Arabic top bar renders", async ({ page }) => {
+  test("Tajawal is loaded once the Arabic top bar renders", async ({ page }) => {
     await gotoAsStoredArabic(page);
     await expect(page.getByRole("banner").getByText(AR_BRAND)).toBeVisible();
 
-    const probe = await page.evaluate(async () => {
-      const notoFamily = getComputedStyle(document.documentElement)
-        .getPropertyValue("--font-noto-sans-arabic")
-        .trim();
-      await document.fonts.ready;
-      return { notoFamily, check: document.fonts.check(`16px ${notoFamily}`, "معرض") };
-    });
-    expect(probe.notoFamily).not.toBe("");
-    // The Arabic face is actually loaded and covers the rendered glyphs (the
-    // rigorous "loaded AND used by metric" assertion lives in fonts.spec.ts).
+    const probe = await page
+      .getByRole("banner")
+      .getByText(AR_BRAND)
+      .evaluate(async (element) => {
+        const tajawalFamily = getComputedStyle(document.documentElement)
+          .getPropertyValue("--font-tajawal")
+          .trim();
+        const renderedStyle = getComputedStyle(element);
+        await document.fonts.ready;
+        return {
+          tajawalFamily,
+          renderedWeight: renderedStyle.fontWeight,
+          check: document.fonts.check(
+            `${renderedStyle.fontWeight} ${renderedStyle.fontSize} ${tajawalFamily}`,
+            element.textContent ?? "معرض",
+          ),
+        };
+      });
+    expect(probe.tajawalFamily).not.toBe("");
+    expect(probe.renderedWeight).toBe("700");
+    // The Arabic face actually used by the top-bar brand is loaded and covers
+    // its rendered glyphs (the rigorous "loaded AND used by metric" assertion
+    // lives in fonts.spec.ts).
     expect(probe.check).toBe(true);
   });
 

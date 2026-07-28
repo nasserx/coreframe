@@ -19,7 +19,7 @@
     outline-offset: 2px;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-body text-foreground;
   }
   /*
    * Pointer affordance. Tailwind v4's Preflight dropped the rule that gave

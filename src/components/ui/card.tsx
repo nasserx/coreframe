@@ -61,7 +61,7 @@ export function CardTitle({ className, ...props }: CardTitleProps) {
     <div
       data-slot="card-title"
       className={cn(
-        "text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
+        "text-body leading-snug font-semibold group-data-[size=sm]/card:text-sm",
         className,
       )}
       {...props}
@@ -73,7 +73,7 @@ export function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-small text-muted-foreground", className)}
       {...props}
     />
   );

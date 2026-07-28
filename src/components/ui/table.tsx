@@ -36,7 +36,7 @@ export function Table({ className, ...props }: TableProps) {
     <div data-slot="table-container" className="relative w-full overflow-x-auto">
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn("w-full caption-bottom text-small", className)}
         {...props}
       />
     </div>
@@ -61,7 +61,7 @@ export function TableFooter({ className, ...props }: TableFooterProps) {
   return (
     <tfoot
       data-slot="table-footer"
-      className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
+      className={cn("border-t bg-muted/50 font-semibold [&>tr]:last:border-b-0", className)}
       {...props}
     />
   );
@@ -85,7 +85,7 @@ export function TableHead({ className, ...props }: TableHeadProps) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-10 px-2 text-start align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pe-0",
+        "h-10 px-2 text-start align-middle font-semibold whitespace-nowrap text-foreground [&:has([role=checkbox])]:pe-0",
         className,
       )}
       {...props}
@@ -107,7 +107,7 @@ export function TableCaption({ className, ...props }: TableCaptionProps) {
   return (
     <caption
       data-slot="table-caption"
-      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      className={cn("mt-4 text-small text-muted-foreground", className)}
       {...props}
     />
   );

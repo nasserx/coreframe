@@ -76,7 +76,7 @@ export function LocaleControl({
           // h-6.5 makes the group 32px tall (h-8) — the baseline control-height
           // step (docs/DESIGN_TOKENS.md § Control height), aligned with
           // ThemeControl and the default-size header CTAs in an action cluster.
-          className="inline-flex h-6.5 items-center justify-center rounded-md px-2 text-small font-medium text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs"
+          className="inline-flex h-6.5 items-center justify-center rounded-md px-2 text-small font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs"
         >
           {LOCALE_INFO[value].label}
         </Toggle>
