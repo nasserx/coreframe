@@ -2,8 +2,8 @@
  * Light theme semantic variable set.
  *
  * Reference-derived light identity: white canvas, cool near-white surface,
- * blue-black ink, cobalt action, and cyan information signal. Exact authored
- * reference values are used where they satisfy the foundation's broader
+ * blue-black ink, clear-blue action, and cyan information signal. Exact
+ * authored reference values are used where they satisfy the foundation's broader
  * semantic contracts. Primary, link, info, destructive, and input are the
  * closest in-gamut alternatives that meet their documented contrast duties.
  * Accent is an independently authored zero-chroma neutral: the reference's
@@ -27,13 +27,13 @@
   --color-card-foreground: var(--color-foreground);
   --color-popover: oklch(1 0 0);
   --color-popover-foreground: var(--color-foreground);
-  /* Reference 0.585/0.219/262.6 fails AA at rest and at /90. Lowering only
-     lightness to 0.531 is the nearest value whose /90 composite clears AA
-     with enough rendering margin for browser accessibility checks. */
-  --color-primary: oklch(0.531 0.219 262.6);
+  /* Rest and hover are independent opaque semantic roles: the resting brand
+     can stay bright without a white-canvas alpha composite weakening hover. */
+  --color-primary: oklch(0.572 0.19 256);
+  --color-primary-hover: oklch(0.544 0.18 256);
   --color-primary-foreground: oklch(1 0 0);
   /* Text links need less darkening than translucent action fills. */
-  --color-link: oklch(0.568 0.219 262.6);
+  --color-link: oklch(0.56 0.18 256);
   --color-secondary: oklch(0.97 0.008 250);
   --color-secondary-foreground: var(--color-foreground);
   --color-muted: oklch(0.97 0.008 250);
@@ -54,11 +54,11 @@
      darker because an unlabeled control boundary must hold 3:1. */
   --color-border: oklch(0.93 0.01 255);
   --color-input: oklch(0.658 0.01 255);
-  /* Ring retains the reference cobalt more closely than the action fill; the
-     action must be darker for translucent-hover text contrast. */
-  --color-ring: oklch(0.585 0.219 262.6);
+  /* Ring is a lighter expression of the same blue, darkened only enough to
+     retain 3:1 on the composited input fill. */
+  --color-ring: oklch(0.589 0.17 256);
   /* Charts retain their existing independent data hues. Chart-1's historical
-     indigo remains a series color despite its proximity to cobalt primary;
+     indigo remains a series color despite its proximity to blue primary;
      neither token is a scale or source for the other. */
   --color-chart-1: oklch(0.55 0.15 262);
   --color-chart-2: oklch(0.62 0.1 195);

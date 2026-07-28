@@ -53,7 +53,7 @@ states that lack another visual cue use the stronger, still-zero-chroma
 `accent-selected`; transient hover and expanded states with an open panel keep
 the quieter `accent`. `secondary` and `muted` keep their content-surface
 responsibilities instead of also owning interaction feedback. Likewise, action
-fill and text link have separate semantic tokens: in dark mode no single cobalt
+fill and text link have separate semantic tokens: in dark mode no single blue
 can contrast 4.5:1 both with a light button foreground and with the lightest
 charcoal card.
 
@@ -67,9 +67,10 @@ charcoal card.
 | `--color-card-foreground`            | `var(--color-foreground)`         | `var(--color-foreground)`         |
 | `--color-popover`                    | `oklch(1 0 0)`                    | `oklch(0.295 0 0)`                |
 | `--color-popover-foreground`         | `var(--color-foreground)`         | `var(--color-foreground)`         |
-| `--color-primary`                    | `oklch(0.531 0.219 262.6)`        | `oklch(0.57 0.19 262)`            |
+| `--color-primary`                    | `oklch(0.572 0.19 256)`           | `oklch(0.572 0.19 256)`           |
+| `--color-primary-hover`              | `oklch(0.544 0.18 256)`           | `oklch(0.544 0.18 256)`           |
 | `--color-primary-foreground`         | `oklch(1 0 0)`                    | `oklch(1 0 0)`                    |
-| `--color-link`                       | `oklch(0.568 0.219 262.6)`        | `oklch(0.673 0.172 262)`          |
+| `--color-link`                       | `oklch(0.56 0.18 256)`            | `oklch(0.68 0.145 256)`           |
 | `--color-secondary`                  | `oklch(0.97 0.008 250)`           | `oklch(0.258 0 0)`                |
 | `--color-secondary-foreground`       | `var(--color-foreground)`         | `var(--color-foreground)`         |
 | `--color-muted`                      | `oklch(0.97 0.008 250)`           | `oklch(0.258 0 0)`                |
@@ -87,7 +88,7 @@ charcoal card.
 | `--color-destructive-foreground`     | `oklch(1 0 0)`                    | `oklch(0.15 0.01 25)`             |
 | `--color-border`                     | `oklch(0.93 0.01 255)`            | `oklch(0.355 0 0)`                |
 | `--color-input`                      | `oklch(0.658 0.01 255)`           | `oklch(0.57 0 0)`                 |
-| `--color-ring`                       | `oklch(0.585 0.219 262.6)`        | `oklch(0.659 0.181 262)`          |
+| `--color-ring`                       | `oklch(0.589 0.17 256)`           | `oklch(0.665 0.15 256)`           |
 | `--color-chart-1`                    | `oklch(0.55 0.15 262)`            | `oklch(0.68 0.13 262)`            |
 | `--color-chart-2`                    | `oklch(0.62 0.1 195)`             | `oklch(0.7 0.11 195)`             |
 | `--color-chart-3`                    | `oklch(0.6 0.12 155)`             | `oklch(0.72 0.12 155)`            |
@@ -105,13 +106,15 @@ charcoal card.
 
 Design notes:
 
-- **Primary is a filled-action cobalt.** The exact reference values fail the
-  foundation pair: light `0.585 0.219 262.6` is 4.38:1 with white and 3.75:1
-  at `/90`; dark `0.62 0.19 262` is 3.74:1 with white. The adopted values keep
-  reference hue/chroma and lower lightness only as far as the binding checks
-  require. `/90` remains the filled hover opacity.
+- **Primary is a bright filled-action blue.** Its hue moves from the former
+  violet-leaning cobalt (`262–263`) to `256`, with a cleaner sky-blue character
+  while remaining 25° from cyan `info` at `231`. Resting primary is deliberately
+  near the maximum that lets white text clear AA. Hover uses its own opaque,
+  slightly darker `primary-hover` token; it never alpha-composites toward the
+  underlying canvas. The brighter exact reference values (`0.585` light,
+  `0.62` dark) cannot retain 4.5:1 with white.
 - **Link is a semantic role, not a raw blue scale.** It preserves more of the
-  reference cobalt than the action fill while meeting 4.5:1 on every canvas,
+  brand blue than the action fill while meeting 4.5:1 on every canvas,
   surface, card, and popover. Button/Badge link variants and field-help links
   consume `text-link`.
 - **Info is cyan, not another action color.** It is available as a semantic
@@ -126,7 +129,7 @@ Design notes:
   navigation and selected table rows consume that stronger plane. SiteShell
   current menu items instead use bold weight, while expanded buttons keep the
   quiet plane because the open panel/dialog/drawer is the independent cue. No
-  neutral interaction borrows cyan, cobalt, or the slightly cool content
+  neutral interaction borrows cyan, brand blue, or the slightly cool content
   surfaces. `sidebar-accent` aliases the transient token so sidebar hover
   follows the same rule without a duplicate value.
 - **`chart-1` remains an independent data color.** Its historical indigo is
@@ -147,8 +150,8 @@ Design notes:
   does not apply to it. The exact reference values (`0.93 0.01 255` light,
   `0.355 0 0` dark) are retained. **`--color-input` is a control boundary**
   and is moved to the closest 3:1 value against every surface. `--color-ring`
-  stays closer to reference cobalt than the darker action fill and is adjusted
-  only enough to remain 3:1 on the composited input fill. Which token a
+  stays a lighter expression of brand blue than the darker action fill and is
+  adjusted only enough to remain 3:1 on the composited input fill. Which token a
   control's edge takes turns on 1.4.11's "**required to identify**" test, not
   on whether it is a control: an **empty** field (input, textarea) has nothing
   but its edge to announce it, so that edge is required and uses `input`; a
@@ -490,7 +493,7 @@ by its centre rather than pretending every control has one role.
 ### Focus and invalid states
 
 The focus indicator is designed, never the UA default: **a solid 2px line
-of `--color-ring`**. Ring is a dedicated reference-cobalt role because the
+of `--color-ring`**. Ring is a dedicated brand-blue role because the
 action fill must darken for white text while the focus line must remain 3:1 on
 the composited input fill. Its geometry follows the control:
 
@@ -499,7 +502,7 @@ the composited input fill. Its geometry follows the control:
   edge, in the flat hairline language.
 - **Standalone controls (buttons, links, badges-as-links):** a 2px ring
   offset by 2px of `background`. The background-colored gap makes the
-  indicator perceptible on any fill, including the closely related cobalt
+  indicator perceptible on any fill, including the closely related blue
   primary.
 - **Nested controls (toggle-group items, tabs triggers):** attached 2px
   ring — an offset ring would collide with siblings 2px away. Scroll
@@ -574,43 +577,41 @@ OKLCH token for sRGB gamut, and evaluates the full surface matrix rather than a
 single convenient backdrop.
 
 The binding cases explain the deviations from the reference. The adopted
-values deliberately clear the source-level threshold rather than landing on
-its rounding boundary: light primary `/90` over white is 4.62:1; dark primary
-with white is 4.61:1; dark link on card is 4.60:1; dark input on card is
-3.11:1; dark ring on the composited input fill is 3.11:1. Thresholds are not
-weakened to admit the palette, and the margin keeps Chromium/axe from rounding
-an authored pass into a rendered failure.
+values are intentionally close to the action-lightness ceiling: primary with
+white is 4.51:1 in both themes, opaque primary hover with white is 5.07:1, dark
+link on card is 4.80:1, dark input on card is 3.11:1, and dark ring on the
+composited input fill is 3.56:1. Thresholds are not weakened to admit the
+palette; source and browser checks both guard the binding action pairs.
 
-| Pair                                               | Requirement | Light | Dark  |
-| -------------------------------------------------- | ----------- | ----- | ----- |
-| foreground / background                            | 4.5         | 17.76 | 15.95 |
-| foreground / surface                               | 4.5         | 17.02 | 13.92 |
-| foreground / card                                  | 4.5         | 17.76 | 12.35 |
-| muted-foreground / background                      | 4.5         | 6.00  | 8.95  |
-| muted-foreground / card                            | 4.5         | 6.00  | 6.93  |
-| primary-foreground / primary                       | 4.5         | 5.53  | 4.61  |
-| primary-foreground / primary `/90` over background | 4.5         | 4.62  | 5.30  |
-| primary-foreground / primary `/90` over card       | 4.5         | 4.62  | 5.15  |
-| link / background                                  | 4.5         | 4.71  | 5.94  |
-| link / card                                        | 4.5         | 4.71  | 4.60  |
-| info-foreground / info                             | 4.5         | 5.38  | 8.15  |
-| info / background                                  | 4.5         | 5.38  | 7.42  |
-| info / info `/10` over card                        | 4.5         | 4.69  | 4.89  |
-| destructive-foreground / destructive               | 4.5         | 6.25  | 8.86  |
-| destructive / background                           | 4.5         | 6.25  | 8.06  |
-| destructive / destructive tint over card           | 4.5         | 5.20  | 4.73  |
-| input / background                                 | 3.0         | 3.13  | 4.01  |
-| input / card                                       | 3.0         | 3.13  | 3.11  |
-| ring / background                                  | 3.0         | 4.38  | 5.61  |
-| ring / card                                        | 3.0         | 4.38  | 4.35  |
-| ring / input fill over card                        | 3.0         | 3.26  | 3.11  |
+| Pair                                     | Requirement | Light | Dark  |
+| ---------------------------------------- | ----------- | ----- | ----- |
+| foreground / background                  | 4.5         | 17.76 | 15.95 |
+| foreground / surface                     | 4.5         | 17.02 | 13.92 |
+| foreground / card                        | 4.5         | 17.76 | 12.35 |
+| muted-foreground / background            | 4.5         | 6.00  | 8.95  |
+| muted-foreground / card                  | 4.5         | 6.00  | 6.93  |
+| primary-foreground / primary             | 4.5         | 4.51  | 4.51  |
+| primary-foreground / primary-hover       | 4.5         | 5.07  | 5.07  |
+| link / background                        | 4.5         | 4.73  | 6.19  |
+| link / card                              | 4.5         | 4.73  | 4.80  |
+| info-foreground / info                   | 4.5         | 5.38  | 8.15  |
+| info / background                        | 4.5         | 5.38  | 7.42  |
+| info / info `/10` over card              | 4.5         | 4.69  | 4.89  |
+| destructive-foreground / destructive     | 4.5         | 6.25  | 8.86  |
+| destructive / background                 | 4.5         | 6.25  | 8.06  |
+| destructive / destructive tint over card | 4.5         | 5.20  | 4.73  |
+| input / background                       | 3.0         | 3.13  | 4.01  |
+| input / card                             | 3.0         | 3.13  | 3.11  |
+| ring / background                        | 3.0         | 4.18  | 5.84  |
+| ring / card                              | 3.0         | 4.18  | 4.52  |
+| ring / input fill over surface           | 3.0         | 3.01  | 3.56  |
 
-Button, linked-Badge, and ErrorFallback hovers composite primary at 90% over
-the underlying surface. The Showcase information specimen composites info at
-10%. Destructive Button/Badge variants composite at 10% light and 15% dark;
-invalid text is also checked over the 30% dark input fill. These composite
-checks are first-class requirements because opaque pair checks cannot prove
-the rendered state.
+Button, linked-Badge, and ErrorFallback hovers consume the opaque
+`primary-hover` semantic token. The Showcase information specimen composites
+info at 10%. Destructive Button/Badge variants composite at 10% light and 15%
+dark; invalid text is also checked over the 30% dark input fill. These
+composite checks are first-class requirements because opaque pair checks cannot
+prove the rendered state.
 
 `--color-border` is excluded by design: it is a decorative separator, not a
 component boundary, so WCAG 1.4.11 does not apply to it. Anything that must be

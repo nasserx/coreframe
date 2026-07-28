@@ -158,9 +158,10 @@ describe("semantic color contract", () => {
       "--color-card-foreground": "var(--color-foreground)",
       "--color-popover": "oklch(1 0 0)",
       "--color-popover-foreground": "var(--color-foreground)",
-      "--color-primary": "oklch(0.531 0.219 262.6)",
+      "--color-primary": "oklch(0.572 0.19 256)",
+      "--color-primary-hover": "oklch(0.544 0.18 256)",
       "--color-primary-foreground": "oklch(1 0 0)",
-      "--color-link": "oklch(0.568 0.219 262.6)",
+      "--color-link": "oklch(0.56 0.18 256)",
       "--color-secondary": "oklch(0.97 0.008 250)",
       "--color-secondary-foreground": "var(--color-foreground)",
       "--color-muted": "oklch(0.97 0.008 250)",
@@ -178,7 +179,7 @@ describe("semantic color contract", () => {
       "--color-destructive-foreground": "oklch(1 0 0)",
       "--color-border": "oklch(0.93 0.01 255)",
       "--color-input": "oklch(0.658 0.01 255)",
-      "--color-ring": "oklch(0.585 0.219 262.6)",
+      "--color-ring": "oklch(0.589 0.17 256)",
       "--color-sidebar": "var(--color-background)",
       "--color-sidebar-foreground": "var(--color-foreground)",
       "--color-sidebar-primary": "var(--color-primary)",
@@ -198,9 +199,10 @@ describe("semantic color contract", () => {
       "--color-card-foreground": "var(--color-foreground)",
       "--color-popover": "oklch(0.295 0 0)",
       "--color-popover-foreground": "var(--color-foreground)",
-      "--color-primary": "oklch(0.57 0.19 262)",
+      "--color-primary": "oklch(0.572 0.19 256)",
+      "--color-primary-hover": "oklch(0.544 0.18 256)",
       "--color-primary-foreground": "oklch(1 0 0)",
-      "--color-link": "oklch(0.673 0.172 262)",
+      "--color-link": "oklch(0.68 0.145 256)",
       "--color-secondary": "oklch(0.258 0 0)",
       "--color-secondary-foreground": "var(--color-foreground)",
       "--color-muted": "oklch(0.258 0 0)",
@@ -218,7 +220,7 @@ describe("semantic color contract", () => {
       "--color-destructive-foreground": "oklch(0.15 0.01 25)",
       "--color-border": "oklch(0.355 0 0)",
       "--color-input": "oklch(0.57 0 0)",
-      "--color-ring": "oklch(0.659 0.181 262)",
+      "--color-ring": "oklch(0.665 0.15 256)",
       "--color-sidebar": "var(--color-background)",
       "--color-sidebar-foreground": "var(--color-foreground)",
       "--color-sidebar-primary": "var(--color-primary)",
@@ -257,17 +259,32 @@ describe("semantic color contract", () => {
     const color = (name: string): LinearSrgb =>
       oklchToLinearSrgb(parseOklch(resolveToken(tokens, name)));
     const primary = color("--color-primary");
+    const primaryHover = color("--color-primary-hover");
     const primaryForeground = color("--color-primary-foreground");
     const background = color("--color-background");
     const surfaces = ["--color-background", "--color-surface", "--color-card"] as const;
+    const primaryOklch = parseOklch(resolveToken(tokens, "--color-primary"));
+    const infoOklch = parseOklch(resolveToken(tokens, "--color-info"));
+    const hueDistance = Math.min(
+      Math.abs(primaryOklch.hue - infoOklch.hue),
+      360 - Math.abs(primaryOklch.hue - infoOklch.hue),
+    );
 
     expect(contrast(primaryForeground, primary), "primary fill").toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrast(primaryForeground, primaryHover),
+      "dedicated primary hover fill",
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      parseOklch(resolveToken(tokens, "--color-primary-hover")).lightness,
+      "primary hover is darker than rest",
+    ).toBeLessThan(primaryOklch.lightness);
+    expect(
+      hueDistance,
+      "primary remains perceptually blue, separate from info cyan",
+    ).toBeGreaterThanOrEqual(24);
     for (const surfaceName of surfaces) {
       const surface = color(surfaceName);
-      expect(
-        contrast(primaryForeground, compositeInSrgb(primary, surface, 0.9)),
-        `Button, linked Badge, and ErrorFallback primary /90 hover over ${surfaceName}`,
-      ).toBeGreaterThanOrEqual(4.5);
       expect(
         contrast(color("--color-link"), surface),
         `link over ${surfaceName}`,

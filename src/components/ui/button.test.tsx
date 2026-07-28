@@ -98,9 +98,9 @@ describe("Button", () => {
     );
   });
 
-  it("keeps the primary hover fill at the contrast-tested opacity", () => {
+  it("uses the dedicated contrast-tested primary hover fill", () => {
     render(<Button>Save</Button>);
-    expect(screen.getByRole("button", { name: "Save" })).toHaveClass("hover:bg-primary/90");
+    expect(screen.getByRole("button", { name: "Save" })).toHaveClass("hover:bg-primary-hover");
   });
 
   it("uses the exact lift contract without blanket transitions", () => {

@@ -2,7 +2,7 @@
  * Dark theme semantic variable set.
  *
  * Reference-derived dark identity: neutral charcoal ladder, near-white ink,
- * deep cobalt action, and bright cyan information signal. Exact values are
+ * clear blue action, and bright cyan information signal. Exact values are
  * retained where they satisfy the foundation contracts. Primary and link are
  * separated because no single mid-blue can contrast 4.5:1 both with white
  * button text and with the lightest charcoal surface. Input and destructive
@@ -22,14 +22,14 @@
   --color-card-foreground: var(--color-foreground);
   --color-popover: oklch(0.295 0 0);
   --color-popover-foreground: var(--color-foreground);
-  /* Reference 0.62/0.19/262 is 3.74:1 with white. Lowering only lightness
-     to 0.57 preserves the deep cobalt identity and clears AA with enough
-     rendering margin for browser accessibility checks. */
-  --color-primary: oklch(0.57 0.19 262);
+  /* The refined blue moves toward sky blue and restores saturation near the
+     lightness ceiling that still retains AA with a white foreground. */
+  --color-primary: oklch(0.572 0.19 256);
+  --color-primary-hover: oklch(0.544 0.18 256);
   --color-primary-foreground: oklch(1 0 0);
-  /* Brighter link-only cobalt passes on card/popover while remaining close to
-     the reference primary; chroma is reduced only to stay inside sRGB. */
-  --color-link: oklch(0.673 0.172 262);
+  /* The brighter link-only blue passes on card/popover while remaining
+     perceptually tied to the action fill. */
+  --color-link: oklch(0.68 0.145 256);
   --color-secondary: oklch(0.258 0 0);
   --color-secondary-foreground: var(--color-foreground);
   --color-muted: oklch(0.258 0 0);
@@ -48,8 +48,8 @@
   --color-destructive-foreground: oklch(0.15 0.01 25);
   --color-border: oklch(0.355 0 0);
   --color-input: oklch(0.57 0 0);
-  /* Reference ring 0.62/0.19/262 falls below 3:1 on the input fill. */
-  --color-ring: oklch(0.659 0.181 262);
+  /* The lighter blue ring remains above 3:1 on the composited input fill. */
+  --color-ring: oklch(0.665 0.15 256);
   /* Charts retain their existing independent data hues; chart-1 is not a
      primary scale even though its historical indigo sits nearby. */
   --color-chart-1: oklch(0.68 0.13 262);

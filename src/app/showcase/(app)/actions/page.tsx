@@ -114,7 +114,7 @@ export default function ActionsPage() {
       </ShowcaseSection>
       <ShowcaseSection
         title="Badge as a link"
-        description="The render prop swaps the element while keeping badge styling; the primary example exposes the /90 hover state."
+        description="The render prop swaps the element while keeping badge styling; the primary example exposes the dedicated semantic hover state."
       >
         <div className="flex flex-wrap items-center gap-2">
           <Badge render={<a href="/showcase" />}>Primary link badge</Badge>

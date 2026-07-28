@@ -8,7 +8,7 @@ describe("Badge", () => {
     render(<Badge render={<a href="/docs" />}>Documentation</Badge>);
 
     expect(screen.getByRole("link", { name: "Documentation" })).toHaveClass(
-      "[a]:hover:bg-primary/90",
+      "[a]:hover:bg-primary-hover",
     );
   });
 

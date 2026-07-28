@@ -15,7 +15,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 hover:not-aria-[haspopup]:-translate-y-0.5 focus-visible:not-aria-[haspopup]:-translate-y-0.5 motion-reduce:hover:not-aria-[haspopup]:translate-none motion-reduce:focus-visible:not-aria-[haspopup]:translate-none",
+          "bg-primary text-primary-foreground hover:bg-primary-hover hover:not-aria-[haspopup]:-translate-y-0.5 focus-visible:not-aria-[haspopup]:-translate-y-0.5 motion-reduce:hover:not-aria-[haspopup]:translate-none motion-reduce:focus-visible:not-aria-[haspopup]:translate-none",
         // Outline, ghost and secondary all sit ON the page in both themes —
         // the flat identity defines them by border (outline) or a quiet
         // in-plane fill (secondary), never a fill lighter than the page that

@@ -14,6 +14,6 @@ it("keeps the primary action hover fill at the contrast-tested opacity", () => {
     "focus-visible:-translate-y-0.5",
     "motion-reduce:hover:translate-none",
     "motion-reduce:focus-visible:translate-none",
-    "hover:bg-primary/90",
+    "hover:bg-primary-hover",
   );
 });

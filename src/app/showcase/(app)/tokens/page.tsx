@@ -65,6 +65,11 @@ const COLOR_GROUPS: ReadonlyArray<Readonly<{ group: string; tokens: readonly Col
     tokens: [
       { name: "primary", variable: "--color-primary", swatchClassName: "bg-primary" },
       {
+        name: "primary-hover",
+        variable: "--color-primary-hover",
+        swatchClassName: "bg-primary-hover",
+      },
+      {
         name: "primary-foreground",
         variable: "--color-primary-foreground",
         swatchClassName: "bg-primary-foreground",

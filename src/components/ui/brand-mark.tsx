@@ -20,7 +20,8 @@ const BRAND_MARK_PATH =
  * The foundation's brand mark: a flat, single-color rounded square with an
  * abstract two-bar glyph, legible from 16px up. Fills with `currentColor` and
  * owns `text-primary` by default, so every foundation identity lockup follows
- * the approved cobalt pair without theme logic or per-shell color duplication.
+ * the approved clear-blue pair without theme logic or per-shell color
+ * duplication.
  *
  * Accessibility: decorative by default (`aria-hidden`); a brand lockup's
  * accessible name belongs to the adjacent text or the wrapping link. Pass

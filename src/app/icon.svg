@@ -3,12 +3,12 @@
        Colors are the semantic primary tokens converted from OKLCH to sRGB
        hex (CSS variables don't exist inside a favicon). The SVG-favicon
        prefers-color-scheme technique follows the light/dark primary pair in
-       Chromium and Firefox; Safari falls back to the light cobalt, which
+       Chromium and Firefox; Safari falls back to the light brand blue, which
        remains legible on dark tab strips. -->
   <style>
-    path { fill: #1d5ee8; }
+    path { fill: #0c74e4; }
     @media (prefers-color-scheme: dark) {
-      path { fill: #336fe5; }
+      path { fill: #0c74e4; }
     }
   </style>
   <path fill-rule="nonzero" d="M14 0h36a14 14 0 0 1 14 14v36a14 14 0 0 1-14 14H14A14 14 0 0 1 0 50V14A14 14 0 0 1 14 0ZM20.5 21h23a4.5 4.5 0 0 1 0 9h-23a4.5 4.5 0 0 1 0-9ZM20.5 36h12a4.5 4.5 0 0 1 0 9h-12a4.5 4.5 0 0 1 0-9Z"/>
