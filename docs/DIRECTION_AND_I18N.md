@@ -71,6 +71,18 @@ text): `PaginationPrevious`/`PaginationNext` (`text`, `aria-label`),
 `getTranslations` value into each. The `(site)` showcase layout is the worked
 example.
 
+The production marketing route uses the same boundary discipline. Its Server
+Component layout and page retain route and visual-slot ownership; the root
+layout owns one canonical, server-rendered metadata title and description from
+`APP_CONFIG`. That metadata does not switch with the client locale. One
+feature-local client composition translates the SiteShell labels/chrome, and
+one page-content client composition subscribes the visible landing copy to the
+active catalogue. Server-rendered children and the decorative preview are
+passed through those boundaries as slots, so they do not enter the importing
+client module graphs. Combining both client compositions would move page
+ownership into the layout; freezing either to `getTranslations` would stop its
+visible copy following the live locale switch.
+
 **Still a product's own responsibility:** ICU pluralization/gender and
 locale-aware number/date **formatting** — `translate()` does simple
 `{placeholder}` substitution only; formatting utilities belong in `src/utils`

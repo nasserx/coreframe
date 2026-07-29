@@ -235,8 +235,10 @@ shell.
 </SiteShell>
 ```
 
-Live demo: `/showcase/site` (`src/app/showcase/(site)/site/layout.tsx` is
-the reference composition).
+Production composition: `/` (`src/app/(marketing)/layout.tsx` configures the
+shared shell through `src/features/marketing`). The isolated mechanics demo
+remains `/showcase/site`; production marketing must not depend on that route or
+its feature code.
 
 ### Structure and slots
 
@@ -426,8 +428,10 @@ page, and its owner is the layout that provides the chrome:
 - Shell-wrapped segments get it from `AppShellMain` / `SiteShellMain` in
   the segment layout (`src/app/showcase/(app)/layout.tsx`,
   `src/app/showcase/(site)/site/layout.tsx`).
-- Bare segments get it from a route-group layout — `src/app/(home)/layout.tsx`
-  is the reference.
+- The production public segment gets it from `SiteShellMain` in
+  `src/app/(marketing)/layout.tsx`; its pages render content only.
+- Any future bare segment gets it from its route-group layout rather than its
+  page.
 - Root boundary files (`not-found.tsx`, `error.tsx`, `global-error.tsx`)
   are the one sanctioned exception: they render with the segment layouts
   gone (or replace the document entirely), so each owns its own `<main>`.

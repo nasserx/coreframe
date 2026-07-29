@@ -61,6 +61,33 @@ export const en = {
     closeNav: "Close navigation",
     unavailable: "Not yet available",
   },
+  /** Production marketing ownership for the root route. */
+  marketing: {
+    brand: "Frontend Foundation",
+    navLabel: "Primary navigation",
+    navOverview: "Overview",
+    navCapabilities: "Capabilities",
+    eyebrow: "Production-ready by design",
+    heroTitle: "A dependable starting point for modern web products.",
+    heroLead:
+      "Build on a typed, accessible foundation with semantic themes, bilingual direction support, responsive public chrome, and automated quality gates.",
+    heroPrimaryCta: "Explore the capabilities",
+    heroNoteArchitecture: "App Router architecture",
+    heroNoteThemes: "Semantic light and dark themes",
+    heroNoteBilingual: "English and Arabic ready",
+    capabilitiesHeading: "Foundation capabilities",
+    capabilityThemesTitle: "Semantic themes",
+    capabilityThemesDescription: "Light and dark from one token system.",
+    capabilityBilingualTitle: "Bilingual direction",
+    capabilityBilingualDescription: "English LTR and Arabic RTL.",
+    capabilityStaticTitle: "Static by default",
+    capabilityStaticDescription: "Routes prerender without request-time locale state.",
+    capabilityQualityTitle: "Automated quality",
+    capabilityQualityDescription: "Formatting, types, tests, accessibility, and overflow checks.",
+    footerContext: "A domain-neutral base for production web applications.",
+    footerNavLabel: "Footer navigation",
+    footerStatus: "Built with semantic tokens, typed contracts, and static generation.",
+  },
   /**
    * The `(site)` showcase — the Arabic proof surface. This is real page copy
    * (brand, navigation, hero, sections, footer) translated end to end so the
