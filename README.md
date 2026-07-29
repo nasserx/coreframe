@@ -2,8 +2,9 @@
 
 A reusable, domain-neutral Next.js (App Router) application base for future
 web products: agreed tooling, folder boundaries, a token-driven theme system,
-testing, and standards — no features, pages, or business logic. This README
-is the entry point; every deeper topic links to its owning document.
+testing, and standards — no product features or business logic. The Showcase
+routes are Foundation inspection code, not product pages. This README is the
+entry point; every deeper topic links to its owning document.
 
 ## Start here
 

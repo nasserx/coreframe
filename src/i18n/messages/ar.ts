@@ -30,6 +30,9 @@ export const ar: Messages = {
   dialog: {
     close: "إغلاق",
   },
+  pagination: {
+    ellipsisLabel: "المزيد من الصفحات",
+  },
   theme: {
     label: "المظهر",
     light: "فاتح",

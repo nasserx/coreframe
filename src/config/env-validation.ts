@@ -1,10 +1,7 @@
 /**
- * Fail-fast environment validation — the Zod half of the env contract, kept in
- * its own module so Zod NEVER enters the client bundle (docs/audit/
- * 2026-07-health-audit.md §1.2). Only `next.config.ts` imports this, for its
- * side effect, so it runs once at startup in every mode (`next dev`, `build`,
- * `start`) before app code executes — and never reaches the browser, because
- * no client-reachable module imports it.
+ * Fail-fast environment validation — the server-only Zod half of the env
+ * contract. Only `next.config.ts` imports this module, so validation runs at
+ * startup while unvalidated client modules never import Zod.
  *
  * It validates the raw reads owned by `./env.ts` (the single `process.env`
  * reader). The schema here is the source of truth for what is VALID; the plain

@@ -2,139 +2,74 @@
 
 # Frontend Foundation — Engineering Context
 
-Persistent context for Claude Code sessions. Detailed rationale lives in `README.md`, `ARCHITECTURE.md`, `DESIGN_SYSTEM.md`, `CODE_STYLE.md`, `CONTRIBUTING.md`, and `DECISIONS.md` — this file distills what matters while implementing. If those docs and this file disagree, the docs win; update this file.
+This is a concise implementation index for Claude Code. It does not own
+architecture, design, code-style, or workflow contracts.
 
-## Project Mission
+## Precedence
 
-A reusable, domain-neutral Next.js (App Router) foundation for future web products. It provides tooling, folder boundaries, theming, and standards — not features, pages, or business logic. The current phase is _foundation only_: most folders intentionally contain just a README describing what will belong there.
+1. `AGENTS.md` governs agent behavior and the requirement to verify this
+   repository's installed Next.js documentation before writing framework code.
+2. The subject-owning living documents define the current contract:
+   `ARCHITECTURE.md`, `DESIGN_SYSTEM.md`, `CODE_STYLE.md`, `CONTRIBUTING.md`,
+   and the focused guides under `docs/`.
+3. `DECISIONS.md` records why durable choices were made.
+4. `README.md`, this file, and `.claude/skills/foundation-rules/SKILL.md` are
+   navigation and summary layers only. If a summary conflicts with an owning
+   document, follow the owner and correct the summary.
 
-## Long-Term Vision
+Files under `docs/audit/` are archived point-in-time evidence, not current
+instruction.
 
-Many future applications should be able to start from this repo without rebuilding architecture. Therefore the foundation must stay independent of any specific UI layout, navigation style, feature set, or business domain. Prefer leaving something out over baking in an assumption.
+## Mission and boundaries
 
-## Architecture Overview
+This repository is a reusable, domain-neutral Next.js App Router foundation.
+Routes compose framework concerns and feature modules; product capabilities
+grow under `src/features`; cross-cutting infrastructure lives under `src/core`;
+and intentionally shared presentation lives under `src/components`.
 
-Single source root `src/`. Layers:
+Dependency direction and folder ownership are defined in `ARCHITECTURE.md` and
+enforced by `eslint.config.mjs`. Read the destination folder's `README.md`
+before adding code. Promote code to shared folders only after reuse is real.
 
-- `src/app` — App Router files only (routes, layouts, metadata, framework wiring). No business logic.
-- `src/core` — cross-cutting infrastructure: `providers`, `guards`, `errors`, `logger`, `monitoring`, `analytics`, `accessibility`. Root provider composition is `src/core/providers/app-provider.tsx` (composes Theme, Locale, React Query, Error Boundary, Toast; Auth is the one remaining TODO slot). The message-translation layer lives in `src/i18n` (typed catalogues + pure resolver) with its client runtime `LocaleProvider` in `src/core/providers` — see `docs/DIRECTION_AND_I18N.md`.
-- `src/features` — feature-first product modules; each feature owns its components, hooks, schemas, types, state.
-- `src/components` — intentionally cross-feature presentation components; shadcn/ui primitives go in `src/components/ui`.
-- `src/services`, `src/api`, `src/store` — service abstractions, API boundary modules, shared Zustand stores.
-- Foundation folders: `src/hooks`, `src/lib`, `src/utils`, `src/types`, `src/constants`, `src/config`, `src/styles`, `src/theme`, `src/assets`.
+## Current implementation index
 
-Each folder has a README stating what belongs / must never be placed there — read it before adding files.
+- **Theme and tokens:** `docs/DESIGN_TOKENS.md` owns semantic colors, type,
+  radius, motion, focus, and rebranding. CSS under `src/styles` is the runtime
+  source of truth. Current motion uses `150ms` quick feedback and
+  `ease-standard`; components consume semantic utilities such as `bg-overlay`.
+- **Layout:** `docs/LAYOUT.md` owns measure, rhythm, landmarks, AppShell, and
+  SiteShell. `Container` uses the shared `max-w-7xl` (1280px) contract;
+  running prose and forms keep their own semantic measure.
+- **Direction and language:** `docs/DIRECTION_AND_I18N.md` owns locale,
+  direction, bidi, and script behavior. Inter owns Latin, Tajawal owns Arabic,
+  and `src/i18n` owns typed catalogues and translation. `LocaleProvider` is the
+  narrow client runtime; direction always follows locale.
+- **UI primitives:** `DESIGN_SYSTEM.md` defines primitive philosophy and
+  `docs/UI_LIBRARY.md` owns the shadcn/Base UI adaptation workflow. Preserve
+  narrow client boundaries only where a wrapper itself needs client behavior.
+- **Data:** `docs/DATA_LAYER.md` owns `apiFetch`, `ApiError`, React Query, and
+  route-level error handling. `src/config/env.ts` is the client-safe value
+  contract; server-only Zod validation lives in `env-validation.ts` and is
+  loaded by `next.config.ts`.
+- **Providers:** `src/core/providers/app-provider.tsx` composes Theme, Locale,
+  Query, ErrorBoundary, and Toaster. Authentication is the deliberate product
+  extension seam; localization is already implemented.
+- **Testing:** `docs/TESTING.md` owns Vitest/component and Playwright/browser
+  responsibilities and CI parity. Browser routes are discovered from
+  `src/app`; do not hard-code route lists.
+- **Showcase:** `/showcase` is Foundation inspection code, not product UI.
+  `docs/CLONING.md` owns the build-time static-404 gate and permanent deletion
+  procedure; `docs/ROADMAP.md` owns deliberate omissions and triggers.
 
-## Dependency Direction (lint-enforced via folder-scoped `no-restricted-imports` in `eslint.config.mjs`)
+## Working rules
 
-Specific → shared, never the reverse:
-
-- `app` → may import `features`, `core`, foundation.
-- `features` → may import `components`, `core`, `api`, `services`, `store`, and foundation. **Not** sibling features (unless an explicit shared contract exists), not `app`.
-- `core` → foundation only. **Never** `features` or `app`.
-- `components` → **never** import from `features`.
-- `theme`, `config`, `constants`, `types`, `utils` → independent from routes and features; `utils` stays framework-agnostic (no React/Next).
-- Cross-folder imports use `@/`; barrels (`index.ts`) only for stable public APIs.
-
-## Theme Runtime
-
-CSS custom properties are the **single source of truth** (full contract: `docs/DESIGN_TOKENS.md`):
-
-1. `src/styles/base.css` — theme-neutral tokens: `--radius-base: 0.5rem` (controls sit at `rounded-lg` = 8px, surfaces at `xl`+ via the multiplier scale in `theme.css` — crisp controls, recognisably rounded surfaces; Badge is deliberately `rounded-md`, not the registry pill) and the motion tokens `--motion-quick: 120ms` / `--motion-moderate: 200ms` (+ `--ease-out-soft` in the bridge — motion is feedback/orientation only; `transition-*` defaults resolve through the tokens, raw `duration-N` in components is drift; reduced motion is handled once globally in `globals.css`).
-2. `src/styles/light.css` / `dark.css` — semantic `--color-*` and `--elevation-*` variables per theme, full parity required (`.dark` class toggles; `@custom-variant dark` in `theme.css`). Identity remains flat/editorial: semantic surfaces and hairline borders carry structure, interactive variants stay in-plane, and shadows are reserved for floating layers. Component typography uses 500 body/supporting copy, 600 controls/navigation/compact titles, and 700 persistent-current or strong headings; 800 is display-only (§2 Weight scale). Running body copy stays `foreground`, while `muted-foreground` is a deliberate demotion for descriptions, help text, metadata, and unavailable navigation. Cross-theme values remain perceptually asymmetric where documented. See `docs/DESIGN_TOKENS.md` §2–3.
-3. `src/styles/theme.css` — bridge mapping semantic variables into Tailwind v4 `@theme inline` and shadcn/ui aliases, plus the theme-neutral type ramp. No `--font-heading` — headings and body share Inter for Latin and Tajawal for Arabic. Marketing display/title remain 3.5rem/2.25rem at 800; page heading is 1.5rem/700; section heading 1.125rem/600; Latin lead `body-lg` is 1.125rem/500, default body is 1rem/500, secondary small is 0.875rem/500, compact supporting is 0.8125rem/500, and caption is 0.75rem/500. The document applies `text-body` as its default. RTL preserves Tajawal's prior sizes, independent leading, and zero tracking while using the same semantic weights.
-4. `src/theme/breakpoints.ts` — the only TS token file (matchMedia can't read CSS variables); must mirror Tailwind's default screens. Never add a TS mirror of a CSS token.
-
-Focus/invalid language (`docs/DESIGN_TOKENS.md` §2): a solid 2px `--ring` line everywhere — attached (border + `ring-1`) on inputs/textareas, offset 2px on standalone controls (the ring barely contrasts with the near-black primary fill; the gap makes it perceptible), attached on nested toggle/tab items, inset on scroll viewports, and a global `:focus-visible` outline rule in `globals.css` as the fallback — never a translucent halo, never the UA default. Invalid = 1px destructive border (FieldError text + `aria-invalid` carry it beyond color); focused+invalid = the 2px focus geometry in destructive.
-
-Entry: `src/app/globals.css` imports `tailwindcss`, `tw-animate-css`, `shadcn/tailwind.css`, then `src/styles/index.css`. Never hardcode colors in components — use semantic Tailwind utilities that resolve through the bridge. Spacing stays Tailwind's default scale (no project tokens); motion is tokenized (see item 1). Any lightness change to a color token requires re-verifying the WCAG AA pairs in `docs/DESIGN_TOKENS.md` §3.
-
-Layout (`docs/LAYOUT.md`; live demos `/showcase/layout` and `/showcase/site`): content measure is tokenized — `--container-prose: 65ch` / `--container-form: 28rem` in `theme.css` → `max-w-prose`/`max-w-form`; a block is prose-capped, form-capped, or full-width, never ad-hoc `max-w-*`. Vertical rhythm is the five named Stack steps (`xs`…`xl` → gap-1/2/4/8/12, named by sibling relationship) in `src/components/ui/stack.tsx`. Page scaffold: `PageHeader` (+Title/Description). Application chrome: `AppShell` (+Sidebar/SidebarTrigger/Header/Main) — grid shell, document-level scroll, mobile modal drawer built on the Base UI Dialog, built-in `SkipLink`, landmark/focus guarantees, consumes the `sidebar-*` tokens, fully logical-property based. Public-site chrome: `SiteShell` (+Header/Nav/NavItem/NavMenu/NavTrigger/Main/Footer) — sticky top bar with brand/nav/actions slots, footer, same drawer mechanics and guarantees, base tokens only; the collapse breakpoint is a prop (`collapseBelow`, no universal default is correct — measure the bar's content), and an href-less `SiteShellNavItem` is the unavailable-**destination** pattern (non-focusable muted text + sr-only hint, never a dead link); unavailable **actions** take the opposite treatment — a real interactive button that explains itself on activation (showcase `UnavailableCta` toasts), never a `pointer-events-none` dead button (docs/LAYOUT.md §6). `SiteShellNavMenu`/`SiteShellNavMenuItem` add a two-column dropdown panel of sub-destinations, built on Base UI `NavigationMenu` (a navigation/disclosure pattern, NOT `role="menu"`): disclosure-button trigger with `aria-expanded`, opens on hover+click/tap, keyboard/Escape/outside-press handled by the primitive, popover surface with chevron + restrained downward-slide entrance (motion tokens), direction fed by `useDocumentDirection` (Base UI positioning can't read DOM `dir`), the unavailable-destination rule applies inside the panel, and below `collapseBelow` it renders in the drawer as a labelled group (never a flat dump) — full contract in docs/LAYOUT.md §6. Nav items sit at `text-small` on a three-step ladder: idle = foreground+semibold, lightening to muted on hover; current = foreground+bold via `aria-current`; unavailable = muted+medium. Hover is color-only, no moving element. The brand out-ranks nav (`text-subheading` bold, its own cluster with `me-4` breathing room in the demo); header action CTAs sit at the baseline `size="default"` (h-8) with the utility toggles aligned to the same height (two coherent sub-groups, centre-aligned). Both shells' sticky headers draw their bottom hairline only once scrolled (`use-scrolled` sentinel + `data-scrolled`); Container caps at `max-w-6xl` (1152px) for dense surfaces — prose in a Container must still carry `max-w-prose`. The `<main>` landmark is owned by layouts, never pages (`AppShellMain`/`SiteShellMain`, or a bare route-group layout like `src/app/(home)/layout.tsx`; root boundary files own theirs). Grids, rows, and one-off alignment stay plain Tailwind — do not add wrapper primitives for them.
-
-Direction & script: `<html lang/dir>` default from `APP_CONFIG` (`src/config/app.ts`) — `APP_LOCALES` supports `en`/`ar`, `LOCALE_INFO` declares per-locale `direction`, `numerals` (Western `latn` default, `arab` opt-in), and `label` (autonym). The server-rendered default direction is static per deployment (keeps routes static); a multi-locale deployment's `LocaleProvider` sets `lang`/`dir` at runtime when the locale is switched (pre-paint on return visits) — direction always follows the selected language, never an independent toggle. Message translation is shipped (`src/i18n` + `LocaleProvider` + `LocaleControl`). Font stack: `--font-sans` = Tajawal Arabic-only local subsets first → Inter Latin (`next/font/google`, exact weights 400–800) → system fallbacks. Geist Mono remains the code face (`--font-mono`). Tajawal's metric fallback stays disabled so it cannot intercept Arabic; its Arabic-only coverage ensures Latin and Western numerals reach Inter in mixed strings. `[dir="rtl"]` overrides in `theme.css` preserve the approved Tajawal sizes/weights, loosen line-heights, and zero tracking for Arabic. Bidi: `code`/`pre` are forced LTR-isolated in `globals.css`; use `<bdi>` for inline opposite-direction runs, `dir="auto"` for unknown-direction blocks. Full architecture: `docs/DIRECTION_AND_I18N.md`.
-
-Runtime: `ThemeProvider` (`src/core/providers/theme-provider.tsx`) supports `"light" | "dark" | "system"` — localStorage persistence (key `theme`), cross-tab sync via the storage event, live matchMedia tracking for system, and a pre-paint inline script for zero-flash first paint (routes stay statically prerendered; a cookie would force dynamic rendering). Consume via `useTheme()` → `{ theme, resolvedTheme, setTheme }`; never toggle the `dark` class manually. Reusable selector: `src/components/ui/theme-control.tsx`; the sonner Toaster follows `resolvedTheme`. Details: `docs/DESIGN_TOKENS.md` §5.
-
-Data layer (`docs/DATA_LAYER.md`; live demo `/showcase/data`): all HTTP goes through `apiFetch` (`src/api/client.ts`) — native fetch, base URL from `NEXT_PUBLIC_API_BASE_URL` (validated in `env.ts`, empty = same-origin), 10s default timeout, React Query's `signal` passed through, opt-in Zod validation via `schema` (no schema ⇒ `unknown` return, casts are deliberate). Every failure is one typed `ApiError` (`kind: network | timeout | http | parse`; caller aborts rethrown untouched); auth is a marked extension point in `client.ts`. Query keys come from per-feature typed factories (reference: `src/features/showcase/api.ts`) — no string keys at call sites; invalidate by factory prefix. Route-level error handling: `error.tsx` (uses Next 16 `unstable_retry`), `global-error.tsx` (rebuilds document shell: fonts from `src/app/fonts.ts`, `THEME_INIT_SCRIPT` + `applyStoredTheme()` for theme, APP_CONFIG lang/dir), `not-found.tsx` — all composing `src/core/errors/error-fallback.tsx`, the same UI the client `ErrorBoundary` uses. The showcase data demo fetches this repo's own route handler (`src/app/api/showcase/records/route.ts`, `force-static` so the route table stays fully prerendered).
-
-## Engineering Principles
-
-- Stay simple; add specificity only when a product need justifies it.
-- Feature code lives with its feature; promote to shared folders only after reuse is _real_, never speculatively.
-- Routing composes; components present; utilities stay pure; core never owns product behavior.
-- No new dependencies without documented trade-offs (add to `DECISIONS.md`).
-
-## Design Philosophy (for primitives)
-
-Small, accessible, composable primitives in `src/components/ui`; domain-neutral names; token-driven styling; controlled/uncontrolled APIs documented; refs forwarded only when consumers need the DOM node; Base UI's `render` prop (this stack's `asChild` equivalent) only for element replacement; primitives own UI interaction state only — never server state, auth, or workflows. `DESIGN_SYSTEM.md` has the full checklist — run it before calling a primitive done.
-
-## Coding Standards (lint-enforced where possible)
-
-- kebab-case files/folders; PascalCase only for single-component files; `.tsx` iff JSX.
-- **Named exports only** — default exports reserved for framework files (App Router route files, configs); ESLint enforces this.
-- `import type` for type-only imports (inline style enforced); import order: React/Next → third-party → `@/` → relative → styles.
-- No `any`; strict tsconfig incl. `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax` — treat these as correctness, not noise.
-- `SCREAMING_SNAKE_CASE` true constants; env vars only through `src/config/env.ts` (the sole `process.env` reader, exposing typed `ENV_CONFIG`; validated fail-fast by the Zod schema in `src/config/env-validation.ts`, kept separate so Zod stays out of client bundles) — never `process.env` elsewhere; `NEXT_PUBLIC_` only for browser-safe values.
-- Curly braces always; `eqeqeq`; no long relative paths (`../../../` banned).
-- **Logical CSS properties only** (`ms-`/`me-`, `ps-`/`pe-`, `start-`/`end-`, `text-start`/`text-end`, `rounded-s-`/`rounded-e-`, `border-s`/`border-e`) — physical direction utilities fail lint via `foundation/no-physical-tailwind-classes` (inline rule in `eslint.config.mjs`; escape hatch: eslint-disable with a justification). Directional icons flip individually with `rtl:rotate-180`; centered overlays use `inset-x-0 mx-auto`, not `left-1/2 -translate-x-1/2`. See `docs/DIRECTION_AND_I18N.md`.
-
-## Tech Stack
-
-Next.js 16 App Router (**breaking changes vs training data — read `node_modules/next/dist/docs/` first, per AGENTS.md**), React 19, TypeScript strict, Tailwind CSS v4 (CSS-first config; no `tailwind.config`), shadcn/ui (style `base-nova`, Base UI runtime `@base-ui/react`, lucide icons, `components.json` at root), React Query (server state; contract in `docs/DATA_LAYER.md`), Zod v4 (note: `z.prettifyError`-era API), sonner (toasts). HTTP is native fetch via `apiFetch` (`src/api`) — axios, zustand, and react-hook-form were deliberately removed as unused (`DECISIONS.md`); RHF is still the chosen form library, reinstalled when the reference form wiring is built; do not reintroduce a store library without a product need.
-
-Commands: `npm run dev` / `build` / `lint` (flat ESLint config) / `format` + `format:check` (Prettier, tailwind class sorting) / `typecheck` (`tsc --noEmit`) / `test` + `test:watch` (Vitest unit/component) / `test:e2e` (Playwright; requires a prior `build`, one-time `npx playwright install chromium`). Quality gates: Husky pre-commit runs lint-staged (eslint --fix + prettier on staged files; deliberately no tests), commit-msg runs commitlint (Conventional Commits); CI (`.github/workflows/ci.yml`) runs format:check → lint → typecheck → test → build → test:e2e on PRs and pushes to `main`. Env validation runs at startup via a side-effect import of `src/config/env-validation.ts` (the Zod fail-fast schema) in `next.config.ts`; `src/config/env.ts` holds only the client-safe typed values (`RAW_ENV` reads + `ENV_CONFIG`), no Zod — the split keeps Zod's ~69 KB out of every client bundle that reads `ENV_CONFIG` (e.g. via `apiFetch`). See `docs/DATA_LAYER.md`.
-
-Testing (`docs/TESTING.md` for full rationale): Vitest + Testing Library, jsdom, tests colocated as `src/**/*.test.{ts,tsx}` (reference tests: `cn`, Button incl. the render-prop slot contract, ErrorBoundary, theme runtime, token parity); Playwright in `tests/e2e` — console-cleanliness harness over every discovered route × theme × direction (runs against `next dev` because React only reports attribute-level hydration mismatches in development builds), `document.fonts` and rendered-metric assertions that Inter and Tajawal are loaded and used for their respective scripts, axe WCAG A/AA scans, shell operability, and horizontal-overflow sweeps against production. Routes are discovered from `src/app` (`tests/e2e/routes.ts`) — never hard-code route lists; dynamic segments throw until discovery is extended.
-
-## Current Project Status
-
-Template-ready. The repo is meant to be used as a GitHub template: clone-and-rename procedure and first-run checklist in `docs/CLONING.md`; deliberate omissions and known issues in `docs/ROADMAP.md`; point-in-time reviews archived in `docs/audit/` (never read those as current state). `/showcase` is gated by `NEXT_PUBLIC_ENABLE_SHOWCASE` (default on; `false` at build time prerenders every showcase route and its API endpoint as a static 404 — routes stay static either way). Node contract: `.nvmrc` (24.18.0) + `package.json#engines` (>=24.18.0 <25). Implemented: folder skeleton with READMEs, theme token system, CSS theme runtime (light/dark), config modules (`app`, `env`, `features`, `routes`), `AppProvider` composing Theme/Locale/Query/ErrorBoundary/Toaster, message translation (`src/i18n` typed catalogues + `LocaleProvider` client runtime + `LocaleControl` switcher), 20 shadcn/ui primitives plus the layout set (Container, Stack, PageHeader, AppShell, SiteShell, SkipLink), the `/showcase` inspection routes (the `(app)` group wrapped in the AppShell, the `(site)` group in the SiteShell), the data layer (`apiFetch` + `ApiError` in `src/api`, query key contract, route-level `error`/`global-error`/`not-found` files, showcase route handler), both test layers, strict TS/ESLint setup, `.gitattributes` line-ending normalization.
-
-## Completed Milestones
-
-1. Repo initialized from create-next-app; `src`-rooted structure established.
-2. Full documentation set (architecture, design system, code style, contributing, decisions).
-3. Theme runtime (tokens → CSS variables → Tailwind bridge) and strict tooling baseline.
-4. Testing baseline: Vitest unit/component layer, Playwright browser layer (console harness, font-loading assertion, axe scans), wired into CI; Noto font ships with its OFL 1.1 license (`src/assets/fonts/OFL.txt`).
-5. Layout vocabulary: measure tokens, Stack rhythm scale, PageHeader scaffold, accessible responsive AppShell (`docs/LAYOUT.md`); showcase migrated onto it; shell keyboard/focus tests in both layers.
-6. Data layer contract: fetch-based `apiFetch` with the typed `ApiError` shape, query key/caching contract (`docs/DATA_LAYER.md`), route-level error/not-found handling verified against a production build, axios and zustand removed as unused.
-7. Template readiness: documentation reconciled with the code, showcase build gate, `docs/CLONING.md` + `docs/ROADMAP.md`, engines field, rebranding procedure empirically verified (`docs/DESIGN_TOKENS.md` §4), full-matrix-on-PR CI decision recorded with measured numbers (`docs/TESTING.md` §CI).
-8. First-product backport: gaps surfaced by the first real clone (an Arabic-first public site) closed — `SiteShell` public-site chrome with configurable collapse and the unavailable-destination pattern, the e2e horizontal-overflow sweep, layout-owned `<main>` landmark rule, `ThemeControl.optionLabels` + `ErrorFallback.className`, and the `docs/CLONING.md` corrections (error-route copy as a rename location, complete showcase-deletion path).
-9. Flat visual identity: warm-paper palette with near-black primary (hue reserved for status/charts), flat elevation model (empty xs/sm, hairline structure, widened dark lightness ladder), single identity face with a heavier/tighter ramp, `BrandMark` component + `src/app/icon.svg` favicon (verified `<link rel="icon">` in build output), full §3 contrast recomputation, rebrand guide rewritten from the second rebrand's lessons (`docs/DESIGN_TOKENS.md` §4).
-10. System-polish pass (2026-08): dark theme moved from warm-paper to a **neutral** near-black (trace warm chroma only; light-on-dark text de-tinted to near-pure white), hairline borders rebalanced quieter in both themes, the identity face switched Archivo → **Geist** (neutral, closed grotesk; re-unifies with Geist Mono; size-adjust 115% unchanged), both shell bars raised h-14 → h-16 with matching `scroll-padding`, and the site header CTAs brought down to the toggles' height. Full §3 recompute, all gates green.
-11. Settling pass (2026-08): converted the values tuned individually across recent passes into documented **scales/rules** (§2) so they are not re-litigated — dark foreground L 0.985 with the pure-white eye-strain rationale; the two-theme **hairline rule** (light 0.9/1.23:1, dark 0.38/1.86:1, different ratios for equal perceived quietness); the four-step **control-height scale** (header clusters at lg/h-9, toggles aligned up); container gutters tightened one step (`sm:px-6` → `sm:px-5`); and a **cross-theme perception** table naming where light/dark use different numbers to feel the same. Full §3 recompute, all gates green.
-12. Dark-refinement pass (2026-09): dark base lifted off near-black to a comfortable **charcoal** (`background 0.185 → 0.235`), the whole in-plane ladder re-derived (surface/popover/border) with the **hairline rule band moved down** for the lighter base (dark border 0.38/1.86 → 0.385/1.70, quieter); light-on-dark text de-tinted to **neutral** white (chroma 0.002 → 0.001); **flat interactive variants** — outline/ghost/secondary (Button, Tabs active) no longer carry a fill lighter than the page in dark, so they read as bordered/in-plane, not raised chips, with token-clean hover/active/focus perceptible in both themes; **header cluster dropped lg/h-9 → default/h-8** (toggles aligned down); **weight scale** documented and the sidebar nav's off-ladder weights fixed (§2 Weight scale). Full §3 recompute (only the destructive composites needed intervention — `destructive` 0.73 → 0.78 + dark tint `/20 → /15`), all gates green.
-13. Body-contrast pass (2026-09): fixed body text reading "thin and faint" at its real causes, not by adding weight. Removed the create-next-app `antialiased` (macOS-only grayscale smoothing that thins stems) from `<body>`; moved running body copy from `muted-foreground` (~6.5:1) to `foreground` (~16:1) and recorded the **body-vs-secondary rule** (§2) so muted is a deliberate demotion (captions, labels, help microcopy, primitive `*Description` slots, secondary nav), not the house body colour; **reverted the body ramp 450 → 400** (the 450 was compensating for the low-contrast baseline — at full contrast 400 reads substantial and is the cleaner texture, weight scale back to five weights, ramp-locked 600/800); and **lifted the light paper toward white** (`background 0.968 → 0.978`, `surface/popover → 0.996`, quiet fills + sidebar up a step, `border 0.9 → 0.91` re-derived from the hairline rule) — paper not cream, warmth carried by chroma. Full §3 light-column recompute (all pass, destructive composites only rose), all gates green.
-14. Hierarchy + separation pass (2026-09, visual-review follow-up): (a) **dark `muted-foreground` 0.72 → 0.69**, re-derived so secondary text separates from the 0.985 body by the same perceived amount as in light — light ink↔grey is 2.62:1, dark now 2.66:1 (a hair higher to offset irradiation); 0.69 is the AA floor (4.66:1 on popover). (b) **Type hierarchy** made a system decision (§2): mid-ramp opened (heading 1.75rem, subheading 1.375rem) so headings lead body by size, and a **lead-paragraph role** at `body-lg` formalised (PageHeaderDescription + hero standfirst), fixing the flat "everything at one tone" page now that prose is all foreground. (c) **Pointer cursor** restored system-wide in `globals.css` (Tailwind v4 Preflight dropped it) — buttons/`[role=button]`/`label[for]`/`summary` get pointer, disabled/aria-disabled get not-allowed, text inputs untouched. §3 dark muted rows recomputed, all gates green.
-15. Body-legibility pass (2026-10, historical): raised body to 17px/400 and reopened the heading/subheading steps. Its font and density choices were superseded by milestones 17–18; the foreground-vs-secondary color rule remains active.
-16. Message translation (2026-07): completed the i18n story direction/fonts/numerals had started, triggered by the first (Arabic-first) product. **Routing decision — static locale per deployment + optional client runtime, NO locale routing** (every route stays statically prerendered; cookie/domain/sub-path all rejected against that constraint — `DECISIONS.md`). **Library decision — a typed in-repo layer** (`src/i18n`), not next-intl/Paraglide/react-i18next (the routing we don't use is the part a library earns its weight on). Catalogues typed against canonical English (missing key fails `tsc`); `useTranslations` (client/active) + `getTranslations` (server/default); `LocaleProvider` mirrors `ThemeProvider` (localStorage + cross-tab + pre-paint `lang`/`dir` script); `LocaleControl` replaced the showcase direction toggle (direction follows language, never an independent control — the e2e matrix still flips `dir` for every route). Default catalogue bundled, others code-split: **single-locale First Load JS within 0.2 kB of pre-i18n and zero second-locale bytes** (measured). `(site)` showcase translated to Arabic end to end (top bar included) as proof. `DialogContent`/`DialogFooter` gained an optional `closeLabel`. Docs: `docs/DIRECTION_AND_I18N.md` (rewritten), `docs/CLONING.md` §3a (single-locale path), `DECISIONS.md`, ROADMAP moved to shipped. All gates green.
-17. Bilingual typography foundation (2026-07, revised by milestone 20): superseded the Public Sans/Noto pairing with a script-aware Latin/Tajawal stack, preserving semantic ownership, direction overrides, and component geometry. Tajawal's Arabic-only 400/500/700/800 WOFF2 subsets are vendored through `next/font/local` so its Latin glyphs cannot intercept the identity face in mixed strings.
-18. Typography-density follow-up (2026-07): corrected the inherited airy prose treatment through shared roles rather than page patches. Shared card/dialog/form/table/menu roles consume semantic tiers, and SiteShell menu descriptions wrap instead of truncating available text. The final size/leading metrics were revised by milestone 20 and weights by milestone 21; Tajawal's tighter RTL leading remains unchanged.
-19. Latin-face comparison (2026-07, superseded): rendered Plus Jakarta Sans, DM Sans, Inter Tight, and Manrope at identical compact metrics. It was an interim exploration before the reference source became authoritative and no longer governs the family decision.
-20. Reference-aligned Latin typography (2026-07): source inspection established **Inter** as the reference's authored `font-sans`, loaded at 400/500/600/700/800. The foundation self-hosts those exact weights through `next/font/google` and maps reference sizes/leading into its semantic ramp. Landing-only responsive hero sizes and runtime Google requests were not copied. Tajawal and every Arabic size/leading/tracking metric remain unchanged.
-21. Typography weight refinement (2026-07): retained every approved size, line-height, wrap, and geometry contract while raising body/supporting roles to 500 and ordinary navigation/UI labels to 600. Normal menu titles remain 600; persistent/current titles remain 700; heading weights are unchanged. Important prose stays `foreground`, while genuinely explanatory copy uses `muted-foreground` to preserve hierarchy despite the stronger strokes. Inter and Tajawal consume the same semantic weights; Tajawal keeps its direction-specific leading and tracking.
-
-## Upcoming Priorities (in rough order)
-
-`docs/ROADMAP.md` is the authoritative list of deliberate omissions, their extension points, and the product signal that triggers each. Headline order:
-
-1. Reference React Hook Form + Zod form wiring (reinstall RHF + resolvers then; the last unbuilt piece of the decided stack).
-2. Auth provider in `AppProvider` as the concrete need arrives (TODO slot reserved). Localization shipped (message translation — `src/i18n` + `LocaleProvider`).
-3. Extend `src/core` placeholders (logger, monitoring) when the first product needs them — error reporting hooks are marked in `error.tsx` and `ErrorBoundary`.
-
-## Architectural Constraints
-
-- Foundation stays domain-neutral: no feature, layout, navigation pattern, or business assumption in shared code.
-- `src/core` must never become a feature catch-all; foundation folders must never import features.
-- CSS variables, not TS tokens, drive runtime theming.
-- Barrel files only at stable public API boundaries.
-
-## Things That Must Never Be Done
-
-- Import `features` from `core`, `components`, or foundation folders.
-- Read `process.env` outside `src/config`.
-- Hardcode colors/spacing that bypass the semantic token bridge.
-- Add default exports outside framework-required files.
-- Create shared abstractions or move code to shared folders before reuse is proven.
-- Add dependencies, cross-feature imports, or `any` without documented justification.
-- Write Next.js code from memory of older versions — check the bundled docs in `node_modules/next/dist/docs/` first.
+- Use named exports except where Next.js or tooling requires a default export.
+- Use `@/` for cross-folder imports and logical CSS utilities for
+  direction-sensitive styling.
+- Read environment values only through `src/config`; use `NEXT_PUBLIC_` only
+  for browser-safe values.
+- Do not add dependencies, shared abstractions, or cross-feature imports
+  without a concrete need and the documentation required by the owning guides.
+- Run the validation layers prescribed by the affected owning document.
+- Check `node_modules/next/dist/docs/` before writing Next.js code; this
+  installed version may differ from remembered APIs and conventions.

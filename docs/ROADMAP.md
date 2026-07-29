@@ -34,9 +34,9 @@ signal is the failure mode this repo was designed to avoid.
   (direction is a property of language, not an independent control) and
   renders nothing on a single-locale deployment. Every route stays statically
   prerendered; the default catalogue is bundled and other locales are
-  code-split, so a single-locale build carries no second-locale bytes
-  (measured within 0.2 kB of the multi-locale build). The `(site)` showcase
-  is translated to Arabic end to end (top bar included) as the proof. Full
+  code-split, so a single-locale build carries no second-locale catalogue.
+  The `(site)` showcase is translated to Arabic end to end (top bar included)
+  as the proof. Full
   rationale — the routing decision, the library decision, and the
   single-locale path — in `docs/DIRECTION_AND_I18N.md`, `DECISIONS.md`, and
   `docs/CLONING.md` §3a.
@@ -121,9 +121,11 @@ signal is the failure mode this repo was designed to avoid.
 
 - **Missing:** the showcase is an engineering inspection surface — dense,
   unstyled-by-design, English-only chrome.
-- **Trigger:** none expected. It is not a product and is gated out of
-  product builds (`NEXT_PUBLIC_ENABLE_SHOWCASE`); polish would be effort
-  spent on something products delete.
+- **Trigger:** none expected. It is not a product. The
+  `NEXT_PUBLIC_ENABLE_SHOWCASE` build-time flag makes its routes return static
+  404s, but the source remains in the build graph until a product follows the
+  permanent deletion procedure in `docs/CLONING.md`; polish would be effort
+  spent on code products ultimately delete.
 
 ## Known open issues
 
@@ -155,10 +157,12 @@ Honest defects and frictions, none currently blocking:
    extension — localized products pass a translated value instead of hiding
    the button and composing their own `DialogClose`. Consistent with the
    shells' label props and `ThemeControl.optionLabels`.
-3. **Three e2e specs hard-reference showcase URLs** (`shell`, `fonts`,
-   `errors`) and need retargeting when the showcase is deleted
-   (`docs/CLONING.md` §3 lists them precisely, together with the
-   `playwright.config.ts` `testMatch` cleanup).
+3. **Production E2E spec discovery is automatic; three specs still
+   hard-reference showcase URLs.** `chromium-prod` owns every `*.spec.ts`
+   except the development-only console suite, so new and renamed production
+   specs enter coverage without config changes. When the showcase is deleted,
+   `shell`, `fonts`, and `errors` still need URL retargeting; `docs/CLONING.md`
+   §3 lists those call sites precisely.
 4. **The showcase gate requires a rebuild to flip.**
    `NEXT_PUBLIC_ENABLE_SHOWCASE` is inlined at build time — the price of
    keeping every route statically prerendered. A runtime kill-switch would
@@ -226,7 +230,7 @@ free, since it is the governor that unblocks the rest.
   pass. TS 6 is covered by the same block for the same reason and lifts the
   same way.
 
-## Deferred from the 2026-07 health audit
+## Deferred findings from the archived 2026-07 health audit
 
 The `chore/template-hardening` pass implemented the high-value findings of
 `docs/audit/2026-07-health-audit.md` (LICENSE; locale-aware font preload; zod
@@ -235,10 +239,14 @@ kept out of the client for unvalidated fetches; `shadcn` → devDependencies;
 and deliberately not actioned** — each is recorded here so the choice is
 visible, not silent.
 
+The audit file is a point-in-time record. Version and vulnerability counts in
+this section are refreshed from the installed tree and current `npm audit`
+output; archived counts inside `docs/audit/` remain unchanged.
+
 > **Current state (since removed):** `LICENSE` and `SECURITY.md` no longer exist — the repo is now private with no project licence. The record above of what the hardening pass did stays true; for the reversal see `DECISIONS.md` → _Private repository, no project license_.
 
 1. **Three production `npm audit` findings remain (all unreachable).**
-   _Posture refreshed 2026-07 against measured output._ The production tree
+   _Posture refreshed 2026-07-29 against measured output._ The production tree
    (`npm audit --omit=dev`) reports **3 high, 0 moderate**:
 
    - `next`→`postcss` (`<=8.5.17`), now **high**, not the moderate this entry
@@ -248,10 +256,12 @@ visible, not silent.
      CSS comment, and **path traversal** in previous-source-map auto-loading.
    - `next`→`sharp` and `sharp` (`<0.35.0`), high, inherited libvips CVEs.
 
-   **No safe patch exists.** `next@16.2.11` is the latest 16.x and hard-pins
-   `postcss@8.4.31` as a bundled dependency, so no patch release moves it; the
-   only `npm audit fix` is `--force`, which installs `next@9.3.3` — a breaking
-   downgrade, still unacceptable.
+   **No safe audit remediation is offered for the installed tree.** The
+   repository has `next@16.2.12`; current `npm audit` still traces these
+   findings through Next's bundled PostCSS and Sharp dependencies. Its only
+   proposed remediation is `npm audit fix --force`, which would install
+   `next@9.3.3` — a breaking downgrade, still unacceptable. This statement is
+   about the installed version, not a claim that it is the latest release.
 
    **The reachability argument holds, with one precondition now made explicit.**
    `sharp` is Next's image optimizer and `next/image` is used **0 times**
@@ -266,8 +276,8 @@ visible, not silent.
    does not author**: a CMS-supplied theme, a plugin stylesheet, or
    user-authored styles.
 
-   The dev tree now reports **15 findings (12 high, 3 moderate)**, up from the
-   4 recorded here, mostly `minimatch`/`brace-expansion` reached through
+   The full tree reports **14 findings (12 high, 2 moderate)**, mostly
+   `minimatch`/`brace-expansion` reached through
    `eslint-config-next`'s bundled plugins, plus
    `shadcn`→`@modelcontextprotocol/sdk`→`@hono/node-server`. All are CLI and
    lint tooling, absent from `npm ci --omit=dev` production installs.
@@ -296,12 +306,7 @@ visible, not silent.
    the Query/Toaster providers in a nested layout rather than the root — record
    that trade-off if taken.
 
-5. **`CLAUDE.md` restates parts of `docs/` at length** (audit §3.4). Not
-   trimmed this pass — it is accurate today, and thinning it is editorial work
-   with its own drift risk. Left as an ongoing maintenance note; the "docs win
-   on conflict" rule already governs it.
-
-6. **`src/config/routes.ts` (`ROUTES`) and `features.ts` (`FEATURE_FLAGS`)
+5. **`src/config/routes.ts` (`ROUTES`) and `features.ts` (`FEATURE_FLAGS`)
    remain unused scaffold** (audit §4.1). Kept intentionally: they are
    documented foundation public-API placeholders, correctly minimal, and cost
    nothing. A clone deletes or fills them per its needs.
@@ -336,18 +341,9 @@ surprise.
    header cluster (brand + user menu + actions), promote that composition to
    a feature-level example, not into the shell.
 
-3. **Frozen primitive strings and variant sets require forking to extend.**
-   The pattern is settled and partly applied: `DialogContent`/`DialogFooter`
-   take `closeLabel`, the shells take `skipLinkLabel`/`label`/`closeLabel`/
-   `unavailableLabel`, and `ThemeControl` takes `optionLabels` — an optional
-   label prop defaulting to English (known issue #2, resolved). What remains
-   is the primitives that have **no such prop**: `Pagination`'s
-   `aria-label="pagination"` and its `"Go to previous/next page"` labels,
-   `PaginationEllipsis`'s `"More pages"`, `Breadcrumb`'s
-   `aria-label="breadcrumb"`, and `Spinner`'s `aria-label="Loading"` are
-   hardcoded, so a localized product edits the primitive instead of composing
-   around it. Separately, Button's variant/size set is explicitly "do not
-   extend per-product". **Trigger:** a localized product that surfaces
-   pagination or a spinner (extend the same optional-label pattern to those
-   primitives in one pass), and the first product with a genuine variant need
-   the official set cannot express.
+3. **Primitive strings are locale-overridable; variant sets remain frozen.**
+   Primitive affordances expose focused label props or native `aria-label`
+   overrides, including `PaginationEllipsis.label`; translation selection
+   remains at the composition boundary. Button's variant/size set remains
+   intentionally frozen. **Trigger:** the first product with a genuine variant
+   need the official set cannot express.

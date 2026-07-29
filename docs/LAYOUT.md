@@ -179,8 +179,8 @@ unknown to the foundation (rules out bottom bars), and it is built on the
 existing Base UI Dialog — focus trap, Escape, backdrop dismissal, scroll
 lock, and focus restoration come from an already-shipped dependency. The
 drawer closes itself on route navigation and when the viewport grows past
-`md` (via `BREAKPOINTS.md` from `src/theme` — the sanctioned TS breakpoint
-mirror).
+`md` (via the exported `BREAKPOINTS` map in
+`src/theme/breakpoints.ts` — the sanctioned TS breakpoint mirror).
 
 Sidebar children render in both the persistent sidebar and the drawer, so
 navigation content must not rely on unique DOM ids.

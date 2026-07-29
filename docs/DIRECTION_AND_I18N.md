@@ -62,11 +62,12 @@ The message layer, concretely:
   it and never restates it — so Arabic messages can never render LTR.
 
 **Primitive strings** localize at the call site (the primitives carry almost no
-text): `PaginationPrevious`/`PaginationNext` (`text`, `aria-label`), the
-AppShell/SiteShell label props (`skipLinkLabel`, `label`, `closeLabel`,
+text): `PaginationPrevious`/`PaginationNext` (`text`, `aria-label`),
+`PaginationEllipsis` (`label`), the AppShell/SiteShell label props
+(`skipLinkLabel`, `label`, `closeLabel`,
 `unavailableLabel`, the trigger `aria-label`), `ThemeControl.optionLabels` +
-`aria-label`, and — added in this pass — `DialogContent`/`DialogFooter`'s
-optional `closeLabel` (default `"Close"`). Pass a `useTranslations`/
+`aria-label`, and `DialogContent`/`DialogFooter`'s optional `closeLabel`
+(default `"Close"`). Pass a `useTranslations`/
 `getTranslations` value into each. The `(site)` showcase layout is the worked
 example.
 

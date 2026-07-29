@@ -9,15 +9,10 @@
  *   `start`).
  * - `ENV_CONFIG` — the typed, defaulted values every other module reads.
  *
- * Why the validator lives in a SEPARATE module (docs/audit/
- * 2026-07-health-audit.md §1.2): Zod is ~69 KB gz. `apiFetch` reads
- * `ENV_CONFIG` on the client, so anything this module statically imports ships
- * to the browser for EVERY apiFetch consumer — even ones that never validate a
- * response. Keeping Zod out of this file (it lives in `./env-validation`,
- * which only `next.config.ts` imports) means the client pays for Zod only when
- * a call site actually passes a schema. This file therefore builds `ENV_CONFIG`
- * in plain TypeScript; `./env-validation` is what guarantees those raw inputs
- * are valid before any of this runs.
+ * Zod validation stays in the server-only `./env-validation` module because
+ * client-reachable modules such as `apiFetch` import `ENV_CONFIG`. This file
+ * must not import Zod, so unvalidated client modules do not import it either.
+ * `next.config.ts` loads the validator before app code runs.
  *
  * Adding a new environment variable:
  * 1. Add it to `RAW_ENV` below (Next.js inlines only the exact

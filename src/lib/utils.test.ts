@@ -27,16 +27,20 @@ describe("cn", () => {
   });
 
   it("treats the type-ramp steps as font-size, not text color", () => {
-    // Regression: default tailwind-merge classified `text-small` etc. as
-    // text-COLOR, so a later color class silently deleted the size —
-    // ramp steps vanished wherever a size and a color met in one call.
-    // The extended config in utils.ts fixes the classification.
     expect(cn("text-caption", "text-muted-foreground")).toBe("text-caption text-muted-foreground");
+    expect(cn("text-supporting", "text-muted-foreground")).toBe(
+      "text-supporting text-muted-foreground",
+    );
     expect(cn("text-small text-muted-foreground", "text-foreground")).toBe(
       "text-small text-foreground",
     );
-    // Ramp steps still merge against each other and against stock sizes.
+
+    // Semantic and stock font-size conflicts still use last-class-wins.
     expect(cn("text-small", "text-caption")).toBe("text-caption");
+    expect(cn("text-caption", "text-supporting")).toBe("text-supporting");
     expect(cn("text-sm", "text-body")).toBe("text-body");
+
+    // Text-color ownership remains independent from the custom size group.
+    expect(cn("text-muted-foreground", "text-foreground")).toBe("text-foreground");
   });
 });

@@ -77,18 +77,13 @@ the schema's inferred type. Without `schema`, the promise resolves to
 deliberately at the call site. That is the opt-in mechanism: validation is
 the path of least resistance, skipping it is visible in review.
 
-**Client-bundle cost (why `client.ts` imports zod as a type only).** Zod is
-~69 KB gz. To keep it off the client for call sites that pass no schema,
-`client.ts` imports `zod` with `import type` only and formats schema-rejection
-errors from the `ZodError` instance's own `issues` rather than the runtime
-`z.prettifyError` (docs/audit/2026-07-health-audit.md §1.2). A call site that
-**does** pass a schema already bundles zod to define that schema, so validated
-routes pay for zod exactly once and unvalidated ones pay nothing. The same
-reasoning is why the fail-fast env **validator** lives in
-`src/config/env-validation.ts` (zod, imported only by `next.config.ts`) and
-not in `src/config/env.ts` (which `apiFetch` reaches on the client) — see that
-file's header. Net effect: zod ships to the browser only where a response is
-actually validated.
+**Client ownership (why `client.ts` imports Zod as a type only).** The shared
+client and `src/config/env.ts` are reachable from unvalidated browser call
+sites, so neither may import Zod at runtime. Schema-rejection errors are
+formatted from the `ZodError` instance's `issues`; a validated call site
+already imports Zod to define its schema. For the same reason, fail-fast
+environment validation lives in the server-only
+`src/config/env-validation.ts`, imported only by `next.config.ts`.
 
 Rationale: validating at the boundary is what makes `"parse"` errors exist
 at all — without it, a backend contract drift surfaces as undefined

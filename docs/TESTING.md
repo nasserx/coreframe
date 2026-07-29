@@ -63,6 +63,11 @@ problem.
 **Browser (`tests/e2e/*.spec.ts`):** the regression net for what only a real
 browser can falsify.
 
+Spec discovery follows server ownership. `chromium-dev` matches only
+`console-clean.spec.ts`; `chromium-prod` matches every other `*.spec.ts` under
+`tests/e2e`. A new E2E spec therefore enters production coverage automatically
+unless it is deliberately assigned to the development server.
+
 - `console-clean.spec.ts` — every route × {light, dark} × {ltr, rtl} must
   produce zero console errors, warnings, uncaught exceptions, or failed
   requests. Runs against `next dev` deliberately: React reports hydration
@@ -146,10 +151,10 @@ npm run test:e2e      # browser layer (Playwright), ~30 s warm
 ```
 
 One-time setup: `npx playwright install chromium`. The browser layer starts
-two servers itself: `next start` on port 3100 (fonts, a11y, shells,
-overflow, geometry — tests what ships) and `next dev` on port 3000 (console
-harness — reuses an already running `npm run dev`, since Next allows one dev
-server per directory).
+two servers itself: `next start` on port 3100 for every production-owned spec,
+and `next dev` on port 3000 for the console/hydration harness. The development
+server reuses an already running `npm run dev`, since Next allows one dev server
+per directory.
 
 ## Extending (for a product team)
 
@@ -161,8 +166,8 @@ server per directory).
 - New locale/direction/theme states → extend the matrix constants in
   `tests/e2e/routes.ts`.
 - A flow worth testing end-to-end (auth, checkout) → new spec under
-  `tests/e2e`; keep the console listener pattern from `console-clean.spec.ts`
-  so flows also fail on console noise.
+  `tests/e2e`; it is production-owned automatically. Keep the console listener
+  pattern from `console-clean.spec.ts` so flows also fail on console noise.
 - Judging an axe finding a false positive → exclude it in `a11y.spec.ts`
   with a comment arguing why; never lower the tag set.
 
@@ -174,22 +179,23 @@ with no secrets or configuration — a fresh clone's CI is green on day one.
 The browser step downloads Chromium only on a Playwright version change
 (cached otherwise).
 
-**The full browser matrix runs on every PR — deliberately.** The measured
-numbers (2026-07, 12 routes): 104 browser tests — 48 console cells + 48 axe
-scans (routes × {light, dark} × {ltr, rtl}) + fonts/errors/shell — complete
-in ~60 s locally and roughly 2–3 minutes on a CI runner, inside a ~5-minute
-total pipeline of which install + build already cost ~2 minutes that any
-subset would still pay. A representative-subset-on-PR scheme was considered
-and rejected: the matrix exists for cross-cutting changes (tokens,
-direction, fonts, providers) whose blast radius is every page at once, so a
-subset would systematically miss exactly the defect class this layer was
-built to catch — and a hydration mismatch found on `main` after merge costs
-far more than the ~2 minutes a subset would save. Growth is linear (~4
-console cells + ~4 axe scans, ≈10–20 s of CI, per new page): even 20
-additional pages keep the browser layer under ~8 minutes. **Revisit when
-browser time passes ~10 minutes** — the right split then is the full matrix
-on `main` plus a changed-routes subset on PRs (`docs/ROADMAP.md`, known
-issues).
+**The full browser matrix runs on every PR — deliberately.** Current measured
+discovery (`npx playwright test --list`, 2026-07-29) is **13 route pages and
+159 Playwright tests in 8 spec files**:
+
+- 52 development-browser console cells (13 routes × 2 themes × 2 directions);
+- 52 production-browser axe cells over the same matrix;
+- 26 production-browser overflow cells (13 routes × 2 directions);
+- 29 targeted production-browser tests for fonts, errors, shells, i18n, and
+  geometry.
+
+This count is separate from the Vitest unit/component layer. A
+representative-subset-on-PR scheme remains rejected because tokens,
+direction, fonts, and providers can affect every route at once. Growth is
+linear: each discovered page adds four development console cells, four
+production axe cells, and two production overflow cells. Revisit the policy
+when browser time passes roughly 10 minutes; `docs/ROADMAP.md` owns that
+trigger.
 
 Pre-commit stays lint-staged only — no tests. Rationale: pre-commit exists
 to keep diffs clean, not to prove correctness; even the 2-second unit run
