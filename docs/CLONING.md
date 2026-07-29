@@ -100,8 +100,10 @@ historical reviews) and `docs/ROADMAP.md` (or repurpose it as your own).
 **Configure first:**
 
 - Environment — copy `.env.example` to `.env.local`; set
-  `NEXT_PUBLIC_API_BASE_URL` if your backend is not same-origin
-  (`src/config/env.ts` is the validated contract; empty = same-origin).
+  `NEXT_PUBLIC_API_BASE_URL` if your backend is not same-origin.
+  `src/config/env.ts` owns the client-safe reads and typed values (empty =
+  same-origin); the server-only Zod contract in
+  `src/config/env-validation.ts` validates them at startup.
 - `src/config/app.ts` — locale (see §3a for the language a product ships in).
 - `next.config.ts` — **`allowedDevOrigins` is a per-developer value.** It
   carries this repo's author's LAN IP so the dev server accepts requests from
@@ -139,9 +141,11 @@ shape):
    is consistent — a forgotten step is a build error, not a silent English
    leak.
 
-3. **If the locale is RTL/Arabic-primary**, set the Noto `preload` to `true`
-   in `src/app/fonts.ts` (the compile-time guard there names this) and review
-   the `[dir="rtl"]` ramp metrics in `src/styles/theme.css`.
+3. **If the locale is RTL/Arabic-primary**, set Tajawal's literal `preload`
+   option to `true` in `src/app/fonts.ts`. The compile-time
+   `_TajawalPreloadMatchesLocale` guard couples that literal to the configured
+   default direction. Review the `[dir="rtl"]` ramp metrics in
+   `src/styles/theme.css` as well.
 
 That is the whole path: one config change and one catalogue. Every route stays
 statically prerendered, the bundle carries no multi-locale machinery, and the

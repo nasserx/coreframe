@@ -174,22 +174,23 @@ with no secrets or configuration — a fresh clone's CI is green on day one.
 The browser step downloads Chromium only on a Playwright version change
 (cached otherwise).
 
-**The full browser matrix runs on every PR — deliberately.** The measured
-numbers (2026-07, 12 routes): 104 browser tests — 48 console cells + 48 axe
-scans (routes × {light, dark} × {ltr, rtl}) + fonts/errors/shell — complete
-in ~60 s locally and roughly 2–3 minutes on a CI runner, inside a ~5-minute
-total pipeline of which install + build already cost ~2 minutes that any
-subset would still pay. A representative-subset-on-PR scheme was considered
-and rejected: the matrix exists for cross-cutting changes (tokens,
-direction, fonts, providers) whose blast radius is every page at once, so a
-subset would systematically miss exactly the defect class this layer was
-built to catch — and a hydration mismatch found on `main` after merge costs
-far more than the ~2 minutes a subset would save. Growth is linear (~4
-console cells + ~4 axe scans, ≈10–20 s of CI, per new page): even 20
-additional pages keep the browser layer under ~8 minutes. **Revisit when
-browser time passes ~10 minutes** — the right split then is the full matrix
-on `main` plus a changed-routes subset on PRs (`docs/ROADMAP.md`, known
-issues).
+**The full browser matrix runs on every PR — deliberately.** Current measured
+discovery (`npx playwright test --list`, 2026-07-29) is **13 route pages and
+158 Playwright tests in 8 spec files**:
+
+- 52 development-browser console cells (13 routes × 2 themes × 2 directions);
+- 52 production-browser axe cells over the same matrix;
+- 26 production-browser overflow cells (13 routes × 2 directions);
+- 28 targeted production-browser tests for fonts, errors, shells, i18n, and
+  geometry.
+
+This count is separate from the Vitest unit/component layer. A
+representative-subset-on-PR scheme remains rejected because tokens,
+direction, fonts, and providers can affect every route at once. Growth is
+linear: each discovered page adds four development console cells, four
+production axe cells, and two production overflow cells. Revisit the policy
+when browser time passes roughly 10 minutes; `docs/ROADMAP.md` owns that
+trigger.
 
 Pre-commit stays lint-staged only — no tests. Rationale: pre-commit exists
 to keep diffs clean, not to prove correctness; even the 2-second unit run

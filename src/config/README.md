@@ -2,7 +2,7 @@
 
 Purpose: Application configuration modules.
 
-Current contents: `app.ts` (identity, locales, direction), `env.ts` (Zod-validated environment access — the only file allowed to read `process.env`), `features.ts` (build-time feature flags), `routes.ts` (route constants), `index.ts` (public barrel; deliberately excludes `env.ts`).
+Current contents: `app.ts` (identity, locales, direction), `env.ts` (the client-safe `process.env` reader and typed/defaulted values), `env-validation.ts` (the server-only Zod schema loaded by `next.config.ts`), `features.ts` (build-time feature flags), `routes.ts` (route constants), and `index.ts` (the public barrel; deliberately excludes environment modules).
 
 Belongs here: environment-derived settings, typed configuration boundaries, and app-level configuration defaults.
 

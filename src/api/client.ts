@@ -110,9 +110,8 @@ export async function apiFetch<T>(
   try {
     payload = await response.json();
   } catch (cause) {
-    // Streaming the body can still be cancelled or time out. Without this, an
-    // ordinary React Query teardown mid-body would surface as malformed JSON
-    // (docs/audit/2026-07-comprehensive-review.md DATA-01).
+    // A body read remains abortable: caller cancellation is rethrown and a
+    // timeout keeps its classification instead of becoming a parse failure.
     throwIfAborted(cause, abortContext);
     throw new ApiError({
       kind: "parse",
@@ -127,13 +126,9 @@ export async function apiFetch<T>(
   }
   const parsed = options.schema.safeParse(payload);
   if (!parsed.success) {
-    // Format from the ZodError instance's own `issues` rather than
-    // `z.prettifyError`: calling a zod runtime helper here would make a static
-    // `import { z }` unavoidable, coupling EVERY apiFetch consumer to zod's
-    // ~69 KB gz even when they pass no schema (docs/audit/2026-07-health-audit.md
-    // §1.2). A caller that does pass a schema already bundles zod to define it,
-    // so validated call sites pay nothing extra; unvalidated ones now pay zero.
-    // `parsed.error` still rides on `cause` for full structured detail.
+    // Format from the ZodError instance so this shared client needs no runtime
+    // Zod import. Unvalidated client modules therefore do not import Zod;
+    // validated call sites already own the schema dependency.
     const detail = parsed.error.issues
       .map((issue) => `  • ${issue.path.join(".") || "(root)"}: ${issue.message}`)
       .join("\n");
@@ -157,8 +152,8 @@ export async function apiFetch<T>(
  * chose. Every call site today passes a developer-written literal, so this is
  * latent, but the auth extension point documented at the top of this file lives
  * in this same function: once credentials are attached here, a path built from
- * user or CMS input becomes credential exfiltration. Guarding is free now
- * (docs/audit/2026-07-comprehensive-review.md SEC-01).
+ * user or CMS input becomes credential exfiltration. The boundary rejects that
+ * shape before any request is issued.
  *
  * A `TypeError`, deliberately not an `ApiError`: this is a caller contract
  * violation, not a transport failure, and it must not be swallowed by the
@@ -218,15 +213,10 @@ function throwIfAborted(cause: unknown, context: AbortContext): void {
  * reports the status, exactly as before. This function must never upgrade a bad
  * error body into a thrown parse error.
  *
- * It must, however, classify aborts rather than swallow them: this read is
- * still subject to the combined signal, so the bare `catch {}` it used to have
- * turned a cancellation into "HTTP 502 with no body" and a timeout into the
- * same (docs/audit/2026-07-comprehensive-review.md DATA-02 — the same class as
- * DATA-01, one catch further down). Both escape through the `throw new ApiError`
- * argument list before the `"http"` error is constructed, which is the intended
- * precedence: neither a caller abort nor a blown timeout is describable as an
- * HTTP failure, and rethrowing the abort untouched is what lets React Query
- * treat teardown as teardown instead of rendering an error state.
+ * It must, however, classify aborts rather than swallow them: neither caller
+ * cancellation nor a timeout is an HTTP failure. Both escape before the
+ * `"http"` error is constructed, preserving the error contract and React
+ * Query's cancellation behavior.
  */
 async function parseJsonBodyOrUndefined(
   response: Response,

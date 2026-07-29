@@ -165,8 +165,7 @@
  * override needs no extra utilities.
  */
 [dir="rtl"] {
-  /* Tajawal's previously approved sizes and weights remain independent from
-     the Latin reference mapping above. */
+  /* Tajawal's RTL metrics remain independent from the Latin mapping above. */
   --text-body-lg: 1.0625rem;
   --text-display--line-height: 1.2;
   --text-display--letter-spacing: 0em;
