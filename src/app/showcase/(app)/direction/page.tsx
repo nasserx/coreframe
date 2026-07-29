@@ -99,7 +99,7 @@ export default function DirectionPage() {
         description="Inter and Tajawal at their independently authored semantic body, UI, heading, and display metrics. The long controls expose set-width, baseline, and clipping regressions without changing component geometry."
       >
         <div className="grid gap-4 lg:grid-cols-2">
-          <Stack gap="sm" lang="en" className="rounded-lg border p-4">
+          <Stack gap="sm" lang="en" className="min-w-0 rounded-lg border p-4">
             <p className="text-caption text-muted-foreground">Inter · Latin and numerals</p>
             <p className="text-body">Body 500 — Clear bilingual product foundations, 1,234.56</p>
             <p className="text-body font-semibold">UI emphasis 600 — Review account preferences</p>
@@ -108,9 +108,11 @@ export default function DirectionPage() {
             </p>
             <p className="text-heading">Heading 700 — Designed for sustained use</p>
             <p className="text-title">Title 800 — Foundation</p>
-            <Button className="self-start">Continue to account configuration</Button>
+            <Button className="h-auto min-h-8 max-w-full self-start py-1.5 whitespace-normal">
+              Continue to account configuration
+            </Button>
           </Stack>
-          <Stack gap="sm" lang="ar" dir="rtl" className="rounded-lg border p-4">
+          <Stack gap="sm" lang="ar" dir="rtl" className="min-w-0 rounded-lg border p-4">
             <p className="text-caption text-muted-foreground">تجوال · العربية والأرقام</p>
             <p className="text-body">
               النص الأساسي 500 — أساس واضح للمنتجات ثنائية اللغة، 1,234.56
@@ -121,7 +123,9 @@ export default function DirectionPage() {
             </p>
             <p className="text-heading">عنوان 700 — مصمم للاستخدام المستمر</p>
             <p className="text-title">عنوان رئيسي 800 — الأساس</p>
-            <Button className="self-start">المتابعة إلى إعدادات الحساب التفصيلية</Button>
+            <Button className="h-auto min-h-8 max-w-full self-start py-1.5 whitespace-normal">
+              المتابعة إلى إعدادات الحساب التفصيلية
+            </Button>
           </Stack>
         </div>
       </ShowcaseSection>
