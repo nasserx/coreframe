@@ -39,6 +39,10 @@ export const en = {
   dialog: {
     close: "Close",
   },
+  /** Pagination primitive affordances localized at the call site. */
+  pagination: {
+    ellipsisLabel: "More pages",
+  },
   /** ThemeControl accessible names (the group and its three options). */
   theme: {
     label: "Theme",

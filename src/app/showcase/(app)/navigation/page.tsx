@@ -10,17 +10,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Stack } from "@/components/ui/stack";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PaginationDemo } from "@/features/showcase/components/pagination-demo";
 import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page-header";
 import { ShowcaseSection } from "@/features/showcase/components/showcase-section";
 
@@ -97,30 +89,7 @@ export default function NavigationPage() {
         title="Pagination"
         description="Page math belongs to the consumer; the primitive renders the given items. Links here point back to this page."
       >
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="/showcase/navigation" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="/showcase/navigation">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="/showcase/navigation" isActive>
-                2
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="/showcase/navigation">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="/showcase/navigation" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <PaginationDemo />
       </ShowcaseSection>
     </>
   );

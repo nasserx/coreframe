@@ -65,7 +65,7 @@ This split exists so registry syncs and styling refinements stay possible withou
 - **ARIA only when native HTML is insufficient**, and only static ARIA in wrappers (`aria-label` on landmarks, `aria-current`, `aria-hidden` on decoration, `sr-only` fallbacks).
 - **`aria-hidden` and an `sr-only` fallback are mutually exclusive on the same subtree.** `aria-hidden` prunes everything inside it, so a nested `sr-only` label is dead markup that no assistive technology can reach — and axe does not flag it, it simply ignores the subtree, so a clean scan is not evidence. Decide per element: hide it and carry no text, or expose it and let the text announce while marking only the icon decorative (see `PaginationEllipsis` vs `BreadcrumbEllipsis`).
 - **No custom keyboard implementations.** If a wrapper needs a key handler, the design is wrong — the behavior belongs in the underlying primitive or the component doesn't belong here.
-- Consumers own context-specific accessibility: labelling form controls, `alt` on avatar images, overriding default `aria-label`s per locale/context.
+- Consumers own context-specific accessibility: labelling form controls, `alt` on avatar images, overriding default `aria-label`s per locale/context, and supplying localized label props such as `PaginationEllipsis.label`.
 
 ## 6. Styling Rules
 

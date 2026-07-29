@@ -20,7 +20,9 @@ export type PaginationPreviousProps = PaginationLinkProps & { text?: string };
 
 export type PaginationNextProps = PaginationLinkProps & { text?: string };
 
-export type PaginationEllipsisProps = ComponentProps<"span">;
+export type PaginationEllipsisProps = Omit<ComponentProps<"span">, "children"> & {
+  label?: string;
+};
 
 /**
  * Page navigation primitive, composed from PaginationContent,
@@ -30,7 +32,7 @@ export type PaginationEllipsisProps = ComponentProps<"span">;
  * Accessibility: renders a `<nav aria-label="pagination">` landmark with a
  * list of links; the active link carries `aria-current="page"`, prev/next
  * expose descriptive `aria-label`s, and the ellipsis announces the elision
- * through an `sr-only` label (see PaginationEllipsis).
+ * through an `sr-only` label supplied by its consumer when localized.
  *
  * Constraints: UI-only — page math, ranges, and hrefs belong to the
  * consumer; the primitive renders whatever items it is given.
@@ -127,7 +129,11 @@ export function PaginationNext({ className, text = "Next", ...props }: Paginatio
  * information, so the wrapper is exposed and the label announces; only the icon
  * is decorative.
  */
-export function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {
+export function PaginationEllipsis({
+  className,
+  label = "More pages",
+  ...props
+}: PaginationEllipsisProps) {
   return (
     <span
       data-slot="pagination-ellipsis"
@@ -138,7 +144,7 @@ export function PaginationEllipsis({ className, ...props }: PaginationEllipsisPr
       {...props}
     >
       <MoreHorizontalIcon aria-hidden="true" />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">{label}</span>
     </span>
   );
 }

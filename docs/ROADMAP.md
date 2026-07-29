@@ -339,14 +339,9 @@ surprise.
    header cluster (brand + user menu + actions), promote that composition to
    a feature-level example, not into the shell.
 
-3. **One primitive string and frozen variant sets still need deliberate
-   extension.** `DialogContent`/`DialogFooter` take `closeLabel`, the shells
-   take label props, and `ThemeControl` takes `optionLabels`. Native prop spread
-   also lets consumers override `aria-label` on `Pagination`,
-   `PaginationPrevious`, `PaginationNext`, `Breadcrumb`, and `Spinner`; the
-   previous/next components additionally expose visible `text`. The remaining
-   frozen string is `PaginationEllipsis`'s nested sr-only `"More pages"`, which
-   its span props cannot replace. Separately, Button's variant/size set remains
-   intentionally frozen. **Trigger:** a localized product that surfaces the
-   pagination ellipsis (add the smallest label prop there), or the first
-   product with a genuine variant need the official set cannot express.
+3. **Primitive strings are locale-overridable; variant sets remain frozen.**
+   Primitive affordances expose focused label props or native `aria-label`
+   overrides, including `PaginationEllipsis.label`; translation selection
+   remains at the composition boundary. Button's variant/size set remains
+   intentionally frozen. **Trigger:** the first product with a genuine variant
+   need the official set cannot express.

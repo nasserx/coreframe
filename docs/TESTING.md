@@ -176,12 +176,12 @@ The browser step downloads Chromium only on a Playwright version change
 
 **The full browser matrix runs on every PR — deliberately.** Current measured
 discovery (`npx playwright test --list`, 2026-07-29) is **13 route pages and
-158 Playwright tests in 8 spec files**:
+159 Playwright tests in 8 spec files**:
 
 - 52 development-browser console cells (13 routes × 2 themes × 2 directions);
 - 52 production-browser axe cells over the same matrix;
 - 26 production-browser overflow cells (13 routes × 2 directions);
-- 28 targeted production-browser tests for fonts, errors, shells, i18n, and
+- 29 targeted production-browser tests for fonts, errors, shells, i18n, and
   geometry.
 
 This count is separate from the Vitest unit/component layer. A

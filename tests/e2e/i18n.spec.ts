@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
 /*
@@ -138,4 +139,34 @@ test.describe("Arabic locale on /showcase/site", () => {
     expect(state.dir).toBe("rtl");
     expect(state.stored).toBe("ar");
   });
+});
+
+test("the pagination ellipsis follows the active locale without accessibility violations", async ({
+  page,
+}) => {
+  await page.goto("/showcase/navigation");
+  await page.waitForLoadState("networkidle");
+
+  const ellipsis = page.locator('[data-slot="pagination-ellipsis"]');
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+  await expect(ellipsis.getByText("More pages", { exact: true })).toHaveCount(1);
+  await expect(ellipsis.locator("svg")).toHaveAttribute("aria-hidden", "true");
+
+  const englishResults = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(englishResults.violations).toEqual([]);
+
+  await page.getByRole("button", { name: "العربية" }).click();
+
+  await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expect(ellipsis.getByText("المزيد من الصفحات", { exact: true })).toHaveCount(1);
+  await expect(ellipsis.getByText("More pages", { exact: true })).toHaveCount(0);
+
+  const arabicResults = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(arabicResults.violations).toEqual([]);
 });
