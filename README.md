@@ -62,7 +62,9 @@ when a product first needs them, not preinstalled. Every dependency has a
   monitoring/analytics/guards/accessibility are chartered placeholders.
 - `src/components`: intentionally cross-feature presentation components;
   primitives in `src/components/ui`.
-- `src/features`: feature-first product modules (currently only `showcase`).
+- `src/features`: feature-first product modules. `marketing` owns the production
+  public composition for `/`; `showcase` remains the Foundation inspection
+  surface.
 - `src/api`: the API boundary — `apiFetch` and the typed `ApiError` contract.
 - `src/i18n`: the message layer — typed catalogues and the pure translation
   resolver; its client runtime is `LocaleProvider` in `src/core/providers`.
@@ -83,6 +85,11 @@ when a product first needs them, not preinstalled. Every dependency has a
 `/showcase` is the foundation's living integration test: every primitive,
 token, layout, and data-layer contract rendered and exercised by the browser
 test matrix. It is **not** product UI.
+
+The root `/` route is the production marketing surface and is owned separately
+under `src/features/marketing`; it may demonstrate Foundation capabilities, but
+it must not import Showcase components or depend on Showcase routes being
+enabled.
 
 - **Development:** enabled by default; keep it while building.
 - **Release:** set `NEXT_PUBLIC_ENABLE_SHOWCASE=false` at build time and every

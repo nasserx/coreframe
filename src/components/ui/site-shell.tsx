@@ -58,11 +58,27 @@ function useSiteShell(caller: string): SiteShellContextValue {
 // Nav children render in two surfaces — the horizontal bar and the mobile
 // drawer — so a dropdown has to know which one it is in: a floating panel in
 // the bar, a labelled group in the drawer. SiteShellNav stamps this on each
-// render; SiteShellNavItem ignores it (it renders the same in both), only
-// SiteShellNavMenu reads it.
+// render; navigation items use it only for drawer-local dismissal, while
+// menus also use it to choose their presentation.
 type SiteShellNavSurface = "bar" | "drawer";
 
 const SiteShellNavSurfaceContext = createContext<SiteShellNavSurface>("bar");
+
+function hasValidSamePageAnchorTarget(href: string): boolean {
+  const current = window.location;
+  const destination = new URL(href, current.href);
+
+  if (
+    destination.origin !== current.origin ||
+    destination.pathname !== current.pathname ||
+    destination.search !== current.search ||
+    destination.hash.length <= 1
+  ) {
+    return false;
+  }
+
+  return document.getElementById(decodeURIComponent(destination.hash.slice(1))) !== null;
+}
 
 export type SiteShellProps = ComponentProps<"div"> & {
   /** Label of the built-in skip link; localize at the call site. */
@@ -356,6 +372,8 @@ export function SiteShellNavItem({
   className,
   children,
 }: SiteShellNavItemProps) {
+  const { setOpen } = useSiteShell("SiteShellNavItem");
+  const surface = useContext(SiteShellNavSurfaceContext);
   const pathname = usePathname();
   const base = "flex items-center rounded-md px-3 py-2 text-small";
 
@@ -382,6 +400,17 @@ export function SiteShellNavItem({
       data-slot="site-shell-nav-item"
       href={href}
       aria-current={isCurrent ? "page" : undefined}
+      {...(surface === "drawer"
+        ? {
+            onClick: () => {
+              // Pathname changes remain owned by SiteShell. A valid anchor on
+              // the current page has no pathname change, so dismiss it here.
+              if (hasValidSamePageAnchorTarget(href)) {
+                setOpen(false);
+              }
+            },
+          }
+        : {})}
       className={cn(
         base,
         // Idle: full-strength foreground at semibold weight (a primary

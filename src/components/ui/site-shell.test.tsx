@@ -220,6 +220,67 @@ describe("SiteShell", () => {
     });
   });
 
+  it.each(["pointer", "keyboard"] as const)(
+    "closes the drawer when a valid same-page anchor is activated by %s",
+    async (activation) => {
+      const user = userEvent.setup();
+      render(
+        <SiteShell>
+          <SiteShellHeader>
+            <a href="/brand-home">Brand</a>
+            <SiteShellNav label="Site sections">
+              <SiteShellNavItem href="#capabilities">Capabilities</SiteShellNavItem>
+            </SiteShellNav>
+            <SiteShellNavTrigger />
+          </SiteShellHeader>
+          <SiteShellMain>
+            <section id="capabilities">Capabilities target</section>
+          </SiteShellMain>
+          <SiteShellFooter>Footer content</SiteShellFooter>
+        </SiteShell>,
+      );
+
+      await user.click(screen.getByRole("button", { name: "Open navigation" }));
+      const drawer = await screen.findByRole("dialog", { name: "Site sections" });
+      const anchor = within(drawer).getByRole("link", { name: "Capabilities" });
+
+      if (activation === "pointer") {
+        await user.click(anchor);
+      } else {
+        anchor.focus();
+        await user.keyboard("{Enter}");
+      }
+
+      await waitFor(() => {
+        expect(screen.queryByRole("dialog", { name: "Site sections" })).not.toBeInTheDocument();
+      });
+    },
+  );
+
+  it("keeps the drawer open when a same-page hash has no target", async () => {
+    const user = userEvent.setup();
+    render(
+      <SiteShell>
+        <SiteShellHeader>
+          <a href="/brand-home">Brand</a>
+          <SiteShellNav label="Site sections">
+            <SiteShellNavItem href="#missing">Missing target</SiteShellNavItem>
+          </SiteShellNav>
+          <SiteShellNavTrigger />
+        </SiteShellHeader>
+        <SiteShellMain>Main content</SiteShellMain>
+        <SiteShellFooter>Footer content</SiteShellFooter>
+      </SiteShell>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Open navigation" }));
+    const drawer = await screen.findByRole("dialog", { name: "Site sections" });
+
+    await user.click(within(drawer).getByRole("link", { name: "Missing target" }));
+
+    expect(screen.getByRole("dialog", { name: "Site sections" })).toBeInTheDocument();
+  });
+
   it("throws an actionable error when shell parts render outside SiteShell", () => {
     // Silence React's error boundary logging for the expected throw.
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
