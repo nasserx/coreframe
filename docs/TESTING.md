@@ -63,6 +63,11 @@ problem.
 **Browser (`tests/e2e/*.spec.ts`):** the regression net for what only a real
 browser can falsify.
 
+Spec discovery follows server ownership. `chromium-dev` matches only
+`console-clean.spec.ts`; `chromium-prod` matches every other `*.spec.ts` under
+`tests/e2e`. A new E2E spec therefore enters production coverage automatically
+unless it is deliberately assigned to the development server.
+
 - `console-clean.spec.ts` — every route × {light, dark} × {ltr, rtl} must
   produce zero console errors, warnings, uncaught exceptions, or failed
   requests. Runs against `next dev` deliberately: React reports hydration
@@ -146,10 +151,10 @@ npm run test:e2e      # browser layer (Playwright), ~30 s warm
 ```
 
 One-time setup: `npx playwright install chromium`. The browser layer starts
-two servers itself: `next start` on port 3100 (fonts, a11y, shells,
-overflow, geometry — tests what ships) and `next dev` on port 3000 (console
-harness — reuses an already running `npm run dev`, since Next allows one dev
-server per directory).
+two servers itself: `next start` on port 3100 for every production-owned spec,
+and `next dev` on port 3000 for the console/hydration harness. The development
+server reuses an already running `npm run dev`, since Next allows one dev server
+per directory.
 
 ## Extending (for a product team)
 
@@ -161,8 +166,8 @@ server per directory).
 - New locale/direction/theme states → extend the matrix constants in
   `tests/e2e/routes.ts`.
 - A flow worth testing end-to-end (auth, checkout) → new spec under
-  `tests/e2e`; keep the console listener pattern from `console-clean.spec.ts`
-  so flows also fail on console noise.
+  `tests/e2e`; it is production-owned automatically. Keep the console listener
+  pattern from `console-clean.spec.ts` so flows also fail on console noise.
 - Judging an axe finding a false positive → exclude it in `a11y.spec.ts`
   with a comment arguing why; never lower the tag set.
 

@@ -157,10 +157,12 @@ Honest defects and frictions, none currently blocking:
    extension — localized products pass a translated value instead of hiding
    the button and composing their own `DialogClose`. Consistent with the
    shells' label props and `ThemeControl.optionLabels`.
-3. **Three e2e specs hard-reference showcase URLs** (`shell`, `fonts`,
-   `errors`) and need retargeting when the showcase is deleted
-   (`docs/CLONING.md` §3 lists them precisely, together with the
-   `playwright.config.ts` `testMatch` cleanup).
+3. **Production E2E spec discovery is automatic; three specs still
+   hard-reference showcase URLs.** `chromium-prod` owns every `*.spec.ts`
+   except the development-only console suite, so new and renamed production
+   specs enter coverage without config changes. When the showcase is deleted,
+   `shell`, `fonts`, and `errors` still need URL retargeting; `docs/CLONING.md`
+   §3 lists those call sites precisely.
 4. **The showcase gate requires a rebuild to flip.**
    `NEXT_PUBLIC_ENABLE_SHOWCASE` is inlined at build time — the price of
    keeping every route statically prerendered. A runtime kill-switch would

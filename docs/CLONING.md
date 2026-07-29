@@ -71,7 +71,7 @@ Three options, in order of product maturity:
    discovery expects the pages to exist.)
 3. **Delete it permanently** — remove the three showcase locations:
    `src/app/showcase`, `src/app/api/showcase`, `src/features/showcase`.
-   Then finish the deletion in four places that reference the showcase:
+   Then finish the deletion in three places that reference the showcase:
    - **The env gate**: `NEXT_PUBLIC_ENABLE_SHOWCASE` becomes dead code once
      the gated routes are gone. Remove it from `src/config/env.ts` (its
      `RAW_ENV` read, its `ENV_CONFIG`/`EnvConfig` field, and the `ProcessEnv`
@@ -85,11 +85,9 @@ Three options, in order of product maturity:
      shell), `fonts.spec.ts` (measures Arabic on `/showcase/direction` —
      any page with Arabic text works), and `errors.spec.ts` (exercises the
      ErrorBoundary demo on `/showcase/feedback` — keep the 404 test,
-     retarget or drop the boundary test).
-   - **`playwright.config.ts`**: the `testMatch` patterns name the spec
-     files explicitly. If retargeting leads you to delete or rename a spec,
-     remove it from `testMatch` too — a stale name there rots silently (the
-     config keeps matching nothing without failing).
+     retarget or drop the boundary test). Production specs are discovered
+     automatically, so deleting or renaming one needs no Playwright config
+     change.
    - **`src/features/README.md`**: its "Current contents" line describes
      `showcase/`; update it to describe your product's features (or "none
      yet").

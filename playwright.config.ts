@@ -20,8 +20,8 @@ const DEV_PORT = 3000;
  *   loading, accessibility scans, the shell operability tests, and the
  *   horizontal-overflow sweep run against exactly what ships.
  *
- * A deleted or renamed spec must also be removed from the testMatch
- * patterns below — a stale name rots silently (docs/CLONING.md).
+ * Spec ownership follows server behavior: the console/hydration suite is
+ * dev-only, and every other E2E spec defaults to the production project.
  */
 export default defineConfig({
   testDir: "tests/e2e",
@@ -52,7 +52,8 @@ export default defineConfig({
     },
     {
       name: "chromium-prod",
-      testMatch: /(fonts|a11y|shell|errors|overflow|i18n|geometry)\.spec\.ts/,
+      testMatch: /\.spec\.ts$/,
+      testIgnore: /console-clean\.spec\.ts$/,
       use: { baseURL: `http://localhost:${PROD_PORT}` },
     },
   ],
