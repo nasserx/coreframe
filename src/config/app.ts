@@ -45,7 +45,6 @@ export const LOCALE_INFO = {
 export const APP_CONFIG = {
   name: "Frontend Foundation",
   description: "A reusable frontend foundation for production web applications.",
-  version: "0.1.0",
   defaultLocale: APP_LOCALES.DEFAULT,
   supportedLocales: APP_LOCALES.SUPPORTED,
   direction: LOCALE_INFO[APP_LOCALES.DEFAULT].direction,
