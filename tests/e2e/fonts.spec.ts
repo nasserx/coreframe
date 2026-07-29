@@ -8,6 +8,7 @@ import { expect, test } from "@playwright/test";
  */
 const ARABIC_SAMPLE = "المعرفةأساسالتقدموالتصميمالجيديخدمالجميع";
 const LATIN_SAMPLE = "Inter keeps bilingual interfaces clear and balanced";
+const INTER_WEIGHTS = [400, 500, 600, 700, 800] as const;
 const TAJAWAL_WEIGHTS = [400, 500, 700, 800] as const;
 
 test("Inter and Tajawal load and render their respective scripts", async ({ page }) => {
@@ -48,19 +49,24 @@ test("Inter and Tajawal load and render their respective scripts", async ({ page
   await page.waitForLoadState("networkidle");
 
   const probe = await page.evaluate(
-    async ([arabicSample, latinSample, tajawalWeights]) => {
+    async ([arabicSample, latinSample, interWeights, tajawalWeights]) => {
       const rootStyle = getComputedStyle(document.documentElement);
       const interFamily = rootStyle.getPropertyValue("--font-inter").trim();
       const tajawalFamily = rootStyle.getPropertyValue("--font-tajawal").trim();
       const bodyStack = getComputedStyle(document.body).fontFamily;
+      const primaryFamily = (stack: string): string => stack.split(",")[0]?.trim() ?? "";
+      const interPrimary = primaryFamily(interFamily);
+      const tajawalPrimary = primaryFamily(tajawalFamily);
 
       // Exercise browser font matching through rendered text instead of
       // imperative FontFaceSet.load() calls. Chromium can reject load() with
       // an opaque NetworkError for one face in a comma-separated next/font
       // family (for example "Inter", "Inter Fallback"), losing the face and
       // request that failed. Layout-triggered loading is the production path;
-      // ready + check() + loaded FontFace evidence below remains strict while
-      // producing actionable diagnostics.
+      // ready + primary-family check() + computed ownership + loaded FontFace
+      // evidence below remains strict while producing actionable diagnostics.
+      // Generated fallback faces remain visible in diagnostics but do not own
+      // readiness for their healthy primary family.
       const fixture = document.createElement("div");
       fixture.setAttribute("aria-hidden", "true");
       Object.assign(fixture.style, {
@@ -75,22 +81,28 @@ test("Inter and Tajawal load and render their respective scripts", async ({ page
       });
 
       const fontChecks = [
-        { family: "Inter", cssFamily: interFamily, weight: 400, sample: latinSample },
+        ...interWeights.map((weight) => ({
+          family: "Inter",
+          cssFamily: interPrimary,
+          weight,
+          sample: latinSample,
+        })),
         ...tajawalWeights.map((weight) => ({
           family: "Tajawal",
-          cssFamily: tajawalFamily,
+          cssFamily: tajawalPrimary,
           weight,
           sample: arabicSample,
         })),
       ];
-      for (const check of fontChecks) {
+      const renderedProbes = fontChecks.map((check) => {
         const text = document.createElement("span");
         text.style.fontFamily = check.cssFamily;
         text.style.fontSize = "16px";
         text.style.fontWeight = String(check.weight);
         text.textContent = check.sample;
         fixture.append(text);
-      }
+        return { check, text };
+      });
       document.body.append(fixture);
 
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -101,10 +113,15 @@ test("Inter and Tajawal load and render their respective scripts", async ({ page
         weight: face.weight,
         status: face.status,
       }));
-      const checks = fontChecks.map((check) => ({
-        ...check,
-        loaded: document.fonts.check(`${check.weight} 16px ${check.cssFamily}`, check.sample),
-      }));
+      const checks = renderedProbes.map(({ check, text }) => {
+        const style = getComputedStyle(text);
+        return {
+          ...check,
+          computedFamily: style.fontFamily,
+          computedWeight: style.fontWeight,
+          loaded: document.fonts.check(`${check.weight} 16px ${check.cssFamily}`, check.sample),
+        };
+      });
 
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
@@ -118,27 +135,37 @@ test("Inter and Tajawal load and render their respective scripts", async ({ page
 
       const result = {
         interFamily,
+        interPrimary,
         tajawalFamily,
+        tajawalPrimary,
         bodyStack,
         fontSetStatus: document.fonts.status,
         checks,
         faces,
         latinStackWidth: measure(latinSample, bodyStack),
-        interWidth: measure(latinSample, interFamily),
+        interWidth: measure(latinSample, interPrimary),
         arialLatinWidth: measure(latinSample, "Arial"),
         arabicStackWidth: measure(arabicSample, bodyStack),
-        tajawalWidth: measure(arabicSample, tajawalFamily),
+        tajawalWidth: measure(arabicSample, tajawalPrimary),
         arialArabicWidth: measure(arabicSample, "Arial"),
       };
       fixture.remove();
       return result;
     },
-    [ARABIC_SAMPLE, LATIN_SAMPLE, TAJAWAL_WEIGHTS] as const,
+    [ARABIC_SAMPLE, LATIN_SAMPLE, INTER_WEIGHTS, TAJAWAL_WEIGHTS] as const,
   );
 
   const diagnostics = JSON.stringify(
     {
       fontSetStatus: probe.fontSetStatus,
+      generatedStacks: {
+        inter: probe.interFamily,
+        tajawal: probe.tajawalFamily,
+      },
+      primaryFamilies: {
+        inter: probe.interPrimary,
+        tajawal: probe.tajawalPrimary,
+      },
       checks: probe.checks,
       faces: probe.faces,
       requests: Array.from(fontRequests.values()),
@@ -160,6 +187,8 @@ test("Inter and Tajawal load and render their respective scripts", async ({ page
 
   expect(probe.interFamily, diagnostics).not.toBe("");
   expect(probe.tajawalFamily, diagnostics).not.toBe("");
+  expect(probe.interPrimary, diagnostics).not.toBe("");
+  expect(probe.tajawalPrimary, diagnostics).not.toBe("");
   expect(probe.fontSetStatus, diagnostics).toBe("loaded");
   expect(
     Array.from(fontRequests.values()).filter(
@@ -168,12 +197,28 @@ test("Inter and Tajawal load and render their respective scripts", async ({ page
     diagnostics,
   ).toEqual([]);
   expect(
-    probe.checks.every((check) => check.loaded),
+    probe.checks.map((check) => ({
+      family: check.family,
+      weight: check.weight,
+      loaded: check.loaded,
+      computedFamily: firstFamily(check.computedFamily),
+      computedWeight: check.computedWeight,
+    })),
     diagnostics,
-  ).toBe(true);
-  expect(loadedFace(firstFamily(probe.interFamily), 400), diagnostics).toBe(true);
+  ).toEqual(
+    probe.checks.map((check) => ({
+      family: check.family,
+      weight: check.weight,
+      loaded: true,
+      computedFamily: firstFamily(check.cssFamily),
+      computedWeight: String(check.weight),
+    })),
+  );
+  for (const weight of INTER_WEIGHTS) {
+    expect(loadedFace(firstFamily(probe.interPrimary), weight), diagnostics).toBe(true);
+  }
   for (const weight of TAJAWAL_WEIGHTS) {
-    expect(loadedFace(firstFamily(probe.tajawalFamily), weight), diagnostics).toBe(true);
+    expect(loadedFace(firstFamily(probe.tajawalPrimary), weight), diagnostics).toBe(true);
   }
 
   expect(firstFamily(probe.bodyStack), diagnostics).toBe(firstFamily(probe.tajawalFamily));
