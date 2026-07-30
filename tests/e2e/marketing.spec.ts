@@ -406,6 +406,138 @@ test("root marketing page and header do not overflow at checkpoint widths", asyn
   }
 });
 
+test("informational story cards coordinate restrained hover feedback and reduced motion", async ({
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await gotoMarketingState(page, "light", "en");
+
+  const cardSelectors = [
+    "#capability-story [data-slot='marketing-story-card']",
+    "#quality [data-slot='marketing-story-card']",
+  ] as const;
+
+  for (const selector of cardSelectors) {
+    const card = page.locator(selector).first();
+    const iconWrapper = card.locator('[data-slot="marketing-story-icon"]');
+    const icon = card.locator('[data-slot="marketing-story-icon-glyph"]');
+    const before = await card.evaluate((element) => ({
+      text: element.textContent,
+      backgroundColor: getComputedStyle(element).backgroundColor,
+      iconBorderColor: getComputedStyle(
+        element.querySelector('[data-slot="marketing-story-icon"]')!,
+      ).borderColor,
+      iconColor: getComputedStyle(element.querySelector('[data-slot="marketing-story-icon"]')!)
+        .color,
+    }));
+
+    await expect(card).not.toHaveAttribute("tabindex");
+    await expect(card).not.toHaveAttribute("role");
+    await expect(card).toHaveCSS("cursor", "auto");
+    await expect(card).toHaveCSS("translate", "none");
+    await card.hover();
+    await expect(card).toHaveCSS("translate", "0px -2px");
+    await expect(icon).toHaveCSS("translate", "0px -1px");
+
+    const after = await card.evaluate((element) => ({
+      text: element.textContent,
+      backgroundColor: getComputedStyle(element).backgroundColor,
+      iconBorderColor: getComputedStyle(
+        element.querySelector('[data-slot="marketing-story-icon"]')!,
+      ).borderColor,
+      iconColor: getComputedStyle(element.querySelector('[data-slot="marketing-story-icon"]')!)
+        .color,
+    }));
+    expect(after.text).toBe(before.text);
+    expect(after.backgroundColor).not.toBe(before.backgroundColor);
+    expect(after.iconBorderColor).not.toBe(before.iconBorderColor);
+    expect(after.iconColor).not.toBe(before.iconColor);
+    await expect(iconWrapper).toHaveCSS("color", after.iconColor);
+  }
+
+  const architectureSpecimen = page.getByRole("figure", { name: COPY.en.architectureDiagram });
+  await architectureSpecimen.hover();
+  await expect(architectureSpecimen).toHaveCSS("translate", "none");
+
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const reducedCard = page.locator(cardSelectors[0]).nth(1);
+  const reducedIcon = reducedCard.locator('[data-slot="marketing-story-icon-glyph"]');
+  await reducedCard.hover();
+  await expect(reducedCard).toHaveCSS("translate", "none");
+  await expect(reducedIcon).toHaveCSS("translate", "none");
+  expect(consoleErrors).toEqual([]);
+});
+
+test("informational story cards keep their static presentation in touch contexts", async ({
+  baseURL,
+  browser,
+}) => {
+  const context = await browser.newContext({
+    baseURL,
+    hasTouch: true,
+    viewport: { width: 390, height: 844 },
+  });
+  const page = await context.newPage();
+
+  try {
+    for (const locale of ["en", "ar"] as const) {
+      await gotoMarketingState(page, "light", locale);
+
+      expect(
+        await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches),
+      ).toBe(false);
+
+      const card = page.locator("#capability-story [data-slot='marketing-story-card']").first();
+      const iconWrapper = card.locator('[data-slot="marketing-story-icon"]');
+      const icon = card.locator('[data-slot="marketing-story-icon-glyph"]');
+      const before = await card.evaluate((element) => ({
+        text: element.textContent,
+        backgroundColor: getComputedStyle(element).backgroundColor,
+      }));
+      const beforeIcon = await iconWrapper.evaluate((element) => ({
+        backgroundColor: getComputedStyle(element).backgroundColor,
+        borderColor: getComputedStyle(element).borderColor,
+        color: getComputedStyle(element).color,
+      }));
+
+      await card.hover();
+      await expect(card).toHaveCSS("translate", "none");
+      await expect(icon).toHaveCSS("translate", "none");
+      expect(
+        await card.evaluate((element) => ({
+          text: element.textContent,
+          backgroundColor: getComputedStyle(element).backgroundColor,
+        })),
+      ).toEqual(before);
+      expect(
+        await iconWrapper.evaluate((element) => ({
+          backgroundColor: getComputedStyle(element).backgroundColor,
+          borderColor: getComputedStyle(element).borderColor,
+          color: getComputedStyle(element).color,
+        })),
+      ).toEqual(beforeIcon);
+
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(1);
+    }
+  } finally {
+    await context.close();
+  }
+});
+
 test("a newly added mobile marketing anchor reaches its target and dismisses", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 

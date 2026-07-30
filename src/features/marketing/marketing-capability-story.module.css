@@ -1,0 +1,41 @@
+.storyCard {
+  transition-property: background-color, border-color, translate;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--ease-standard);
+}
+
+.storyIcon {
+  transition-property: background-color, border-color, color;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--ease-standard);
+}
+
+.storyIconGlyph {
+  transition-property: translate;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .storyCard:hover {
+    background-color: var(--accent);
+    translate: 0 -2px;
+  }
+
+  .storyCard:hover .storyIcon {
+    border-color: var(--primary);
+    background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+    color: var(--primary);
+  }
+
+  .storyCard:hover .storyIconGlyph {
+    translate: 0 -1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storyCard:hover,
+  .storyCard:hover .storyIconGlyph {
+    translate: none;
+  }
+}

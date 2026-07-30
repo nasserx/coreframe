@@ -24,6 +24,7 @@ import {
   type MarketingSpecimenStep,
   QualityPipeline,
 } from "./marketing-specimens";
+import styles from "./marketing-capability-story.module.css";
 
 type FeatureSplitProps = Readonly<{
   eyebrow: string;
@@ -77,9 +78,19 @@ function StoryCard({ title, description, evidence, technologies, icon: Icon }: S
   const t = useTranslations("marketing");
 
   return (
-    <article className="flex h-full min-w-0 flex-col rounded-xl border bg-card p-6">
-      <div className="flex size-10 items-center justify-center rounded-lg border bg-surface text-info">
-        <Icon aria-hidden={true} className="size-5" />
+    <article
+      data-slot="marketing-story-card"
+      className={`${styles["storyCard"]} flex h-full min-w-0 flex-col rounded-xl border bg-card p-6`}
+    >
+      <div
+        data-slot="marketing-story-icon"
+        className={`${styles["storyIcon"]} flex size-10 items-center justify-center rounded-lg border bg-surface text-info`}
+      >
+        <Icon
+          aria-hidden={true}
+          data-slot="marketing-story-icon-glyph"
+          className={`${styles["storyIconGlyph"]} size-5`}
+        />
       </div>
       <bdi dir="auto" className="mt-5 self-start text-caption font-semibold text-link">
         {technologies}
