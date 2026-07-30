@@ -482,6 +482,10 @@ test("informational story cards keep their static presentation in touch contexts
   baseURL,
   browser,
 }) => {
+  if (!baseURL) {
+    throw new Error("The marketing touch-context test requires a configured Playwright baseURL.");
+  }
+
   const context = await browser.newContext({
     baseURL,
     hasTouch: true,
