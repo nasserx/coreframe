@@ -67,6 +67,8 @@ export const en = {
     navLabel: "Primary navigation",
     navOverview: "Overview",
     navCapabilities: "Capabilities",
+    navArchitecture: "Architecture",
+    navQuality: "Quality",
     eyebrow: "Production-ready by design",
     heroTitle: "A dependable starting point for modern web products.",
     heroLead:
@@ -84,8 +86,140 @@ export const en = {
     capabilityStaticDescription: "Routes prerender without request-time locale state.",
     capabilityQualityTitle: "Automated quality",
     capabilityQualityDescription: "Formatting, types, tests, accessibility, and overflow checks.",
+    storyEyebrow: "Capabilities with evidence",
+    storyTitle: "Technical choices that carry their evidence.",
+    storyLead:
+      "The Foundation turns its core decisions into maintainable outcomes. Each capability is owned in code, documented where it belongs, and exercised by a quality gate suited to the risk it reduces.",
+    storyEvidenceLabel: "Repository check",
+    storyArchitectureTitle: "Architecture with clear ownership",
+    storyArchitectureDescription:
+      "App Router pages stay focused on framework wiring while feature modules own product composition. Explicit TypeScript boundaries make integrations easier to maintain.",
+    storyArchitectureEvidence:
+      "Dependency-direction lint rules and strict typechecking enforce the boundary.",
+    storyArchitectureTechnologies: "Next.js · App Router · TypeScript",
+    storyTokensTitle: "A semantic design system",
+    storyTokensDescription:
+      "Tailwind CSS utilities resolve through one semantic token layer, so light and dark surfaces change by role instead of component-level raw colors.",
+    storyTokensEvidence: "Token-parity and contrast tests exercise both themes.",
+    storyTokensTechnologies: "Tailwind CSS · semantic tokens",
+    storyBilingualTitle: "Bilingual by construction",
+    storyBilingualDescription:
+      "Each script has an appropriate typeface, while logical spacing and alignment let English and Arabic share the same component structure in both directions.",
+    storyBilingualEvidence:
+      "Catalogue, font, direction, accessibility, and overflow checks cover the contract.",
+    storyBilingualTechnologies: "Inter · Tajawal · LTR · RTL",
+    storyShellTitle: "Responsive public chrome",
+    storyShellDescription:
+      "SiteShell provides the header, main, footer, skip link, and a focus-managed mobile drawer without making pages duplicate shell behavior.",
+    storyShellEvidence:
+      "Component keyboard tests and production-browser shell coverage exercise it.",
+    storyShellTechnologies: "SiteShell · Base UI",
+    storyStaticTitle: "A static delivery path",
+    storyStaticDescription:
+      "The landing route prerenders from server-owned route composition and does not read request-time locale state.",
+    storyStaticEvidence:
+      "The production build and the Showcase-disabled root-route check verify it.",
+    storyStaticTechnologies: "Next.js · static output",
+    storyQualityTitle: "Quality gates that observe the browser",
+    storyQualityDescription:
+      "Formatting, linting, types, unit tests, builds, and browser tests cover both code contracts and rendered behavior.",
+    storyQualityEvidence: "The CI workflow and auto-discovered route matrix own the verification.",
+    storyQualityTechnologies: "Vitest · Playwright · axe",
+    architectureEyebrow: "Architecture and delivery",
+    architectureTitleBefore: "",
+    architectureTitleAfter: ": static where the route allows it.",
+    architectureLead:
+      "Route composition and metadata remain server-owned. Translated content and controls cross explicit client boundaries only when they respond to live locale, theme, or shell state.",
+    architectureBody:
+      "The page reads no request-time locale state, so the build can prerender it from the configured default catalogue. That avoids unnecessary request-time work and keeps deployment simpler for this route, without promising that every future route will be static.",
+    verificationLabel: "Repository evidence",
+    architectureVerification:
+      "Normal and Showcase-disabled builds both mark / as static, and disabling the Showcase does not change its HTTP 200 response.",
+    architectureDiagramLabel: "Architecture delivery path",
+    architectureStepRouteKicker: "Server",
+    architectureStepRouteTitle: "Server-owned route",
+    architectureStepRouteDescription:
+      "The App Router page composes marketing content and canonical metadata.",
+    architectureStepStaticKicker: "Static",
+    architectureStepStaticTitle: "Prerendered output",
+    architectureStepStaticDescription:
+      "The build emits the root page as static content from the default locale.",
+    architectureStepClientKicker: "Client",
+    architectureStepClientTitle: "Explicit client boundaries",
+    architectureStepClientDescription:
+      "Translated content, SiteShell chrome, theme, and locale controls hydrate for live interaction.",
+    bilingualEyebrow: "Bilingual design system",
+    bilingualTitle: "One semantic system, equal care in both directions.",
+    bilingualLead:
+      "The interface begins with semantic roles for color, surface, and state rather than raw values inside each component. Logical properties then adapt spacing and alignment to the active language direction.",
+    bilingualInterDescription: "Owns Latin text throughout the shared sans stack.",
+    bilingualTajawalDescription:
+      "Owns Arabic text through local font files limited to Arabic characters.",
+    bilingualVerification:
+      "Browser tests verify that both families are loaded and selected for their scripts; theme and direction matrices cover accessibility and overflow.",
+    bilingualDiagramLabel: "Semantic design-system path",
+    bilingualStepTokensKicker: "Tokens",
+    bilingualStepTokensTitle: "Semantic roles",
+    bilingualStepTokensDescription: "Background, surface, text, action, and status.",
+    bilingualStepThemesKicker: "Themes",
+    bilingualStepThemesTitle: "Theme values",
+    bilingualStepThemesDescription: "Light and dark resolve from the same role vocabulary.",
+    bilingualStepDirectionKicker: "Direction",
+    bilingualStepDirectionTitle: "Language and direction",
+    bilingualStepDirectionDescription: "English LTR and Arabic RTL share one structure.",
+    qualityEyebrow: "Verified safeguards",
+    qualityTitle: "Risk-reducing defaults, not absolute guarantees.",
+    qualityLead:
+      "The Foundation combines static analysis with browser checks because neither layer catches every class of failure. These safeguards reduce known risks and keep their evidence reviewable; they do not promise perfect security.",
+    safeguardContractsTitle: "Explicit contracts",
+    safeguardContractsDescription:
+      "Strict TypeScript contracts and dependency-direction linting catch invalid message keys, missing catalogue entries, and layer violations before they cross a quality gate.",
+    safeguardContractsEvidence: "Typecheck, catalogue-parity tests, and lint own the checks.",
+    safeguardContractsTechnologies: "TypeScript · ESLint",
+    safeguardAccessTitle: "Accessible interaction",
+    safeguardAccessDescription:
+      "Semantic landmarks, visible focus, keyboard-operated shell navigation, and reduced-motion rules reduce interaction barriers in the implemented shell.",
+    safeguardAccessEvidence:
+      "Component interaction tests and axe scans exercise both themes and directions.",
+    safeguardAccessTechnologies: "Base UI · axe · keyboard",
+    safeguardBrowserTitle: "Rendered-behavior checks",
+    safeguardBrowserDescription:
+      "Browser tests monitor console output, horizontal overflow, font selection, keyboard flows, themes, and directions against running builds.",
+    safeguardBrowserEvidence:
+      "Development and production Playwright projects own these observations for their configured routes and states.",
+    safeguardBrowserTechnologies: "Playwright · Chromium",
+    safeguardFontsTitle: "Bundled and local fonts",
+    safeguardFontsDescription:
+      "Inter is bundled through Next.js, while Tajawal is served from local Arabic subsets. Browser tests verify script ownership without runtime Google Fonts requests.",
+    safeguardFontsEvidence:
+      "Font ownership tests verify requests, loaded faces, and script-specific selection.",
+    safeguardFontsTechnologies: "next/font · Inter · Tajawal",
+    safeguardInstallTitle: "Controlled installation scripts",
+    safeguardInstallDescription:
+      "A strict allowlist restricts dependency install-time scripts to reviewed approvals, reducing unreviewed code execution during installation. Approvals are revisited when dependency versions change.",
+    safeguardInstallEvidence:
+      "The npm policy fails closed for unreviewed dependency lifecycle scripts.",
+    safeguardInstallTechnologies: "npm · allowScripts",
+    safeguardShowcaseTitle: "Showcase isolation",
+    safeguardShowcaseDescription:
+      "For the current release contract, a build-time flag turns Showcase routes and their API into static 404s while the production root remains independently available.",
+    safeguardShowcaseEvidence:
+      "The disabled build and root HTTP check verify that release boundary.",
+    safeguardShowcaseTechnologies: "NEXT_PUBLIC_ENABLE_SHOWCASE",
+    dependencyPostureTitle: "Transparent dependency posture",
+    dependencyPostureDescription:
+      "Known dependency advisories are documented and reviewed rather than hidden or cleared through an unsafe forced downgrade. This reduces uncertainty; it does not mean the dependency tree is risk-free.",
+    pipelineLabel: "Automated validation pipeline",
+    pipelineFormat: "Format",
+    pipelineLint: "Lint",
+    pipelineTypes: "Types",
+    pipelineUnit: "Unit tests",
+    pipelineBuild: "Production build",
+    pipelineBrowser: "Browser tests",
     footerContext: "A domain-neutral base for production web applications.",
     footerNavLabel: "Footer navigation",
+    footerOverview: "Overview",
+    footerCapabilities: "Capabilities",
     footerStatus: "Built with semantic tokens, typed contracts, and static generation.",
   },
   /**

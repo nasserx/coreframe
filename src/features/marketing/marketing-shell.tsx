@@ -40,6 +40,13 @@ export function MarketingShell({ children }: MarketingShellProps) {
     system: tTheme("system"),
   } as const;
 
+  const navigationItems = [
+    { href: "#overview", label: t("navOverview") },
+    { href: "#capability-story", label: t("navCapabilities") },
+    { href: "#architecture", label: t("navArchitecture") },
+    { href: "#quality", label: t("navQuality") },
+  ] as const;
+
   return (
     <SiteShell collapseBelow="md" skipLinkLabel={tShell("skipLink")}>
       <SiteShellHeader>
@@ -52,8 +59,11 @@ export function MarketingShell({ children }: MarketingShellProps) {
         </Link>
 
         <SiteShellNav label={t("navLabel")} closeLabel={tShell("closeNav")}>
-          <SiteShellNavItem href="#overview">{t("navOverview")}</SiteShellNavItem>
-          <SiteShellNavItem href="#capabilities">{t("navCapabilities")}</SiteShellNavItem>
+          {navigationItems.map(({ href, label }) => (
+            <SiteShellNavItem key={href} href={href}>
+              {label}
+            </SiteShellNavItem>
+          ))}
 
           <div className="mt-3 flex flex-col items-start gap-3 border-t pt-4 md:hidden">
             <LocaleControl />
@@ -92,7 +102,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
                   href="#overview"
                   className="rounded-md transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  {t("navOverview")}
+                  {t("footerOverview")}
                 </Link>
               </li>
               <li>
@@ -100,7 +110,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
                   href="#capabilities"
                   className="rounded-md transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  {t("navCapabilities")}
+                  {t("footerCapabilities")}
                 </Link>
               </li>
             </ul>

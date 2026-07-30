@@ -11,7 +11,19 @@ const COPY = {
     cta: "Explore the capabilities",
     navLabel: "Primary navigation",
     openNav: "Open navigation",
-    capabilities: "Capabilities",
+    navigation: [
+      { label: "Overview", href: "#overview" },
+      { label: "Capabilities", href: "#capability-story" },
+      { label: "Architecture", href: "#architecture" },
+      { label: "Quality", href: "#quality" },
+    ],
+    storyHeading: "Technical choices that carry their evidence.",
+    architectureHeading: "App Router: static where the route allows it.",
+    bilingualHeading: "One semantic system, equal care in both directions.",
+    qualityHeading: "Risk-reducing defaults, not absolute guarantees.",
+    architectureDiagram: "Architecture delivery path",
+    bilingualDiagram: "Semantic design-system path",
+    pipelineDiagram: "Automated validation pipeline",
   },
   ar: {
     direction: "rtl",
@@ -19,7 +31,19 @@ const COPY = {
     cta: "استكشف الإمكانات",
     navLabel: "التنقل الرئيسي",
     openNav: "فتح التنقل",
-    capabilities: "الإمكانات",
+    navigation: [
+      { label: "نظرة عامة", href: "#overview" },
+      { label: "القدرات", href: "#capability-story" },
+      { label: "المعمارية", href: "#architecture" },
+      { label: "الجودة", href: "#quality" },
+    ],
+    storyHeading: "اختيارات تقنية تحمل دليلها معها.",
+    architectureHeading: "معمارية App Router، وتوليد ثابت حين يسمح المسار.",
+    bilingualHeading: "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
+    qualityHeading: "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
+    architectureDiagram: "مسار التسليم المعماري",
+    bilingualDiagram: "مسار نظام التصميم الدلالي",
+    pipelineDiagram: "مسار التحقق الآلي",
   },
 } as const;
 
@@ -36,6 +60,8 @@ const ENGLISH_MARKETING_TEXT = [
   "Frontend Foundation",
   "Overview",
   "Capabilities",
+  "Architecture",
+  "Quality",
   "Production-ready by design",
   "A dependable starting point for modern web products.",
   "Build on a typed, accessible foundation with semantic themes, bilingual direction support, responsive public chrome, and automated quality gates.",
@@ -51,6 +77,22 @@ const ENGLISH_MARKETING_TEXT = [
   "Routes prerender without request-time locale state.",
   "Automated quality",
   "Formatting, types, tests, accessibility, and overflow checks.",
+  "Technical choices that carry their evidence.",
+  "App Router: static where the route allows it.",
+  "One semantic system, equal care in both directions.",
+  "Risk-reducing defaults, not absolute guarantees.",
+  "The landing route prerenders from server-owned route composition and does not read request-time locale state.",
+  "Inter is bundled through Next.js, while Tajawal is served from local Arabic subsets. Browser tests verify script ownership without runtime Google Fonts requests.",
+  "Known dependency advisories are documented and reviewed rather than hidden or cleared through an unsafe forced downgrade. This reduces uncertainty; it does not mean the dependency tree is risk-free.",
+  "Tailwind CSS · semantic tokens",
+  "Next.js · static output",
+  "Base UI · axe · keyboard",
+  "Server",
+  "Static",
+  "Client",
+  "Tokens",
+  "Themes",
+  "Direction",
   "A domain-neutral base for production web applications.",
   "Built with semantic tokens, typed contracts, and static generation.",
 ] as const;
@@ -58,6 +100,9 @@ const ENGLISH_MARKETING_TEXT = [
 const ARABIC_MARKETING_TEXT = [
   "أساس الواجهات",
   "نظرة عامة",
+  "القدرات",
+  "المعمارية",
+  "الجودة",
   "الإمكانات",
   "جاهز للإنتاج من الأساس",
   "نقطة انطلاق موثوقة لمنتجات ويب حديثة.",
@@ -74,6 +119,22 @@ const ARABIC_MARKETING_TEXT = [
   "تُولَّد المسارات مسبقًا دون الاعتماد على حالة وقت الطلب.",
   "جودة آلية",
   "فحص التنسيق والأنواع والاختبارات والوصول ومنع التجاوز الأفقي.",
+  "اختيارات تقنية تحمل دليلها معها.",
+  "معمارية App Router، وتوليد ثابت حين يسمح المسار.",
+  "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
+  "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
+  "يُولَّد المسار الرئيسي مسبقًا من تركيب مملوك للخادم، ولا يقرأ حالة اللغة وقت الطلب.",
+  "يُحزَّم Inter عبر Next.js، بينما يُقدَّم Tajawal من ملفات محلية مخصّصة للعربية. وتتحقق اختبارات المتصفح من اختيار الخط المناسب دون طلب Google Fonts وقت التشغيل.",
+  "تُوثَّق تنبيهات الاعتمادات المعروفة وتُراجع بدل إخفائها أو إزالتها بخفض قسري غير آمن للإصدارات. يقلّل ذلك الغموض، لكنه لا يعني أن شجرة الاعتمادات خالية من المخاطر.",
+  "رموز دلالية · Tailwind CSS",
+  "ناتج ثابت · Next.js",
+  "لوحة المفاتيح · Base UI · axe",
+  "الخادم",
+  "ثابت",
+  "العميل",
+  "الرموز",
+  "المظاهر",
+  "الاتجاه",
   "أساس محايد المجال لبناء تطبيقات ويب إنتاجية.",
   "مبني على رموز دلالية وعقود أنواع صريحة وتوليد ثابت.",
 ] as const;
@@ -110,9 +171,20 @@ test("root marketing route owns one landmark set and a resolved primary action",
   await expect(page.getByRole("contentinfo")).toHaveCount(1);
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
 
+  const headingLevels = await page
+    .locator("h1, h2, h3")
+    .evaluateAll((headings) => headings.map((heading) => Number(heading.tagName.slice(1))));
+  expect(headingLevels[0]).toBe(1);
+  for (let index = 1; index < headingLevels.length; index += 1) {
+    expect(headingLevels[index] ?? 0).toBeLessThanOrEqual((headingLevels[index - 1] ?? 0) + 1);
+  }
+
   const cta = page.getByRole("link", { name: COPY.en.cta });
   await expect(cta).toHaveAttribute("href", "#capabilities");
   await expect(page.locator("section#capabilities")).toHaveCount(1);
+  for (const id of ["capability-story", "architecture", "bilingual-design", "quality"]) {
+    await expect(page.locator(`section#${id}`)).toHaveCount(1);
+  }
   await expect(page.locator('[data-slot="marketing-preview"]')).toHaveAttribute(
     "aria-hidden",
     "true",
@@ -133,6 +205,40 @@ test("root marketing metadata remains the canonical server value after a locale 
   );
 });
 
+test("desktop and drawer navigation share four ordered, unique page targets", async ({ page }) => {
+  for (const locale of ["en", "ar"] as const) {
+    await page.setViewportSize({ width: 1024, height: 900 });
+    await gotoMarketingState(page, "light", locale);
+
+    const desktopNavigation = page
+      .getByRole("banner")
+      .getByRole("navigation", { name: COPY[locale].navLabel });
+    const desktopLinks = desktopNavigation.getByRole("link");
+    await expect(desktopLinks).toHaveText(COPY[locale].navigation.map(({ label }) => label));
+
+    for (const [index, { href }] of COPY[locale].navigation.entries()) {
+      await expect(desktopLinks.nth(index)).toHaveAttribute("href", href);
+      await expect(page.locator(href)).toHaveCount(1);
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole("button", { name: COPY[locale].openNav }).click();
+
+    const drawer = page.getByRole("dialog", { name: COPY[locale].navLabel });
+    const drawerLinks = drawer.getByRole("link");
+    await expect(drawerLinks).toHaveText(COPY[locale].navigation.map(({ label }) => label));
+    for (const [index, { href }] of COPY[locale].navigation.entries()) {
+      await expect(drawerLinks.nth(index)).toHaveAttribute("href", href);
+    }
+
+    const duplicateIds = await page.locator("[id]").evaluateAll((elements) => {
+      const ids = elements.map(({ id }) => id);
+      return ids.filter((id, index) => ids.indexOf(id) !== index);
+    });
+    expect(duplicateIds).toEqual([]);
+  }
+});
+
 test("visible marketing copy, direction, and display metrics follow the live locale", async ({
   page,
 }) => {
@@ -150,6 +256,15 @@ test("visible marketing copy, direction, and display metrics follow the live loc
   });
   expect(englishMetrics.fontWeight).toBe("800");
   expect(englishMetrics.lineHeight / englishMetrics.fontSize).toBeCloseTo(1.05, 1);
+
+  for (const name of [
+    COPY.en.storyHeading,
+    COPY.en.architectureHeading,
+    COPY.en.bilingualHeading,
+    COPY.en.qualityHeading,
+  ]) {
+    await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+  }
 
   await page.getByRole("button", { name: "العربية" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
@@ -187,6 +302,22 @@ test("visible marketing copy, direction, and display metrics follow the live loc
     "#capabilities",
   );
   await expect(page.getByRole("navigation", { name: COPY.ar.navLabel })).toBeVisible();
+
+  for (const name of [
+    COPY.ar.storyHeading,
+    COPY.ar.architectureHeading,
+    COPY.ar.bilingualHeading,
+    COPY.ar.qualityHeading,
+  ]) {
+    await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+  }
+  for (const name of [
+    COPY.ar.architectureDiagram,
+    COPY.ar.bilingualDiagram,
+    COPY.ar.pipelineDiagram,
+  ]) {
+    await expect(page.getByRole("figure", { name })).toBeVisible();
+  }
 });
 
 test("root marketing page is axe-clean in each theme and locale", async ({ page }) => {
@@ -233,7 +364,7 @@ test("root marketing page and header do not overflow at checkpoint widths", asyn
   }
 });
 
-test("mobile marketing navigation reaches a real anchor and dismisses", async ({ page }) => {
+test("a newly added mobile marketing anchor reaches its target and dismisses", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
   for (const locale of ["en", "ar"] as const) {
@@ -244,10 +375,11 @@ test("mobile marketing navigation reaches a real anchor and dismisses", async ({
 
     const drawer = page.getByRole("dialog", { name: COPY[locale].navLabel });
     await expect(drawer).toBeVisible();
-    await drawer.getByRole("link", { name: COPY[locale].capabilities }).click();
+    const quality = COPY[locale].navigation[3];
+    await drawer.getByRole("link", { name: quality.label }).click();
 
     await expect(drawer).toBeHidden();
-    await expect(page).toHaveURL(/\/#capabilities$/);
-    await expect(page.locator("section#capabilities")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/${quality.href}$`));
+    await expect(page.locator(quality.href)).toBeVisible();
   }
 });
