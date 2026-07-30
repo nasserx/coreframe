@@ -120,6 +120,11 @@ unless it is deliberately assigned to the development server.
   distinction between interactive linked-card lift and motionless static
   Cards. These are computed-layout assertions against the production build,
   not duplicated class strings.
+- `marketing.spec.ts` — the production `/` contract: one landmark set and
+  heading hierarchy, canonical server metadata, live English/Arabic copy,
+  named informative specimens, theme/direction axe scans, checkpoint-width
+  overflow, and same-page mobile navigation. It stays route-specific because
+  these are production composition claims, not SiteShell mechanics.
 
 Routes are **discovered** (`tests/e2e/routes.ts` walks `src/app` for
 `page.*`), so a new page is covered automatically. Dynamic or parallel
@@ -180,14 +185,14 @@ The browser step downloads Chromium only on a Playwright version change
 (cached otherwise).
 
 **The full browser matrix runs on every PR — deliberately.** Current measured
-discovery (`npx playwright test --list`, 2026-07-29) is **13 route pages and
-159 Playwright tests in 8 spec files**:
+discovery (`npx playwright test --list`, 2026-07-30) is **13 route pages and
+165 Playwright tests in 9 spec files**:
 
 - 52 development-browser console cells (13 routes × 2 themes × 2 directions);
 - 52 production-browser axe cells over the same matrix;
 - 26 production-browser overflow cells (13 routes × 2 directions);
-- 29 targeted production-browser tests for fonts, errors, shells, i18n, and
-  geometry.
+- 35 targeted production-browser tests for fonts, errors, shells, i18n,
+  geometry, and the marketing route.
 
 This count is separate from the Vitest unit/component layer. A
 representative-subset-on-PR scheme remains rejected because tokens,

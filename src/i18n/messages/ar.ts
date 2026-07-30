@@ -52,7 +52,9 @@ export const ar: Messages = {
     brand: "أساس الواجهات",
     navLabel: "التنقل الرئيسي",
     navOverview: "نظرة عامة",
-    navCapabilities: "الإمكانات",
+    navCapabilities: "القدرات",
+    navArchitecture: "المعمارية",
+    navQuality: "الجودة",
     eyebrow: "جاهز للإنتاج من الأساس",
     heroTitle: "نقطة انطلاق موثوقة لمنتجات ويب حديثة.",
     heroLead:
@@ -70,8 +72,135 @@ export const ar: Messages = {
     capabilityStaticDescription: "تُولَّد المسارات مسبقًا دون الاعتماد على حالة وقت الطلب.",
     capabilityQualityTitle: "جودة آلية",
     capabilityQualityDescription: "فحص التنسيق والأنواع والاختبارات والوصول ومنع التجاوز الأفقي.",
+    storyEyebrow: "قدرات موثَّقة",
+    storyTitle: "اختيارات تقنية تحمل دليلها معها.",
+    storyLead:
+      "يحوّل الأساس قراراته الجوهرية إلى نتائج قابلة للصيانة. لكل قدرة مالك واضح في الشفرة، وعقد موثَّق في موضعه، وفحص يناسب نوع المخاطر التي تقلّلها.",
+    storyEvidenceLabel: "التحقق في المستودع",
+    storyArchitectureTitle: "معمارية بملكية واضحة",
+    storyArchitectureDescription:
+      "تبقى ملفات المسارات مخصّصة لربط إطار العمل، بينما تملك وحدات الميزات تركيب المنتج. وتُظهر عقود الأنواع الصريحة حدود التكامل وتحافظ على سهولة تطويرها.",
+    storyArchitectureEvidence: "تفرض قواعد اتجاه الاعتماد وفحص الأنواع الصارم هذه الحدود.",
+    storyArchitectureTechnologies: "Next.js · App Router · TypeScript",
+    storyTokensTitle: "نظام تصميم دلالي",
+    storyTokensDescription:
+      "تُبنى المظاهر من أدوار لونية دلالية موحّدة، فتتغير الأسطح والحالات بحسب وظيفتها بدل تثبيت ألوان خام داخل المكوّنات.",
+    storyTokensEvidence: "تختبر فحوص تكافؤ الرموز والتباين المظهرين كليهما.",
+    storyTokensTechnologies: "رموز دلالية · Tailwind CSS",
+    storyBilingualTitle: "ثنائية اللغة من صميم البنية",
+    storyBilingualDescription:
+      "يملك كل نص خطه المناسب، وتتبع المسافات والمحاذاة خصائص منطقية، فتستخدم الإنجليزية والعربية بنية المكوّنات نفسها في الاتجاهين.",
+    storyBilingualEvidence:
+      "تغطي فحوص الكتالوج والخطوط والاتجاه والوصول والتجاوز الأفقي هذا العقد.",
+    storyBilingualTechnologies: "Inter · Tajawal · LTR · RTL",
+    storyShellTitle: "هيكل عام متجاوب",
+    storyShellDescription:
+      "يوفّر هيكل الموقع الرأس والمحتوى الرئيسي والتذييل ورابط التخطي ودرجًا للجوال مضبوط التركيز، دون تكرار سلوك الهيكل داخل الصفحات.",
+    storyShellEvidence: "تختبره فحوص لوحة المفاتيح للمكوّن وتغطية الهيكل في متصفح الإنتاج.",
+    storyShellTechnologies: "SiteShell · Base UI",
+    storyStaticTitle: "مسار جاهز للتوليد الثابت",
+    storyStaticDescription:
+      "يُولَّد المسار الرئيسي مسبقًا من تركيب مملوك للخادم، ولا يقرأ حالة اللغة وقت الطلب.",
+    storyStaticEvidence: "يتحقق منه البناء الإنتاجي وفحص المسار الرئيسي عند تعطيل العرض التوضيحي.",
+    storyStaticTechnologies: "ناتج ثابت · Next.js",
+    storyQualityTitle: "بوابات جودة ترى السلوك الفعلي",
+    storyQualityDescription:
+      "تجمع دورة التحقق بين التنسيق والتحليل والأنواع واختبارات الوحدات والبناء واختبارات المتصفح، فتغطي عقود الشفرة والسلوك المعروض.",
+    storyQualityEvidence: "يملك مسار التكامل المستمر ومصفوفة المسارات المكتشفة آليًا عملية التحقق.",
+    storyQualityTechnologies: "Vitest · Playwright · axe",
+    architectureEyebrow: "المعمارية والتسليم",
+    architectureTitleBefore: "معمارية ",
+    architectureTitleAfter: "، وتوليد ثابت حين يسمح المسار.",
+    architectureLead:
+      "تبقى ملكية المسار والبيانات الوصفية على الخادم. وتعبر المحتويات المترجمة وعناصر التحكم حدودًا واضحة إلى المكوّنات التفاعلية فقط عندما تستجيب مباشرةً للغة أو المظهر أو حالة الهيكل.",
+    architectureBody:
+      "لا تقرأ الصفحة حالة اللغة وقت الطلب، ولذلك يستطيع البناء توليدها مسبقًا من الكتالوج الافتراضي. يقلّل ذلك العمل غير الضروري وقت الطلب ويبقي نشر هذا المسار أبسط، من دون الادعاء بأن كل مسار مستقبلي سيكون ثابتًا.",
+    verificationLabel: "دليل المستودع",
+    architectureVerification:
+      "يُظهر البناء العادي والبناء مع تعطيل العرض أن المسار الرئيسي ثابت، ويبقى متاحًا بنجاح عند تعطيل العرض.",
+    architectureDiagramLabel: "مسار التسليم المعماري",
+    architectureStepRouteKicker: "الخادم",
+    architectureStepRouteTitle: "ملكية الخادم",
+    architectureStepRouteDescription:
+      "يربط المسار المملوك للخادم المحتوى التسويقي بالبيانات الوصفية الأساسية.",
+    architectureStepStaticKicker: "ثابت",
+    architectureStepStaticTitle: "ناتج مولّد مسبقًا",
+    architectureStepStaticDescription:
+      "ينتج البناء الصفحة الرئيسية كمحتوى ثابت من كتالوج اللغة الافتراضية.",
+    architectureStepClientKicker: "العميل",
+    architectureStepClientTitle: "حدود تفاعلية صريحة",
+    architectureStepClientDescription:
+      "تُفعَّل المحتويات المترجمة وهيكل الموقع وعناصر اللغة والمظهر للتفاعل المباشر.",
+    bilingualEyebrow: "نظام تصميم ثنائي اللغة",
+    bilingualTitle: "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
+    bilingualLead:
+      "تبدأ الواجهة من أدوار دلالية للون والسطح والحالة، لا من قيم خام داخل كل مكوّن. ثم تطبّق الخصائص المنطقية التباعد والمحاذاة بحسب اتجاه اللغة تلقائيًا.",
+    bilingualInterDescription: "يتولى النص اللاتيني في مجموعة الخطوط المشتركة.",
+    bilingualTajawalDescription: "يتولى النص العربي عبر ملفات محلية مخصّصة للمحارف العربية.",
+    bilingualVerification:
+      "تتحقق اختبارات المتصفح من تحميل الخطين واختيارهما للنص المناسب، وتغطي مصفوفة المظهر والاتجاه الوصول والتجاوز الأفقي.",
+    bilingualDiagramLabel: "مسار نظام التصميم الدلالي",
+    bilingualStepTokensKicker: "الرموز",
+    bilingualStepTokensTitle: "أدوار دلالية",
+    bilingualStepTokensDescription: "الخلفية والسطح والنص والإجراء والحالة.",
+    bilingualStepThemesKicker: "المظاهر",
+    bilingualStepThemesTitle: "قيم المظهر",
+    bilingualStepThemesDescription: "يُشتق الفاتح والداكن من مفردات الأدوار نفسها.",
+    bilingualStepDirectionKicker: "الاتجاه",
+    bilingualStepDirectionTitle: "اللغة والاتجاه",
+    bilingualStepDirectionDescription: "تجربة متكافئة للإنجليزية LTR والعربية RTL.",
+    qualityEyebrow: "ضوابط موثَّقة",
+    qualityTitle: "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
+    qualityLead:
+      "يجمع الأساس بين التحليل الساكن وفحوص المتصفح لأن أي طبقة منفردة لا تكشف كل أنواع الأعطال. تقلّل هذه الضوابط مخاطر معروفة وتجعل أدلتها قابلة للمراجعة، لكنها لا تدّعي أمانًا كاملًا.",
+    safeguardContractsTitle: "عقود صريحة",
+    safeguardContractsDescription:
+      "تكشف عقود TypeScript الصريحة وقواعد اتجاه الاعتماد مفاتيح الرسائل غير الصالحة ونقص الكتالوج ومخالفات الطبقات قبل عبورها بوابة الجودة.",
+    safeguardContractsEvidence:
+      "تملك فحوص الأنواع واختبارات تكافؤ الكتالوج والتحليل الساكن هذا التحقق.",
+    safeguardContractsTechnologies: "TypeScript · ESLint",
+    safeguardAccessTitle: "تفاعل متوافق مع الوصول",
+    safeguardAccessDescription:
+      "تقلّل المعالم الدلالية والتركيز المرئي والتنقل بلوحة المفاتيح وقواعد تقليل الحركة عوائق التفاعل في هيكل الواجهة المنفّذ.",
+    safeguardAccessEvidence: "تختبر فحوص تفاعل المكوّن وفحوص axe المظهرين والاتجاهين.",
+    safeguardAccessTechnologies: "لوحة المفاتيح · Base UI · axe",
+    safeguardBrowserTitle: "فحوص للسلوك المعروض",
+    safeguardBrowserDescription:
+      "تراقب اختبارات المتصفح سجل وحدة التحكم والتجاوز الأفقي واختيار الخطوط ومسارات لوحة المفاتيح والمظاهر والاتجاهات على بناء فعلي.",
+    safeguardBrowserEvidence:
+      "يملك مشروعا Playwright للتطوير والإنتاج هذه الملاحظات ضمن المسارات والحالات المضبوطة لكل منهما.",
+    safeguardBrowserTechnologies: "Playwright · Chromium",
+    safeguardFontsTitle: "خطوط محزّمة ومحلية",
+    safeguardFontsDescription:
+      "يُحزَّم Inter عبر Next.js، بينما يُقدَّم Tajawal من ملفات محلية مخصّصة للعربية. وتتحقق اختبارات المتصفح من اختيار الخط المناسب دون طلب Google Fonts وقت التشغيل.",
+    safeguardFontsEvidence:
+      "تتحقق اختبارات ملكية الخطوط من الطلبات والملفات المحمّلة واختيار الخط المناسب لكل نص.",
+    safeguardFontsTechnologies: "next/font · Inter · Tajawal",
+    safeguardInstallTitle: "سكربتات تثبيت مضبوطة",
+    safeguardInstallDescription:
+      "تحصر قائمة سماح صارمة سكربتات دورة حياة الاعتماد وقت التثبيت في الموافقات المراجَعة، فتقلّل تنفيذ شيفرة غير مراجَعة أثناء التثبيت. وتُعاد مراجعة الموافقات عند تغيّر إصدارات الاعتمادات.",
+    safeguardInstallEvidence:
+      "تمنع سياسة مدير الحزم افتراضيًا سكربتات دورة حياة الاعتماد غير المراجعة.",
+    safeguardInstallTechnologies: "npm · allowScripts",
+    safeguardShowcaseTitle: "عزل العرض التوضيحي",
+    safeguardShowcaseDescription:
+      "ضمن عقد الإصدار الحالي، يحوّل علم وقت البناء مسارات Showcase وواجهتها البرمجية إلى صفحات غير موجودة ثابتة، بينما يبقى المسار الإنتاجي الرئيسي متاحًا باستقلال.",
+    safeguardShowcaseEvidence: "يتحقق البناء المعطّل وفحص استجابة المسار الرئيسي من حد النشر هذا.",
+    safeguardShowcaseTechnologies: "NEXT_PUBLIC_ENABLE_SHOWCASE",
+    dependencyPostureTitle: "موقف شفاف من الاعتمادات",
+    dependencyPostureDescription:
+      "تُوثَّق تنبيهات الاعتمادات المعروفة وتُراجع بدل إخفائها أو إزالتها بخفض قسري غير آمن للإصدارات. يقلّل ذلك الغموض، لكنه لا يعني أن شجرة الاعتمادات خالية من المخاطر.",
+    pipelineLabel: "مسار التحقق الآلي",
+    pipelineFormat: "التنسيق",
+    pipelineLint: "التحليل الساكن",
+    pipelineTypes: "الأنواع",
+    pipelineUnit: "اختبارات الوحدات",
+    pipelineBuild: "البناء الإنتاجي",
+    pipelineBrowser: "اختبارات المتصفح",
     footerContext: "أساس محايد المجال لبناء تطبيقات ويب إنتاجية.",
     footerNavLabel: "تنقل التذييل",
+    footerOverview: "نظرة عامة",
+    footerCapabilities: "الإمكانات",
     footerStatus: "مبني على رموز دلالية وعقود أنواع صريحة وتوليد ثابت.",
   },
   site: {
