@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
@@ -98,5 +101,61 @@ describe("MarketingCapabilityStory", () => {
     }
     expect(document.querySelectorAll('article bdi[dir="auto"]')).toHaveLength(12);
     expect(document.querySelectorAll('bdi[dir="ltr"]')).not.toHaveLength(0);
+  });
+
+  it("keeps the shared capability and safeguard cards informational while coordinating their icons", () => {
+    renderMarketingPage();
+
+    const storyCards = document.querySelectorAll('[data-slot="marketing-story-card"]');
+    expect(storyCards).toHaveLength(12);
+    expect(
+      document.querySelectorAll('#capability-story [data-slot="marketing-story-card"]'),
+    ).toHaveLength(6);
+    expect(document.querySelectorAll('#quality [data-slot="marketing-story-card"]')).toHaveLength(
+      6,
+    );
+
+    for (const card of storyCards) {
+      expect(card.tagName).toBe("ARTICLE");
+      expect(card).not.toHaveAttribute("tabindex");
+      expect(card).not.toHaveAttribute("role");
+      expect(card).not.toHaveAttribute("onclick");
+      expect(card.className).not.toContain("cursor-pointer");
+      expect(card.querySelectorAll("a, button, input, select, textarea, [tabindex]")).toHaveLength(
+        0,
+      );
+      expect(card.querySelector('[data-slot="marketing-story-icon"]')).toBeInTheDocument();
+      expect(card.querySelector('[data-slot="marketing-story-icon-glyph"]')).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
+    }
+
+    for (const specimen of document.querySelectorAll("figure")) {
+      expect(specimen.querySelector('[data-slot="marketing-story-card"]')).toBeNull();
+    }
+  });
+
+  it("owns a fine-pointer, token-based 2px interaction with an explicit reduced-motion opt-out", () => {
+    const css = readFileSync(
+      join(import.meta.dirname, "marketing-capability-story.module.css"),
+      "utf8",
+    );
+
+    expect(css).toContain("@media (hover: hover) and (pointer: fine)");
+    expect(css).toContain("translate: 0 -2px");
+    expect(css).toContain("translate: 0 -1px");
+    expect(css).toContain("background-color: var(--accent)");
+    expect(css).toContain("border-color: var(--primary)");
+    expect(css).toContain("color: var(--primary)");
+    expect(css).toContain("color-mix(in oklab, var(--primary) 10%, transparent)");
+    expect(css).toContain("transition-duration: var(--motion-quick)");
+    expect(css).toContain("transition-timing-function: var(--ease-standard)");
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.storyCard:hover[\s\S]*\.storyIconGlyph[\s\S]*translate: none/,
+    );
+    expect(css).not.toMatch(
+      /cursor|scale|rotate|box-shadow|#[\da-f]{3,8}|\brgb\(|\bhsl\(|\boklch\(/i,
+    );
   });
 });

@@ -486,9 +486,13 @@ opacity, color) does the job. The header boundary transitions only
 buttons lift 2px on hover and keyboard focus, except disclosure triggers
 (`aria-haspopup`), whose stable anchor matters more than lift. The reference
 authors no separate active transform, so a pressed pointer state retains the
-hover position. Linked overview cards lift 4px on hover and focus; static
-Cards remain motionless. Nav hover remains color-only so a dropdown trigger
-does not fight the panel (see `docs/LAYOUT.md` §6).
+hover position. Linked overview cards lift 4px on hover and focus. Static Cards
+remain motionless by default; feature-owned informational marketing cards may
+use a 2px lift on fine-pointer hover while their decorative icon carries the
+primary color response. That feedback adds no interactive semantics, and
+reduced motion removes both card and icon translation. Nav hover remains
+color-only so a dropdown trigger does not fight the panel (see `docs/LAYOUT.md`
+§6).
 
 ## 3. Verified contrast (WCAG AA)
 
