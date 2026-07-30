@@ -597,12 +597,15 @@ Steps, sharpened by all three migrations:
    table, then run the gates — the axe matrix re-checks real composited
    contrast on every route × theme × direction, and the overflow sweep
    re-checks the new type metrics at every width.
-8. **Brand assets (beyond tokens, by nature):** the mark is
-   `src/components/ui/brand-mark.tsx` (one `currentColor` path with
-   `text-primary` as its component-owned default) and `src/app/icon.svg`
-   (same geometry, static hex fills computed from the light/dark primary
-   tokens, `prefers-color-scheme` for dark browser UI). Keep the two in sync;
-   both carry a comment saying so.
+8. **Brand assets (beyond tokens, by nature):** the default identity is
+   **Foundation Frame** — two opposing open structural corners around a
+   replaceable central module, expressing clear architectural boundaries.
+   `src/components/ui/brand-mark.tsx` owns the compact 24-unit glyph as one
+   `currentColor` path with `text-primary` as its component default. It never
+   mirrors in RTL. `src/app/icon.svg` repeats that path because a static
+   file-convention icon cannot import component geometry; its fixed Foundation
+   cobalt field and white glyph remain legible against light and dark browser
+   chrome. The colocated mark test enforces geometry parity.
 9. Open `/showcase/tokens` in both themes — every swatch shows its authored
    value exactly as written in `src/styles`, and the ramp/elevation/radius
    sections reflect your edits live. Then look at `/` and `/showcase/site`:

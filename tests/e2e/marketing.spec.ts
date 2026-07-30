@@ -6,6 +6,7 @@ type MarketingTheme = "light" | "dark";
 
 const COPY = {
   en: {
+    brand: "Frontend Foundation",
     direction: "ltr",
     heading: "A dependable starting point for modern web products.",
     cta: "Explore the capabilities",
@@ -26,6 +27,7 @@ const COPY = {
     pipelineDiagram: "Automated validation pipeline",
   },
   ar: {
+    brand: "أساس الواجهات",
     direction: "rtl",
     heading: "نقطة انطلاق موثوقة لمنتجات ويب حديثة.",
     cta: "استكشف الإمكانات",
@@ -203,6 +205,46 @@ test("root marketing metadata remains the canonical server value after a locale 
     "content",
     "A reusable frontend foundation for production web applications.",
   );
+});
+
+test("shared brand lockups keep text-owned names and resolve the app icon", async ({
+  page,
+  request,
+}) => {
+  for (const locale of ["en", "ar"] as const) {
+    await gotoMarketingState(page, "light", locale);
+
+    const headerBrand = page
+      .getByRole("banner")
+      .getByRole("link", { name: COPY[locale].brand, exact: true });
+    const footerBrand = page
+      .getByRole("contentinfo")
+      .getByRole("link", { name: COPY[locale].brand, exact: true });
+
+    await expect(headerBrand).toBeVisible();
+    await expect(footerBrand).toBeVisible();
+    await expect(page.getByRole("link", { name: COPY[locale].brand, exact: true })).toHaveCount(2);
+    await expect(headerBrand.locator('[data-slot="brand-mark"]')).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    await expect(footerBrand.locator('[data-slot="brand-mark"]')).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    await expect(page.getByRole("img", { name: COPY[locale].brand })).toHaveCount(0);
+  }
+
+  const iconLink = page.locator('link[rel="icon"]');
+  await expect(iconLink).toHaveCount(1);
+  const iconHref = await iconLink.getAttribute("href");
+  expect(iconHref).not.toBeNull();
+  const iconUrl = new URL(iconHref ?? "", page.url());
+  expect(iconUrl.pathname).toBe("/icon.svg");
+
+  const iconResponse = await request.get(iconUrl.toString());
+  expect(iconResponse.status()).toBe(200);
+  expect(iconResponse.headers()["content-type"]).toContain("image/svg+xml");
 });
 
 test("desktop and drawer navigation share four ordered, unique page targets", async ({ page }) => {
