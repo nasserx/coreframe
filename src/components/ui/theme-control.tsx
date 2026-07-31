@@ -1,84 +1,68 @@
 "use client";
 
-import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
-import { Toggle } from "@base-ui/react/toggle";
-import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { MoonIcon, SunIcon } from "lucide-react";
 
-import { type ThemePreference, useTheme } from "@/core/providers/theme-provider";
-import { cn } from "@/lib/utils";
+import { useTranslations } from "@/core/providers/locale-provider";
+import { useTheme } from "@/core/providers/theme-provider";
 
-const THEME_OPTIONS = [
-  { value: "light", label: "Light", Icon: SunIcon },
-  { value: "dark", label: "Dark", Icon: MoonIcon },
-  { value: "system", label: "System", Icon: MonitorIcon },
-] as const satisfies ReadonlyArray<{
-  value: ThemePreference;
-  label: string;
-  Icon: typeof SunIcon;
-}>;
+import { Button, type ButtonProps } from "./button";
 
 export type ThemeControlProps = Omit<
-  ToggleGroup.Props<ThemePreference>,
-  "value" | "defaultValue" | "onValueChange" | "multiple"
-> & {
-  /**
-   * Accessible names of the three icon-only options; localize at the call
-   * site (the group's own name is overridden via `aria-label`).
-   */
-  optionLabels?: Partial<Record<ThemePreference, string>>;
-};
+  ButtonProps,
+  "aria-label" | "children" | "onClick" | "size" | "type" | "variant"
+>;
 
 /**
- * Three-state theme selector (light / dark / system) bound to the theme
- * runtime via `useTheme()` — selection reflects the stored *preference*, not
- * the resolved theme, so "System" stays selected while the OS decides.
+ * Light/dark toggle bound to the theme runtime via `useTheme()`. One native
+ * button with two states and no third option: the operating-system preference
+ * initializes the session but is not a selectable value, so there is nothing
+ * for a dropdown or segmented control to hold (docs/DESIGN_TOKENS.md §5).
  *
- * Accessibility: Base UI's ToggleGroup provides the group role with roving
- * arrow-key focus; each option is a native toggle button exposing
- * `aria-pressed` and an icon-only accessible name. The group's name
- * ("Theme") can be overridden via `aria-label`. Re-pressing the active
- * option is a no-op — the group can never reach an empty selection. The
- * English option names are defaults, overridable via `optionLabels`.
+ * The icon and the accessible name both describe the ACTION, not the current
+ * value — a Moon means "switch to dark", a Sun means "switch to light". That is
+ * why there is no `aria-pressed`: the button is not a boolean whose label stays
+ * fixed while its state flips, it is a command whose label changes with the
+ * state. Announcing it as pressed/unpressed on top of an already-changing name
+ * would say the same thing twice, and contradictorily.
  *
- * Constraints: UI-only; persistence and application of the theme belong to
- * the ThemeProvider, never to this control.
+ * The glyph is decorative (`aria-hidden`) and never mirrors: no `rtl:` variant
+ * is applied. Border, surface, hover, active, and focus feedback are entirely
+ * the Button primitive's `outline` variant, at the same `icon-lg` square as
+ * LocaleControl, so the two read as one pair without either adding visual
+ * treatment or motion of its own.
+ *
+ * Accessible names come from the `theme` catalogue, so the control follows the
+ * active locale without any per-call-site plumbing.
+ *
+ * Constraints: UI-only; persistence, OS resolution, and application of the
+ * theme belong to the ThemeProvider, never to this control.
  */
-export function ThemeControl({ className, optionLabels, ...props }: ThemeControlProps) {
+export function ThemeControl({ className, ...props }: ThemeControlProps) {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("theme");
+
+  const target = theme === "dark" ? "light" : "dark";
+  const Icon = target === "dark" ? MoonIcon : SunIcon;
 
   return (
-    <ToggleGroup
+    <Button
       data-slot="theme-control"
-      aria-label="Theme"
-      className={cn(
-        "inline-flex items-center gap-0.5 rounded-lg border bg-muted/50 p-0.5",
-        className,
-      )}
+      variant="outline"
+      // Matches LocaleControl exactly: the authoritative 36px square on the
+      // same h-9 step as the header CTAs (docs/DESIGN_TOKENS.md
+      // § Control height).
+      size="icon-lg"
+      aria-label={target === "dark" ? t("toDark") : t("toLight")}
+      className={className}
       {...props}
-      value={[theme]}
-      onValueChange={(next) => {
-        const selected = THEME_OPTIONS.find((option) => option.value === next[0]);
-        if (selected) {
-          setTheme(selected.value);
-        }
+      onClick={() => {
+        setTheme(target);
       }}
     >
-      {THEME_OPTIONS.map(({ value, label, Icon }) => (
-        <Toggle
-          key={value}
-          value={value}
-          aria-label={optionLabels?.[value] ?? label}
-          // size-6.5 makes the group 32px tall (h-8) — the baseline
-          // control-height step (docs/DESIGN_TOKENS.md § Control height), so
-          // it aligns with default-size header CTAs in an action cluster.
-          // Attached (not offset) focus ring: the toggle is nested
-          // inside the group's own border, so an offset ring would collide
-          // with its siblings (docs/DESIGN_TOKENS.md §2).
-          className="inline-flex size-6.5 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs [&_svg]:pointer-events-none [&_svg]:size-4"
-        >
-          <Icon />
-        </Toggle>
-      ))}
-    </ToggleGroup>
+      {/* `data-icon` names the glyph so tests can assert which one rendered
+          without reaching into lucide's markup or SVG path data. The glyph
+          keeps the primitive's standard 16px size. */}
+      <Icon aria-hidden="true" data-icon={target === "dark" ? "moon" : "sun"} />
+    </Button>
   );
 }

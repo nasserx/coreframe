@@ -65,11 +65,16 @@ The message layer, concretely:
 text): `PaginationPrevious`/`PaginationNext` (`text`, `aria-label`),
 `PaginationEllipsis` (`label`), the AppShell/SiteShell label props
 (`skipLinkLabel`, `label`, `closeLabel`,
-`unavailableLabel`, the trigger `aria-label`), `ThemeControl.optionLabels` +
-`aria-label`, and `DialogContent`/`DialogFooter`'s optional `closeLabel`
-(default `"Close"`). Pass a `useTranslations`/
-`getTranslations` value into each. The `(site)` showcase layout is the worked
-example.
+`unavailableLabel`, the trigger `aria-label`), and
+`DialogContent`/`DialogFooter`'s optional `closeLabel` (default `"Close"`).
+Pass a `useTranslations`/`getTranslations` value into each. The `(site)`
+showcase layout is the worked example.
+
+`LocaleControl` and `ThemeControl` are the deliberate exceptions: they are
+already client components sitting inside `LocaleProvider`, and each has exactly
+one accessible name per state, so they read the `localeControl` / `theme`
+namespaces themselves. That removes identical label plumbing from every shell
+that renders them and makes the strings impossible to drift between call sites.
 
 The production marketing route uses the same boundary discipline. Its Server
 Component layout and page retain route and visual-slot ownership; the root
@@ -121,6 +126,22 @@ reviewing a page in both directions — belongs to the test suite, which flips
 `dir` programmatically for **every** route (`tests/e2e/matrix.ts`), not to the
 product surface. The showcase header now carries a real `LocaleControl` (the
 language switcher); direction follows the chosen language.
+
+`LocaleControl` is a **direct two-language toggle**: one icon-only native
+button showing a single globe, whose accessible name identifies the **target**
+language rather than the current one (`Switch to Arabic` /
+`التبديل إلى الإنجليزية`). It is a command, not a selection, so it carries no
+`aria-pressed`, tab, or radio semantics, and no visible language code, flag,
+letter, or dropdown arrow. Icon-only is also what makes the button exactly
+square and identical in width in every locale — there is no text whose metrics
+could change with the language. The globe is `aria-hidden` and never mirrors.
+Two locales are the contract: a deployment that builds in three or more needs a
+chooser and should replace the component.
+
+Both header toggles are the shared Button primitive's `outline` variant at its
+`icon-lg` square, and they add no visual treatment or motion of their own —
+border, surface, hover, active, and focus feedback are entirely the primitive's
+(docs/DESIGN_TOKENS.md § Control height).
 
 ## The logical-property rule
 

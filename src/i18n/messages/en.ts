@@ -43,16 +43,21 @@ export const en = {
   pagination: {
     ellipsisLabel: "More pages",
   },
-  /** ThemeControl accessible names (the group and its three options). */
+  /**
+   * ThemeControl accessible names. Both describe the ACTION the button takes,
+   * so the name changes with the state and never needs `aria-pressed`.
+   */
   theme: {
-    label: "Theme",
-    light: "Light",
-    dark: "Dark",
-    system: "System",
+    toDark: "Switch to dark mode",
+    toLight: "Switch to light mode",
   },
-  /** LocaleControl accessible name (option labels are autonyms from config). */
+  /**
+   * LocaleControl accessible name. It names the OTHER language in the CURRENT
+   * one, so each catalogue owns exactly one string — correct while the switch
+   * is between two locales, which is the control's contract.
+   */
   localeControl: {
-    label: "Language",
+    switchLabel: "Switch to Arabic",
   },
   /** Shell chrome affordances (AppShell / SiteShell) localized at call sites. */
   shell: {

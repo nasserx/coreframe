@@ -14,7 +14,7 @@ type TokenSwatchProps = Readonly<{
 
 /**
  * A color token swatch with its name and the authored value for the
- * currently resolved theme, exactly as written in src/styles — copyable
+ * active theme, exactly as written in src/styles — copyable
  * straight back into the token files. getComputedStyle is deliberately not
  * used: browsers serialize computed colors into lab()/hex, which is
  * unreadable and not round-trippable. The inset foreground-tinted ring
@@ -22,8 +22,8 @@ type TokenSwatchProps = Readonly<{
  * (background, surface, border, …).
  */
 export function TokenSwatch({ name, swatchClassName, lightValue, darkValue }: TokenSwatchProps) {
-  const { resolvedTheme } = useTheme();
-  const value = resolvedTheme === "dark" ? darkValue : lightValue;
+  const { theme } = useTheme();
+  const value = theme === "dark" ? darkValue : lightValue;
 
   return (
     <div className="flex items-center gap-3 rounded-lg border p-3">

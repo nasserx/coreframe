@@ -1,86 +1,79 @@
 "use client";
 
-import { Toggle } from "@base-ui/react/toggle";
-import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { GlobeIcon } from "lucide-react";
 
-import { type AppLocale, LOCALE_INFO } from "@/config";
 import { useLocale, useTranslations } from "@/core/providers/locale-provider";
-import { cn } from "@/lib/utils";
+
+import { Button, type ButtonProps } from "./button";
 
 export type LocaleControlProps = Omit<
-  ToggleGroup.Props<AppLocale>,
-  "value" | "defaultValue" | "onValueChange" | "multiple"
+  ButtonProps,
+  "aria-label" | "children" | "onClick" | "size" | "type" | "variant"
 >;
 
 /**
- * Language switcher bound to the locale runtime via `useLocale()`. Selecting a
- * locale swaps its message catalogue AND — because direction, numerals, and
- * Arabic type metrics all derive from the SAME locale through `LOCALE_INFO` —
- * flips `<html dir/lang>` in one move. There is deliberately no separate
- * direction control: nobody wants English rendered right-to-left, so direction
- * is a property of language, never an independent toggle.
+ * Language toggle bound to the locale runtime via `useLocale()`. Activating it
+ * switches straight to the other built-in language: its catalogue, and —
+ * because direction, numerals, and Arabic type metrics all derive from the SAME
+ * locale through `LOCALE_INFO` — `<html lang/dir>` in one move. There is
+ * deliberately no separate direction control: nobody wants English rendered
+ * right-to-left, so direction is a property of language, never an independent
+ * toggle.
  *
- * Options are the built-in locales' autonyms (each language's name in its own
- * script, from `LOCALE_INFO.label`) — the correct label regardless of the
- * current UI language, so they are not themselves translated.
+ * Icon-only, with a globe: the accessible name carries the whole meaning
+ * (`Switch to Arabic` / `التبديل إلى الإنجليزية`), so it names the target
+ * language rather than the current one. Being icon-only is also what keeps the
+ * button EXACTLY square in both locales — no visible code, no text metrics, no
+ * width that shifts when the language does. It carries no `aria-pressed` and no
+ * selected/tab semantics: a two-language switch is a command, not a selection
+ * among visible options.
+ *
+ * The glyph is decorative (`aria-hidden`) and never mirrors: no `rtl:` variant
+ * is applied. Border, surface, hover, active, and focus feedback are entirely
+ * the Button primitive's `outline` variant — this control adds no visual
+ * treatment and no motion of its own.
  *
  * Renders nothing on a single-locale deployment (`canSwitchLocale` is false):
  * with one built-in language there is nothing to switch, and the control costs
- * that deployment no UI surface. The group's accessible name comes from the
- * `localeControl` messages and is overridable via `aria-label`.
+ * that deployment no UI surface.
  *
- * Accessibility: Base UI's ToggleGroup provides the group role with roving
- * arrow-key focus; each option is a native toggle exposing `aria-pressed`.
- * Re-pressing the active option is a no-op — the group can never reach an
- * empty selection.
+ * Two locales are the contract this control is built for; a deployment that
+ * builds in three or more needs a chooser rather than a toggle, and should
+ * replace this component (see docs/DIRECTION_AND_I18N.md).
  *
  * Constraints: UI-only; persistence and application of the locale belong to the
  * LocaleProvider, never to this control.
  */
-export function LocaleControl({
-  className,
-  "aria-label": ariaLabel,
-  ...props
-}: LocaleControlProps) {
+export function LocaleControl({ className, ...props }: LocaleControlProps) {
   const { locale, availableLocales, canSwitchLocale, setLocale } = useLocale();
   const t = useTranslations("localeControl");
 
-  if (!canSwitchLocale) {
+  const target = availableLocales.find((candidate) => candidate !== locale);
+
+  if (!canSwitchLocale || target === undefined) {
     return null;
   }
 
   return (
-    <ToggleGroup
+    <Button
       data-slot="locale-control"
-      aria-label={ariaLabel ?? t("label")}
-      className={cn(
-        "inline-flex items-center gap-0.5 rounded-lg border bg-muted/50 p-0.5",
-        className,
-      )}
+      variant="outline"
+      // `icon-lg` is the authoritative 36px square (docs/DESIGN_TOKENS.md
+      // § Control height): the same h-9 step as the header CTAs, so the utility
+      // pair sits on the CTA baseline instead of a step below it.
+      size="icon-lg"
+      aria-label={t("switchLabel")}
+      className={className}
       {...props}
-      value={[locale]}
-      onValueChange={(next) => {
-        const selected = next[0];
-        if (
-          selected !== undefined &&
-          (availableLocales as readonly AppLocale[]).includes(selected)
-        ) {
-          setLocale(selected);
-        }
+      onClick={() => {
+        setLocale(target);
       }}
     >
-      {availableLocales.map((value) => (
-        <Toggle
-          key={value}
-          value={value}
-          // h-6.5 makes the group 32px tall (h-8) — the baseline control-height
-          // step (docs/DESIGN_TOKENS.md § Control height), aligned with
-          // ThemeControl and the default-size header CTAs in an action cluster.
-          className="inline-flex h-6.5 items-center justify-center rounded-md px-2 text-small font-semibold text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs"
-        >
-          {LOCALE_INFO[value].label}
-        </Toggle>
-      ))}
-    </ToggleGroup>
+      {/* `data-icon` names the glyph so tests can assert which one rendered
+          without reaching into lucide's markup or SVG path data. The glyph
+          keeps the primitive's standard 16px size — the larger box buys
+          breathing room, not a larger icon. */}
+      <GlobeIcon aria-hidden="true" data-icon="globe" />
+    </Button>
   );
 }

@@ -207,7 +207,9 @@ describe("MarketingShell footer", () => {
     const user = userEvent.setup();
     renderMarketingShell();
 
-    await user.click(screen.getAllByRole("button", { name: "العربية" })[0]!);
+    // The shell renders the same control twice (desktop cluster + drawer);
+    // either one switches the whole runtime.
+    await user.click(screen.getAllByRole("button", { name: "Switch to Arabic" })[0]!);
     await waitFor(() => expect(document.documentElement).toHaveAttribute("dir", "rtl"));
 
     const region = footer();

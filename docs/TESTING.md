@@ -48,7 +48,9 @@ are meant to be copied:
   engages).
 - `src/core/providers/theme-provider.test.tsx` — module-singleton state
   (`vi.resetModules()` + dynamic import per test), a controllable
-  `matchMedia` stub, storage failure, and cross-tab sync.
+  `matchMedia` stub, storage failure, cross-tab sync, and parity between the
+  provider and the real pre-paint init script (the script string is executed,
+  not paraphrased).
 - `src/styles/token-parity.test.ts` — exact authored values, source-level
   parity and bridge checks, plus whole-palette OKLCH gamut, WCAG contrast, and
   selected/disabled/invalid state checks (including alpha composites), where
@@ -127,6 +129,29 @@ unless it is deliberately assigned to the development server.
   switch that re-renders an error already on screen, LTR email entry inside the
   RTL form, and axe scans of the error and success states. Route-level axe,
   console, and overflow coverage for the page still comes from discovery.
+- `controls.spec.ts` — the shared language and theme toggles in the states that
+  span a navigation and therefore cannot be unit-tested: a choice surviving a
+  reload, the one-time `prefers-color-scheme` fallback (not written back), a
+  legacy stored `"system"` still resolving, an OS change after initialization
+  being ignored, and — the defect class the browser layer exists for — the theme
+  landing on the document at `DOMContentLoaded`, before React hydrates, rather
+  than from an effect. Also drives the drawer copies, keyboard activation,
+  checkpoint-width fit in both locales, header axe scans, and the rendered
+  geometry the controls exist to hold: exactly 36px squares with the outline
+  variant's one-pixel border in all four theme/locale cells, alignment with the
+  header CTA, and no transform on either glyph in any interaction state. Two
+  traps make that geometry harder to measure than it looks, and both are
+  encoded here. First, `click()` leaves the cursor on the button, so a
+  state-change measurement taken straight afterwards samples the outline
+  variant's hover lift mid-transition; every such measurement therefore parks
+  the pointer away from the cluster first, and reads only movement caused by
+  the state change. Second, that lift is a real inherited behaviour rather than
+  something to dodge, so it has its own test asserting it is exactly `-2px` on
+  hover and reverts completely — a lift that never accumulates cannot become a
+  layout shift. Note also that both shells render each control twice (bar
+  cluster + drawer copy), so every page-side lookup here selects the copy that
+  is actually laid out; reading the hidden one measures a zero-sized box and
+  passes vacuously.
 - `marketing.spec.ts` — the production `/` contract: one landmark set and
   heading hierarchy, canonical server metadata, live English/Arabic copy,
   named informative specimens, the composed sections' own behavior
@@ -199,15 +224,15 @@ Node comes from `.nvmrc` (currently `24.18.0`, matching the `engines` range in
 version change (cached otherwise).
 
 **The full browser matrix runs on every PR — deliberately.** Current measured
-discovery (`npx playwright test --list`, 2026-07-31) is **192 Playwright tests
-in 10 spec files across 2 projects**, over the **13 app-page routes** that
+discovery (`npx playwright test --list`, 2026-08-01) is **220 Playwright tests
+in 11 spec files across 2 projects**, over the **13 app-page routes** that
 `tests/e2e/routes.ts` discovers:
 
 - 52 `chromium-dev` console cells (13 routes × 2 themes × 2 directions);
 - 52 `chromium-prod` axe cells over the same matrix;
 - 26 `chromium-prod` overflow cells (13 routes × 2 directions);
-- 62 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
-  geometry, the marketing route, and the reference form.
+- 90 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
+  geometry, the marketing route, the reference form, and the shared controls.
 
 That route number counts `page.*` files under `src/app`. It is deliberately
 not the build's printed route table — which also lists the not-found page, the
@@ -215,8 +240,8 @@ route handlers, and the generated icon — and not the count of statically
 generated pages; all three differ, and `npm run build` owns the latter two.
 Route handlers are not pages and never enter route discovery.
 
-These counts are separate from the Vitest unit/component layer, currently 217
-tests in 32 files. A representative-subset-on-PR scheme remains rejected
+These counts are separate from the Vitest unit/component layer, currently 251
+tests in 34 files. A representative-subset-on-PR scheme remains rejected
 because tokens, direction, fonts, and providers can affect every route at
 once. Growth is linear: each discovered page adds four development console
 cells, four production axe cells, and two production overflow cells. Revisit

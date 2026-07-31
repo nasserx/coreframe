@@ -60,13 +60,6 @@ const FOOTER_FOCUS_RING =
 export function MarketingShell({ children }: MarketingShellProps) {
   const t = useTranslations("marketing");
   const tShell = useTranslations("shell");
-  const tTheme = useTranslations("theme");
-
-  const themeLabels = {
-    light: tTheme("light"),
-    dark: tTheme("dark"),
-    system: tTheme("system"),
-  } as const;
 
   const navigationItems = [
     { href: "#overview", label: t("navOverview") },
@@ -93,16 +86,16 @@ export function MarketingShell({ children }: MarketingShellProps) {
             </SiteShellNavItem>
           ))}
 
-          <div className="mt-3 flex flex-col items-start gap-3 border-t pt-4 md:hidden">
+          <div className="mt-3 flex items-center gap-1 border-t pt-4 md:hidden">
             <LocaleControl />
-            <ThemeControl aria-label={tTheme("label")} optionLabels={themeLabels} />
+            <ThemeControl />
           </div>
         </SiteShellNav>
 
         <div className="ms-auto flex shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 max-md:hidden">
+          <div className="flex items-center gap-1 max-md:hidden">
             <LocaleControl />
-            <ThemeControl aria-label={tTheme("label")} optionLabels={themeLabels} />
+            <ThemeControl />
           </div>
           <SiteShellNavTrigger aria-label={tShell("openNav")} />
         </div>

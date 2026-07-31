@@ -128,8 +128,8 @@ test.describe("Arabic locale on /showcase/site", () => {
     // Default deployment locale is English.
     await expect(page.getByRole("banner").getByText(EN_BRAND)).toBeVisible();
 
-    // Switch via the real LocaleControl (its options are the locale autonyms).
-    await page.getByRole("button", { name: "العربية" }).click();
+    // Switch via the real LocaleControl (one button, named for the action).
+    await page.getByRole("button", { name: "Switch to Arabic" }).click();
 
     await expect(page.getByRole("banner").getByText(AR_BRAND)).toBeVisible();
     const state = await page.evaluate(() => ({
@@ -158,7 +158,7 @@ test("the pagination ellipsis follows the active locale without accessibility vi
     .analyze();
   expect(englishResults.violations).toEqual([]);
 
-  await page.getByRole("button", { name: "العربية" }).click();
+  await page.getByRole("button", { name: "Switch to Arabic" }).click();
 
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");

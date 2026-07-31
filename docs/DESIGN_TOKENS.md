@@ -409,9 +409,10 @@ Public-site compositions can override only geometry while reusing the
 primitive: navigation CTA `h-9 px-5`, hero CTA `h-10 px-6`, pricing CTA
 `h-11 px-5`, and prominent CTA `h-12 px-7`, all 14/20 at weight 600. These
 are composition treatments, not new Button size names. The Showcase header
-uses the navigation treatment; the hero uses the hero treatment. Utility
-toggles keep their own h-8 geometry, so the control cluster remains aligned
-by its centre rather than pretending every control has one role.
+uses the navigation treatment; the hero uses the hero treatment. The icon-only
+utility toggles (language, theme) use the primitive's `icon-lg` square — the
+same `lg`/h-9 step as the navigation CTA — so the whole header cluster shares
+one height instead of stacking two, and no local sizing override is needed.
 
 ### Focus and invalid states
 
@@ -634,62 +635,94 @@ The tokens are applied by the theme runtime in
 
 ### States
 
-Three states: `"light" | "dark" | "system"`. `"system"` tracks the OS
-preference live via `matchMedia`; the other two are explicit user overrides.
-The runtime applies the result as the `dark` class on `<html>`, which is what
-switches the semantic variable set.
+Two states: `"light" | "dark"`. Both are concrete and both are user choices —
+there is no third `"system"` state at runtime. The runtime applies the result
+as the `dark` class on `<html>`, which is what switches the semantic variable
+set (and, with it, `color-scheme`, declared in `light.css`/`dark.css`, so the
+browser's native surfaces follow without separate handling).
+
+### The operating-system preference is an initialization input
+
+`prefers-color-scheme` is read **once**, and only when storage holds no
+explicit choice. From then on the session's theme is whatever the runtime
+resolved or the visitor last chose:
+
+1. Storage holds concrete `"light"`/`"dark"` → apply it.
+2. Otherwise → resolve `prefers-color-scheme` once to a concrete value.
+3. **The resolved value is not written back.** A page load is not a choice, so
+   a visitor who never touches the control keeps following their OS on the
+   next visit rather than being frozen at whatever it was the first time.
+4. Only activating the control persists, and it persists a concrete value.
+5. A later OS change does **not** restyle a page already being read — there is
+   no live `matchMedia` subscription.
+
+**Legacy migration.** The superseded three-state runtime persisted the literal
+string `"system"`, so it exists in returning visitors' storage. It is read as
+"no choice yet": the OS preference resolves as in step 2, `"system"` never
+becomes active state, and the next toggle overwrites it. Migration needs no
+code path of its own — the same `readStoredTheme` rule that rejects garbage
+rejects it.
 
 ### Persistence: localStorage (not a cookie)
 
 An explicit choice persists in `localStorage` under the key `theme` and syncs
-across tabs through the `storage` event. **Tradeoff accepted:** a cookie would
-let the server render the correct theme class, but reading it forces every
-route into dynamic rendering — this foundation prerenders all routes
-statically and keeps it that way. The costs of localStorage are (a) the server
-never knows the theme, and (b) a pre-paint script is required — which is
-needed for `"system"` anyway, since no server can know the OS preference at
-static-generation time. If storage is unavailable (private mode, blocked), the
-choice still applies in-memory for the session; only persistence is lost.
+across tabs through the `storage` event (a cleared key returns that tab to the
+OS fallback). **Tradeoff accepted:** a cookie would let the server render the
+correct theme class, but reading it forces every route into dynamic rendering —
+this foundation prerenders all routes statically and keeps it that way. The
+costs of localStorage are (a) the server never knows the theme, and (b) a
+pre-paint script is required — which is needed for the OS fallback anyway,
+since no server can know `prefers-color-scheme` at static-generation time. If
+storage is unavailable (private mode, blocked), the choice still applies
+in-memory for the session; only persistence is lost.
 
 ### Anti-flash mechanism
 
 The provider renders a tiny inline script _ahead of the app tree_ (no network
-round trip). Before first paint it reads the stored preference and sets the
-`dark` class: `dark` if stored `"dark"`, `light` if stored `"light"`,
-otherwise the `matchMedia` result. This makes first paint correct in all three
-states, including a stored preference that disagrees with the OS. The root
-`<html>` sets `suppressHydrationWarning` because the server renders no theme
-class.
+round trip). Before first paint it sets the `dark` class by the exact rule
+above: `dark` if stored `"dark"`, `light` if stored `"light"`, otherwise the
+`matchMedia` result. It deliberately writes nothing. The root `<html>` sets
+`suppressHydrationWarning` because the server renders no theme class.
+
+Script and provider must resolve identically or the page flashes, so that is
+asserted rather than assumed: `theme-provider.test.tsx` executes the real
+exported `THEME_INIT_SCRIPT` and compares its outcome with the provider's
+across every storage/OS combination, and `controls.spec.ts` reads the root
+class at `DOMContentLoaded` in a real browser — before React hydrates — so a
+theme applied only from an effect fails.
 
 ### Hook contract
 
 ```ts
-const { theme, resolvedTheme, setTheme } = useTheme();
-// theme:         "light" | "dark" | "system"  — the stored preference
-// resolvedTheme: "light" | "dark"             — what is actually applied
-// setTheme:      (theme: ThemePreference) => void
+const { theme, setTheme } = useTheme();
+// theme:    "light" | "dark"            — the applied theme, always concrete
+// setTheme: (theme: Theme) => void      — persists an explicit choice
 ```
 
-The two values are deliberately distinct: render _selection_ UI from `theme`
-(so "System" shows as selected) and theme-dependent visuals from
-`resolvedTheme`. The hook throws with an actionable message outside the
-provider.
+One value, because the runtime holds one. Selection UI and theme-dependent
+visuals read the same thing; there is no preference/resolved pair to reconcile,
+because there is no non-concrete preference. The hook throws with an actionable
+message outside the provider.
 
 ### Hydration-safe consumption
 
-The runtime reads both the stored preference and the OS preference through
-`useSyncExternalStore` with server snapshots of `"system"` / light. Server
-markup and the first client render therefore always agree — there is no
-divergence to guard against; values settle to the real preference immediately
-after hydration. The document class itself is always correct before first
-paint via the inline script, so token-driven styling never flashes. Only if a
-consumer renders the _values as text_ (as `/showcase/tokens` does) can the
-brief post-hydration settle be observed; gate on a `mounted` flag if even that
-is unacceptable.
+The runtime reads its store through `useSyncExternalStore` with a server
+snapshot of `"light"` — the value every route is statically prerendered in.
+Server markup and the first client render therefore always agree; the value
+settles to the resolved theme immediately after hydration. The document class
+itself is always correct before first paint via the inline script, so
+token-driven styling never flashes. Only if a consumer renders the _value as
+text_ (as `/showcase/tokens` does) can the brief post-hydration settle be
+observed; gate on a `mounted` flag if even that is unacceptable.
 
 ### UI control
 
-`src/components/ui/theme-control.tsx` is the reusable three-state selector
-(Base UI ToggleGroup: group role, roving arrow-key focus, `aria-pressed`
-toggle buttons, ring-token focus styling). The Toaster follows
-`resolvedTheme`, so toasts always match the applied theme.
+`src/components/ui/theme-control.tsx` is one native button (the shared Button
+primitive, `ghost` variant, `icon` size). Icon and accessible name both name
+the **action**, not the current value: a Moon means "Switch to dark mode", a
+Sun means "Switch to light mode". It carries no `aria-pressed` — the name
+already changes with the state, and announcing a pressed/unpressed boolean on
+top of that would state the same fact twice, contradictorily. The icon is
+`aria-hidden` and never mirrors. Labels come from the `theme` catalogue, so the
+control follows the active locale with no per-call-site plumbing. The Toaster
+follows `theme`, so toasts always match the applied theme.
