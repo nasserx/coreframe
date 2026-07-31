@@ -7,6 +7,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { useTranslations } from "@/core/providers/locale-provider";
 
+import { MarketingSectionIntro } from "./marketing-section-intro";
 import styles from "./marketing-faq.module.css";
 
 type FaqItem = Readonly<{
@@ -94,15 +95,17 @@ export function MarketingFaq() {
   return (
     <section id="faq" aria-labelledby="faq-heading" className="border-t">
       <Container className="py-20 sm:py-24">
-        <div className="max-w-prose">
-          <p className="text-small font-semibold text-link">{t("faqEyebrow")}</p>
-          <h2 id="faq-heading" className="mt-3 text-heading sm:text-title">
-            {t("faqTitle")}
-          </h2>
-          <p className="mt-5 text-body-lg">{t("faqLead")}</p>
-        </div>
+        <MarketingSectionIntro
+          eyebrow={t("faqEyebrow")}
+          headingId="faq-heading"
+          title={t("faqTitle")}
+          lead={t("faqLead")}
+        />
 
-        <Accordion.Root data-slot="marketing-faq-accordion" className="mt-10 max-w-prose border-y">
+        <Accordion.Root
+          data-slot="marketing-faq-accordion"
+          className="mx-auto mt-10 max-w-prose border-y"
+        >
           {items.map(({ id, question, answer }) => (
             <Accordion.Item
               key={id}
@@ -114,11 +117,11 @@ export function MarketingFaq() {
                 <Accordion.Trigger
                   id={`faq-${id}-trigger`}
                   data-slot="marketing-faq-trigger"
-                  className={`${styles["trigger"]} grid min-h-14 w-full items-center gap-4 px-4 py-4 text-start font-semibold transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset data-panel-open:bg-accent`}
+                  className={`${styles["trigger"]} min-h-14 w-full px-4 py-4 font-semibold transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset data-panel-open:bg-accent`}
                 >
                   <span
                     data-slot="marketing-faq-question"
-                    className={`${styles["question"]} min-w-0 text-start`}
+                    className={`${styles["question"]} min-w-0`}
                   >
                     <BidiText>{question}</BidiText>
                   </span>
@@ -139,7 +142,7 @@ export function MarketingFaq() {
                 data-slot="marketing-faq-panel"
                 className={styles["panel"]}
               >
-                <p className="px-4 pt-1 pb-5 text-body text-muted-foreground">
+                <p className="mx-auto max-w-prose px-4 pt-1 pb-5 text-center text-body text-muted-foreground">
                   <BidiText>{answer}</BidiText>
                 </p>
               </Accordion.Panel>

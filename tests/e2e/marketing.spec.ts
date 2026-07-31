@@ -256,6 +256,52 @@ async function gotoMarketingState(
   await expect(page.getByRole("heading", { level: 1, name: COPY[locale].heading })).toBeVisible();
 }
 
+async function getCardSemanticColors(page: Page) {
+  return page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.position = "fixed";
+    probe.style.visibility = "hidden";
+    const tokenOwner = document.querySelector('[data-slot="marketing-story-card"]');
+    if (!tokenOwner) throw new Error("The marketing color check requires a StoryCard token owner.");
+    tokenOwner.append(probe);
+
+    const resolveColor = (value: string) => {
+      probe.style.color = value;
+      return getComputedStyle(probe).color;
+    };
+    const resolveBackground = (value: string) => {
+      probe.style.backgroundColor = value;
+      return getComputedStyle(probe).backgroundColor;
+    };
+
+    const foreground = resolveColor("var(--foreground)");
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("The marketing color check requires a 2D canvas context.");
+    context.fillStyle = foreground;
+    context.fillRect(0, 0, 1, 1);
+    const [red = 0, green = 0, blue = 0] = context.getImageData(0, 0, 1, 1).data;
+    const linearize = (channel: number) => {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    };
+    const result = {
+      foreground,
+      foregroundLuminance:
+        0.2126 * linearize(red) + 0.7152 * linearize(green) + 0.0722 * linearize(blue),
+      primary: resolveColor("var(--primary)"),
+      border: resolveColor("var(--border)"),
+      surface: resolveBackground("var(--surface)"),
+      primaryTint: resolveBackground("color-mix(in oklab, var(--primary) 10%, transparent)"),
+    };
+
+    probe.remove();
+    return result;
+  });
+}
+
 test("root marketing route owns one landmark set and a resolved primary action", async ({
   page,
 }) => {
@@ -555,11 +601,20 @@ test("marketing FAQ delegates its single-open disclosure contract to Base UI", a
   const englishQuestionBox = await firstTrigger
     .locator('[data-slot="marketing-faq-question"]')
     .boundingBox();
+  const englishTriggerBox = await firstTrigger.boundingBox();
   const englishIndicatorBox = await firstTrigger
     .locator('[data-slot="marketing-faq-indicator"]')
     .boundingBox();
   expect(englishQuestionBox).not.toBeNull();
+  expect(englishTriggerBox).not.toBeNull();
   expect(englishIndicatorBox).not.toBeNull();
+  expect(
+    Math.abs(
+      (englishQuestionBox?.x ?? 0) +
+        (englishQuestionBox?.width ?? 0) / 2 -
+        ((englishTriggerBox?.x ?? 0) + (englishTriggerBox?.width ?? 0) / 2),
+    ),
+  ).toBeLessThanOrEqual(1);
   expect(englishIndicatorBox?.x ?? 0).toBeGreaterThan(englishQuestionBox?.x ?? 0);
 
   await page.getByRole("button", { name: "العربية" }).click();
@@ -584,12 +639,21 @@ test("marketing FAQ delegates its single-open disclosure contract to Base UI", a
     .first()
     .locator('[data-slot="marketing-faq-question"]')
     .boundingBox();
+  const arabicTriggerBox = await arabicTriggers.first().boundingBox();
   const arabicIndicatorBox = await arabicTriggers
     .first()
     .locator('[data-slot="marketing-faq-indicator"]')
     .boundingBox();
   expect(arabicQuestionBox).not.toBeNull();
+  expect(arabicTriggerBox).not.toBeNull();
   expect(arabicIndicatorBox).not.toBeNull();
+  expect(
+    Math.abs(
+      (arabicQuestionBox?.x ?? 0) +
+        (arabicQuestionBox?.width ?? 0) / 2 -
+        ((arabicTriggerBox?.x ?? 0) + (arabicTriggerBox?.width ?? 0) / 2),
+    ),
+  ).toBeLessThanOrEqual(1);
   expect(arabicIndicatorBox?.x ?? 0).toBeLessThan(arabicQuestionBox?.x ?? 0);
 
   const duplicateIds = await page.locator("[id]").evaluateAll((elements) => {
@@ -598,6 +662,126 @@ test("marketing FAQ delegates its single-open disclosure contract to Base UI", a
   });
   expect(duplicateIds).toEqual([]);
   expect(consoleErrors).toEqual([]);
+});
+
+test("post-hero marketing content uses its centered, text-first composition", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  for (const locale of ["en", "ar"] as const) {
+    await gotoMarketingState(page, "light", locale);
+
+    const composition = await page.evaluate(() => {
+      const center = (element: Element) => {
+        const bounds = element.getBoundingClientRect();
+        return bounds.x + bounds.width / 2;
+      };
+
+      const introductions = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-slot="marketing-section-intro"]'),
+      ).map((intro) => ({
+        centerDelta: Math.abs(center(intro) - center(intro.parentElement!)),
+        textAlign: getComputedStyle(intro).textAlign,
+      }));
+
+      const cards = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-slot="marketing-story-card"]'),
+      ).map((card) => {
+        const icon = card.querySelector<HTMLElement>('[data-slot="marketing-story-icon"]')!;
+        const style = getComputedStyle(card);
+        const cardBounds = card.getBoundingClientRect();
+        const inlineStart =
+          style.direction === "rtl"
+            ? cardBounds.right - Number.parseFloat(style.paddingRight)
+            : cardBounds.left + Number.parseFloat(style.paddingLeft);
+        const content = [
+          icon,
+          card.querySelector<HTMLElement>('[data-slot="marketing-story-technologies"]')!,
+          card.querySelector<HTMLElement>('[data-slot="marketing-story-heading"]')!,
+          card.querySelector<HTMLElement>('[data-slot="marketing-story-description"]')!,
+          card.querySelector<HTMLElement>('[data-slot="marketing-story-evidence"]')!,
+        ];
+        const heading = card.querySelector<HTMLElement>('[data-slot="marketing-story-heading"]')!;
+        const headingText = document.createRange();
+        headingText.selectNodeContents(heading);
+        const headingTextBounds = headingText.getBoundingClientRect();
+        const headingTextInlineStart =
+          style.direction === "rtl" ? headingTextBounds.right : headingTextBounds.left;
+        return {
+          direction: style.direction,
+          inlineStartDeltas: content.map((element) => {
+            const bounds = element.getBoundingClientRect();
+            const elementInlineStart = style.direction === "rtl" ? bounds.right : bounds.left;
+            return Math.abs(elementInlineStart - inlineStart);
+          }),
+          headingTextInlineStartDelta: Math.abs(headingTextInlineStart - inlineStart),
+          textAlign: style.textAlign,
+        };
+      });
+
+      const grids = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-slot="marketing-story-grid"]'),
+      ).map((grid) => ({
+        centerDelta: Math.abs(center(grid) - center(grid.closest('[data-slot="container"]')!)),
+      }));
+
+      const features = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-slot="marketing-centered-feature"]'),
+      ).map((feature) => {
+        const copy = feature.querySelector<HTMLElement>('[data-slot="marketing-feature-copy"]')!;
+        const specimen = feature.querySelector<HTMLElement>(
+          '[data-slot="marketing-feature-specimen"]',
+        )!;
+        return {
+          copyBeforeSpecimen:
+            copy.compareDocumentPosition(specimen) === Node.DOCUMENT_POSITION_FOLLOWING,
+          copyAboveSpecimen:
+            copy.getBoundingClientRect().bottom < specimen.getBoundingClientRect().top,
+          specimenCenterDelta: Math.abs(center(specimen) - center(feature)),
+        };
+      });
+
+      const centeredSupportingContent = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "#architecture figure li, #bilingual-design figure li, #quality aside, #quality figure figcaption, #quality figure li",
+        ),
+      ).map((element) => getComputedStyle(element).textAlign);
+
+      return { introductions, cards, grids, features, centeredSupportingContent };
+    });
+
+    expect(composition.introductions).toHaveLength(5);
+    for (const intro of composition.introductions) {
+      expect(intro.centerDelta).toBeLessThanOrEqual(1);
+      expect(intro.textAlign).toBe("center");
+    }
+
+    expect(composition.cards).toHaveLength(12);
+    for (const card of composition.cards) {
+      expect(card.direction).toBe(COPY[locale].direction);
+      expect(card.textAlign).toBe("start");
+      expect(card.headingTextInlineStartDelta).toBeLessThanOrEqual(1);
+      for (const delta of card.inlineStartDeltas) {
+        expect(delta).toBeLessThanOrEqual(1);
+      }
+    }
+
+    expect(composition.grids).toHaveLength(2);
+    for (const grid of composition.grids) {
+      expect(grid.centerDelta).toBeLessThanOrEqual(1);
+    }
+
+    expect(composition.features).toHaveLength(2);
+    for (const feature of composition.features) {
+      expect(feature.copyBeforeSpecimen).toBe(true);
+      expect(feature.copyAboveSpecimen).toBe(true);
+      expect(feature.specimenCenterDelta).toBeLessThanOrEqual(1);
+    }
+
+    expect(composition.centeredSupportingContent.length).toBeGreaterThan(0);
+    expect(composition.centeredSupportingContent.every((alignment) => alignment === "center")).toBe(
+      true,
+    );
+  }
 });
 
 test("marketing FAQ open states remain accessible, reduced, and overflow-free", async ({
@@ -681,49 +865,49 @@ test("informational story cards coordinate restrained hover feedback and reduced
   });
 
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await gotoMarketingState(page, "light", "en");
-
   const cardSelectors = [
     "#capability-story [data-slot='marketing-story-card']",
     "#quality [data-slot='marketing-story-card']",
   ] as const;
+  let lightSemantic: Awaited<ReturnType<typeof getCardSemanticColors>> | undefined;
 
-  for (const selector of cardSelectors) {
-    const card = page.locator(selector).first();
-    const iconWrapper = card.locator('[data-slot="marketing-story-icon"]');
-    const icon = card.locator('[data-slot="marketing-story-icon-glyph"]');
-    const before = await card.evaluate((element) => ({
-      text: element.textContent,
-      backgroundColor: getComputedStyle(element).backgroundColor,
-      iconBorderColor: getComputedStyle(
-        element.querySelector('[data-slot="marketing-story-icon"]')!,
-      ).borderColor,
-      iconColor: getComputedStyle(element.querySelector('[data-slot="marketing-story-icon"]')!)
-        .color,
-    }));
+  for (const theme of ["light", "dark"] as const) {
+    await gotoMarketingState(page, theme, "en");
+    const semantic = await getCardSemanticColors(page);
+    if (theme === "light") lightSemantic = semantic;
+    expect(
+      theme === "light" ? semantic.foregroundLuminance < 0.5 : semantic.foregroundLuminance > 0.5,
+    ).toBe(true);
 
-    await expect(card).not.toHaveAttribute("tabindex");
-    await expect(card).not.toHaveAttribute("role");
-    await expect(card).toHaveCSS("cursor", "auto");
-    await expect(card).toHaveCSS("translate", "none");
-    await card.hover();
-    await expect(card).toHaveCSS("translate", "0px -2px");
-    await expect(icon).toHaveCSS("translate", "0px -1px");
+    for (const selector of cardSelectors) {
+      const card = page.locator(selector).first();
+      const iconWrapper = card.locator('[data-slot="marketing-story-icon"]');
+      const icon = card.locator('[data-slot="marketing-story-icon-glyph"]');
+      const before = await card.evaluate((element) => ({
+        text: element.textContent,
+        backgroundColor: getComputedStyle(element).backgroundColor,
+      }));
 
-    const after = await card.evaluate((element) => ({
-      text: element.textContent,
-      backgroundColor: getComputedStyle(element).backgroundColor,
-      iconBorderColor: getComputedStyle(
-        element.querySelector('[data-slot="marketing-story-icon"]')!,
-      ).borderColor,
-      iconColor: getComputedStyle(element.querySelector('[data-slot="marketing-story-icon"]')!)
-        .color,
-    }));
-    expect(after.text).toBe(before.text);
-    expect(after.backgroundColor).not.toBe(before.backgroundColor);
-    expect(after.iconBorderColor).not.toBe(before.iconBorderColor);
-    expect(after.iconColor).not.toBe(before.iconColor);
-    await expect(iconWrapper).toHaveCSS("color", after.iconColor);
+      await expect(icon).toHaveCSS("color", semantic.foreground);
+      await expect(iconWrapper).toHaveCSS("background-color", semantic.surface);
+      await expect(iconWrapper).toHaveCSS("border-color", semantic.border);
+      await expect(card).not.toHaveAttribute("tabindex");
+      await expect(card).not.toHaveAttribute("role");
+      await expect(card).toHaveCSS("cursor", "auto");
+      await expect(card).toHaveCSS("translate", "none");
+
+      await card.hover();
+      await expect(card).toHaveCSS("translate", "0px -2px");
+      await expect(icon).toHaveCSS("translate", "0px -1px");
+      await expect(icon).toHaveCSS("color", semantic.primary);
+      await expect(iconWrapper).toHaveCSS("color", semantic.primary);
+      await expect(iconWrapper).toHaveCSS("background-color", semantic.primaryTint);
+      await expect(iconWrapper).toHaveCSS("border-color", semantic.primary);
+      expect(await card.evaluate((element) => element.textContent)).toBe(before.text);
+      expect(await card.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
+        before.backgroundColor,
+      );
+    }
   }
 
   const architectureSpecimen = page.getByRole("figure", { name: COPY.en.architectureDiagram });
@@ -736,11 +920,16 @@ test("informational story cards coordinate restrained hover feedback and reduced
   expect(overflow).toBeLessThanOrEqual(1);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
+  await gotoMarketingState(page, "light", "en");
+  if (!lightSemantic) throw new Error("The reduced-motion check requires light-theme semantics.");
   const reducedCard = page.locator(cardSelectors[0]).nth(1);
+  const reducedIconWrapper = reducedCard.locator('[data-slot="marketing-story-icon"]');
   const reducedIcon = reducedCard.locator('[data-slot="marketing-story-icon-glyph"]');
   await reducedCard.hover();
   await expect(reducedCard).toHaveCSS("translate", "none");
   await expect(reducedIcon).toHaveCSS("translate", "none");
+  await expect(reducedIcon).toHaveCSS("color", lightSemantic.primary);
+  await expect(reducedIconWrapper).toHaveCSS("background-color", lightSemantic.primaryTint);
   expect(consoleErrors).toEqual([]);
 });
 
@@ -760,48 +949,56 @@ test("informational story cards keep their static presentation in touch contexts
   const page = await context.newPage();
 
   try {
-    for (const locale of ["en", "ar"] as const) {
-      await gotoMarketingState(page, "light", locale);
+    for (const theme of ["light", "dark"] as const) {
+      for (const locale of ["en", "ar"] as const) {
+        await gotoMarketingState(page, theme, locale);
+        const semantic = await getCardSemanticColors(page);
 
-      expect(
-        await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches),
-      ).toBe(false);
+        expect(
+          await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches),
+        ).toBe(false);
 
-      const card = page.locator("#capability-story [data-slot='marketing-story-card']").first();
-      const iconWrapper = card.locator('[data-slot="marketing-story-icon"]');
-      const icon = card.locator('[data-slot="marketing-story-icon-glyph"]');
-      const before = await card.evaluate((element) => ({
-        text: element.textContent,
-        backgroundColor: getComputedStyle(element).backgroundColor,
-      }));
-      const beforeIcon = await iconWrapper.evaluate((element) => ({
-        backgroundColor: getComputedStyle(element).backgroundColor,
-        borderColor: getComputedStyle(element).borderColor,
-        color: getComputedStyle(element).color,
-      }));
-
-      await card.hover();
-      await expect(card).toHaveCSS("translate", "none");
-      await expect(icon).toHaveCSS("translate", "none");
-      expect(
-        await card.evaluate((element) => ({
+        const card = page.locator("#capability-story [data-slot='marketing-story-card']").first();
+        const iconWrapper = card.locator('[data-slot="marketing-story-icon"]');
+        const icon = card.locator('[data-slot="marketing-story-icon-glyph"]');
+        const before = await card.evaluate((element) => ({
           text: element.textContent,
           backgroundColor: getComputedStyle(element).backgroundColor,
-        })),
-      ).toEqual(before);
-      expect(
-        await iconWrapper.evaluate((element) => ({
+        }));
+        const beforeIcon = await iconWrapper.evaluate((element) => ({
           backgroundColor: getComputedStyle(element).backgroundColor,
           borderColor: getComputedStyle(element).borderColor,
           color: getComputedStyle(element).color,
-        })),
-      ).toEqual(beforeIcon);
+        }));
+        expect(beforeIcon).toEqual({
+          backgroundColor: semantic.surface,
+          borderColor: semantic.border,
+          color: semantic.foreground,
+        });
 
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-        ),
-      ).toBeLessThanOrEqual(1);
+        await card.hover();
+        await expect(card).toHaveCSS("translate", "none");
+        await expect(icon).toHaveCSS("translate", "none");
+        expect(
+          await card.evaluate((element) => ({
+            text: element.textContent,
+            backgroundColor: getComputedStyle(element).backgroundColor,
+          })),
+        ).toEqual(before);
+        expect(
+          await iconWrapper.evaluate((element) => ({
+            backgroundColor: getComputedStyle(element).backgroundColor,
+            borderColor: getComputedStyle(element).borderColor,
+            color: getComputedStyle(element).color,
+          })),
+        ).toEqual(beforeIcon);
+
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          ),
+        ).toBeLessThanOrEqual(1);
+      }
     }
   } finally {
     await context.close();

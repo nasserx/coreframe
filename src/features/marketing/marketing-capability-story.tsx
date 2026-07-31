@@ -24,9 +24,10 @@ import {
   type MarketingSpecimenStep,
   QualityPipeline,
 } from "./marketing-specimens";
+import { MarketingSectionIntro } from "./marketing-section-intro";
 import styles from "./marketing-capability-story.module.css";
 
-type FeatureSplitProps = Readonly<{
+type CenteredFeatureProps = Readonly<{
   eyebrow: string;
   headingId: string;
   title: ReactNode;
@@ -45,7 +46,7 @@ type StoryCard = Readonly<{
   icon: LucideIcon;
 }>;
 
-function FeatureSplit({
+function CenteredFeature({
   eyebrow,
   headingId,
   title,
@@ -54,22 +55,23 @@ function FeatureSplit({
   verificationLabel,
   verification,
   specimen,
-}: FeatureSplitProps) {
+}: CenteredFeatureProps) {
   return (
-    <Container className="grid items-center gap-12 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16">
-      <div className="max-w-prose min-w-0">
-        <p className="text-small font-semibold text-link">{eyebrow}</p>
-        <h2 id={headingId} className="mt-3 text-heading sm:text-title">
-          {title}
-        </h2>
-        <p className="mt-5 text-body-lg">{lead}</p>
-        <div className="mt-6 space-y-4 text-body">{body}</div>
-        <div className="mt-8 border-s-2 border-info ps-4">
+    <Container data-slot="marketing-centered-feature" className="py-20 sm:py-24">
+      <MarketingSectionIntro eyebrow={eyebrow} headingId={headingId} title={title} lead={lead} />
+      <div
+        data-slot="marketing-feature-copy"
+        className="mx-auto mt-6 max-w-prose space-y-4 text-center text-body"
+      >
+        {body}
+        <div className="mt-8 border-t pt-4">
           <p className="text-small font-semibold">{verificationLabel}</p>
           <p className="mt-1 text-supporting text-muted-foreground">{verification}</p>
         </div>
       </div>
-      <div className="min-w-0">{specimen}</div>
+      <div data-slot="marketing-feature-specimen" className="mx-auto mt-12 max-w-5xl min-w-0">
+        {specimen}
+      </div>
     </Container>
   );
 }
@@ -80,11 +82,11 @@ function StoryCard({ title, description, evidence, technologies, icon: Icon }: S
   return (
     <article
       data-slot="marketing-story-card"
-      className={`${styles["storyCard"]} flex h-full min-w-0 flex-col rounded-xl border bg-card p-6`}
+      className={`${styles["storyCard"]} flex h-full min-w-0 flex-col items-start rounded-xl border bg-card p-6 text-start`}
     >
       <div
         data-slot="marketing-story-icon"
-        className={`${styles["storyIcon"]} flex size-10 items-center justify-center rounded-lg border bg-surface text-info`}
+        className={`${styles["storyIcon"]} flex size-10 items-center justify-center self-start rounded-lg border bg-surface text-foreground`}
       >
         <Icon
           aria-hidden={true}
@@ -92,12 +94,21 @@ function StoryCard({ title, description, evidence, technologies, icon: Icon }: S
           className={`${styles["storyIconGlyph"]} size-5`}
         />
       </div>
-      <bdi dir="auto" className="mt-5 self-start text-caption font-semibold text-link">
-        {technologies}
-      </bdi>
-      <h3 className="mt-2 text-subheading">{title}</h3>
-      <p className="mt-3 text-small">{description}</p>
-      <p className="mt-6 border-t pt-4 text-supporting text-muted-foreground">
+      <div data-slot="marketing-story-technologies" className="mt-5 w-full text-start">
+        <bdi dir="auto" className="text-caption font-semibold text-link">
+          {technologies}
+        </bdi>
+      </div>
+      <h3 data-slot="marketing-story-heading" className="mt-2 w-full text-start text-subheading">
+        {title}
+      </h3>
+      <p data-slot="marketing-story-description" className="mt-3 w-full text-start text-small">
+        {description}
+      </p>
+      <p
+        data-slot="marketing-story-evidence"
+        className="mt-6 w-full border-t pt-4 text-start text-supporting text-muted-foreground"
+      >
         <span className="font-semibold text-foreground">{t("storyEvidenceLabel")}:</span> {evidence}
       </p>
     </article>
@@ -251,15 +262,17 @@ export function MarketingCapabilityStory() {
     <>
       <section id="capability-story" aria-labelledby="capability-story-heading">
         <Container className="py-20 sm:py-24">
-          <div className="max-w-prose">
-            <p className="text-small font-semibold text-link">{t("storyEyebrow")}</p>
-            <h2 id="capability-story-heading" className="mt-3 text-heading sm:text-title">
-              {t("storyTitle")}
-            </h2>
-            <p className="mt-5 text-body-lg">{t("storyLead")}</p>
-          </div>
+          <MarketingSectionIntro
+            eyebrow={t("storyEyebrow")}
+            headingId="capability-story-heading"
+            title={t("storyTitle")}
+            lead={t("storyLead")}
+          />
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div
+            data-slot="marketing-story-grid"
+            className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          >
             {capabilities.map((capability) => (
               <StoryCard key={capability.title} {...capability} />
             ))}
@@ -272,7 +285,7 @@ export function MarketingCapabilityStory() {
         aria-labelledby="architecture-heading"
         className="border-y bg-surface"
       >
-        <FeatureSplit
+        <CenteredFeature
           eyebrow={t("architectureEyebrow")}
           headingId="architecture-heading"
           title={
@@ -293,13 +306,13 @@ export function MarketingCapabilityStory() {
       </section>
 
       <section id="bilingual-design" aria-labelledby="bilingual-design-heading">
-        <FeatureSplit
+        <CenteredFeature
           eyebrow={t("bilingualEyebrow")}
           headingId="bilingual-design-heading"
           title={t("bilingualTitle")}
           lead={t("bilingualLead")}
           body={
-            <dl className="grid gap-4 sm:grid-cols-2">
+            <dl className="grid gap-4 text-center sm:grid-cols-2">
               <div className="rounded-lg border bg-card p-4">
                 <dt>
                   <bdi dir="ltr" className="text-small font-semibold text-link">
@@ -332,31 +345,33 @@ export function MarketingCapabilityStory() {
 
       <section id="quality" aria-labelledby="quality-heading" className="border-t bg-surface">
         <Container className="py-20 sm:py-24">
-          <div className="max-w-prose">
-            <p className="text-small font-semibold text-link">{t("qualityEyebrow")}</p>
-            <h2 id="quality-heading" className="mt-3 text-heading sm:text-title">
-              {t("qualityTitle")}
-            </h2>
-            <p className="mt-5 text-body-lg">{t("qualityLead")}</p>
-          </div>
+          <MarketingSectionIntro
+            eyebrow={t("qualityEyebrow")}
+            headingId="quality-heading"
+            title={t("qualityTitle")}
+            lead={t("qualityLead")}
+          />
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div
+            data-slot="marketing-story-grid"
+            className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          >
             {safeguards.map((safeguard) => (
               <StoryCard key={safeguard.title} {...safeguard} />
             ))}
           </div>
 
           <aside
-            className="mt-6 rounded-xl border bg-background p-6"
+            className="mx-auto mt-6 max-w-prose rounded-xl border bg-background p-6 text-center"
             aria-labelledby="dependency-posture-heading"
           >
             <h3 id="dependency-posture-heading" className="text-subheading">
               {t("dependencyPostureTitle")}
             </h3>
-            <p className="mt-3 max-w-prose text-small">{t("dependencyPostureDescription")}</p>
+            <p className="mt-3 text-small">{t("dependencyPostureDescription")}</p>
           </aside>
 
-          <div className="mt-8">
+          <div className="mx-auto mt-8 max-w-5xl">
             <QualityPipeline label={t("pipelineLabel")} stages={pipeline} />
           </div>
         </Container>

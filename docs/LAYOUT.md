@@ -240,6 +240,18 @@ shared shell through `src/features/marketing`). The isolated mechanics demo
 remains `/showcase/site`; production marketing must not depend on that route or
 its feature code.
 
+Post-hero production marketing sections use a feature-owned centered
+composition by default. Introductions and explanatory copy retain the prose
+measure; informational card grids are centered page content while card
+interiors retain logical-start alignment for readability; technical sections
+place constrained specimens below their text in DOM order; and FAQ triggers
+center question text independently of their logical inline-end indicator. Card
+glyphs use semantic foreground at rest, then the glyph and wrapper use semantic
+primary only as fine-pointer hover feedback; reduced motion removes their
+spatial translation. This contract belongs to `src/features/marketing` and
+does not change `Container`, the global typography ramp, shared `Card`, global
+icon behavior, or application layout defaults.
+
 ### Structure and slots
 
 A `min-h-dvh` flex column; the **document itself scrolls**. The header is

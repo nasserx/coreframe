@@ -103,7 +103,7 @@ describe("MarketingCapabilityStory", () => {
     expect(document.querySelectorAll('bdi[dir="ltr"]')).not.toHaveLength(0);
   });
 
-  it("keeps the shared capability and safeguard cards informational while coordinating their icons", () => {
+  it("keeps the shared cards informational with logical-start interiors and centered grids", () => {
     renderMarketingPage();
 
     const storyCards = document.querySelectorAll('[data-slot="marketing-story-card"]');
@@ -125,6 +125,25 @@ describe("MarketingCapabilityStory", () => {
         0,
       );
       expect(card.querySelector('[data-slot="marketing-story-icon"]')).toBeInTheDocument();
+      expect(card.className).toContain("items-start");
+      expect(card.className).toContain("text-start");
+
+      const icon = card.querySelector('[data-slot="marketing-story-icon"]');
+      expect(icon?.className).toContain("self-start");
+      expect(icon?.className).toContain("text-foreground");
+      expect(icon?.className).not.toContain("text-info");
+
+      for (const slot of [
+        "marketing-story-technologies",
+        "marketing-story-heading",
+        "marketing-story-description",
+        "marketing-story-evidence",
+      ]) {
+        const content = card.querySelector(`[data-slot="${slot}"]`);
+        expect(content).toBeInTheDocument();
+        expect(content?.className).toContain("w-full");
+        expect(content?.className).toContain("text-start");
+      }
       expect(card.querySelector('[data-slot="marketing-story-icon-glyph"]')).toHaveAttribute(
         "aria-hidden",
         "true",
@@ -133,6 +152,44 @@ describe("MarketingCapabilityStory", () => {
 
     for (const specimen of document.querySelectorAll("figure")) {
       expect(specimen.querySelector('[data-slot="marketing-story-card"]')).toBeNull();
+    }
+
+    const grids = document.querySelectorAll('[data-slot="marketing-story-grid"]');
+    expect(grids).toHaveLength(2);
+    for (const grid of grids) {
+      expect(grid.className).toContain("grid");
+      expect(grid.closest('[data-slot="container"]')?.className).toContain("mx-auto");
+      expect(grid.closest('[data-slot="container"]')?.className).toContain("max-w-7xl");
+    }
+  });
+
+  it("uses one centered introduction owner and text-first stacked technical sections", () => {
+    renderMarketingPage();
+
+    const introductions = document.querySelectorAll('[data-slot="marketing-section-intro"]');
+    expect(introductions).toHaveLength(4);
+    for (const introduction of introductions) {
+      expect(introduction.className).toContain("mx-auto");
+      expect(introduction.className).toContain("max-w-prose");
+      expect(introduction.className).toContain("text-center");
+    }
+
+    const centeredFeatures = document.querySelectorAll('[data-slot="marketing-centered-feature"]');
+    expect(centeredFeatures).toHaveLength(2);
+    for (const feature of centeredFeatures) {
+      const copy = feature.querySelector('[data-slot="marketing-feature-copy"]');
+      const specimen = feature.querySelector('[data-slot="marketing-feature-specimen"]');
+      expect(copy).toBeInTheDocument();
+      expect(specimen).toBeInTheDocument();
+      if (!copy || !specimen) {
+        throw new Error("Centered marketing features require copy and specimen owners.");
+      }
+      expect(copy.compareDocumentPosition(specimen) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+      expect(copy.className).toContain("text-center");
+      expect(specimen.className).toContain("mx-auto");
+      expect(specimen.className).toContain("max-w-5xl");
     }
   });
 
@@ -155,7 +212,7 @@ describe("MarketingCapabilityStory", () => {
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.storyCard:hover[\s\S]*\.storyIconGlyph[\s\S]*translate: none/,
     );
     expect(css).not.toMatch(
-      /cursor|scale|rotate|box-shadow|#[\da-f]{3,8}|\brgb\(|\bhsl\(|\boklch\(/i,
+      /cursor|scale|rotate|box-shadow|#[\da-f]{3,8}|\brgb\(|\bhsl\(|\boklch\(|\bblack\b|\bwhite\b|\bleft\b|\bright\b/i,
     );
   });
 });

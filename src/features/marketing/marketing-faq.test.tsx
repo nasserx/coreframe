@@ -93,6 +93,15 @@ describe("MarketingFaq", () => {
       }),
     ).toHaveLength(1);
     expect(within(section as HTMLElement).getAllByRole("heading", { level: 3 })).toHaveLength(6);
+
+    const intro = section?.querySelector('[data-slot="marketing-section-intro"]');
+    expect(intro?.className).toContain("mx-auto");
+    expect(intro?.className).toContain("max-w-prose");
+    expect(intro?.className).toContain("text-center");
+
+    const accordion = section?.querySelector('[data-slot="marketing-faq-accordion"]');
+    expect(accordion?.className).toContain("mx-auto");
+    expect(accordion?.className).toContain("max-w-prose");
   });
 
   it("delegates a collapsed, single-open, collapsible keyboard contract to Base UI", async () => {
@@ -129,6 +138,10 @@ describe("MarketingFaq", () => {
     expect(triggerId).toBeTruthy();
     expect(panelId).toBeTruthy();
     expect(document.getElementById(panelId ?? "")).toHaveAttribute("aria-labelledby", triggerId);
+    const answer = document.getElementById(panelId ?? "")?.querySelector("p");
+    expect(answer?.className).toContain("mx-auto");
+    expect(answer?.className).toContain("max-w-prose");
+    expect(answer?.className).toContain("text-center");
 
     const ids = Array.from(document.querySelectorAll("[id]"), ({ id }) => id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -181,9 +194,13 @@ describe("MarketingFaq", () => {
     expect(css).toContain("var(--motion-moderate)");
     expect(css).toContain("var(--motion-quick)");
     expect(css).toContain("var(--ease-standard)");
-    expect(css).toContain('grid-template-areas: "question indicator"');
+    expect(css).toContain('grid-template-areas: "reserve question indicator"');
+    expect(css).toContain("grid-template-columns: 2rem minmax(0, 1fr) 2rem");
     expect(css).toContain(".trigger:dir(rtl)");
-    expect(css).toContain('grid-template-areas: "indicator question"');
+    expect(css).toContain('grid-template-areas: "indicator question reserve"');
+    expect(css).toContain("inline-size: 100%");
+    expect(css).toContain("text-align: center");
+    expect(css).not.toMatch(/\bleft\s*:|\bright\s*:/);
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.panel,[\s\S]*\.indicatorIcon[\s\S]*transition: none/,
     );
