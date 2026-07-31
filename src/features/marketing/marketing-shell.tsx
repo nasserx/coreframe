@@ -16,10 +16,38 @@ import {
 } from "@/components/ui/site-shell";
 import { ThemeControl } from "@/components/ui/theme-control";
 import { useTranslations } from "@/core/providers/locale-provider";
+import { cn } from "@/lib/utils";
 
 export type MarketingShellProps = Readonly<{
   children: ReactNode;
 }>;
+
+/**
+ * Footer destinations, in DOM order. Every entry is a section this page
+ * actually renders, so the footer promises nothing the route does not own —
+ * no external link, no unbuilt destination, no Showcase surface.
+ *
+ * `Capabilities` points at `#capability-story` (the named capability section),
+ * not the hero's unlabelled `#capabilities` strip: the footer is a page index,
+ * and an index entry should land on the section that carries the heading.
+ * `#next-step` is deliberately absent — the closing CTA sits immediately above
+ * the footer, so a link back to it would be a link to the reader's own
+ * position.
+ */
+const FOOTER_LINKS = [
+  { href: "#overview", key: "footerOverview" },
+  { href: "#capability-story", key: "footerCapabilities" },
+  { href: "#architecture", key: "footerArchitecture" },
+  { href: "#bilingual-design", key: "footerBilingualDesign" },
+  { href: "#quality", key: "footerQuality" },
+  { href: "#faq", key: "footerFaq" },
+] as const;
+
+// Shared by the footer brand lockup and every footer destination: a focus ring
+// on the semantic ring token, and the same recede-on-hover feedback the header
+// navigation uses (SiteShellNavItem) so both chrome regions read as one system.
+const FOOTER_FOCUS_RING =
+  "rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /**
  * Production public-site composition for the marketing route group.
@@ -83,11 +111,18 @@ export function MarketingShell({ children }: MarketingShellProps) {
       <SiteShellMain>{children}</SiteShellMain>
 
       <SiteShellFooter>
-        <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-start">
-          <div className="max-w-prose">
+        {/* Stacks on narrow viewports and only becomes a two-column
+            composition once the measure allows it; alignment is logical
+            throughout, so English reads from the left edge and Arabic from the
+            right with no conditional class. */}
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+          <div data-slot="marketing-footer-identity" className="max-w-prose">
             <Link
               href="/"
-              className="inline-flex items-center gap-2.5 rounded-md text-subheading font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className={cn(
+                "inline-flex items-center gap-2.5 text-subheading font-bold",
+                FOOTER_FOCUS_RING,
+              )}
             >
               <BrandMark className="size-7" />
               {t("brand")}
@@ -95,29 +130,33 @@ export function MarketingShell({ children }: MarketingShellProps) {
             <p className="mt-3 text-small text-muted-foreground">{t("footerContext")}</p>
           </div>
 
-          <nav aria-label={t("footerNavLabel")}>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-small font-semibold">
-              <li>
-                <Link
-                  href="#overview"
-                  className="rounded-md transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                >
-                  {t("footerOverview")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#capabilities"
-                  className="rounded-md transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                >
-                  {t("footerCapabilities")}
-                </Link>
-              </li>
+          <nav data-slot="marketing-footer-nav" aria-label={t("footerNavLabel")}>
+            {/* Two comfortable columns rather than a dense sitemap: one column
+                while stacked, two once there is room, in both compositions. */}
+            <ul className="grid gap-x-10 gap-y-3 text-small font-semibold sm:grid-cols-2">
+              {FOOTER_LINKS.map(({ href, key }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className={cn(
+                      "inline-block transition-colors hover:text-muted-foreground",
+                      FOOTER_FOCUS_RING,
+                    )}
+                  >
+                    {t(key)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
 
-        <p className="mt-8 border-t pt-6 text-supporting text-muted-foreground">
+        {/* The closing status line sits beneath a semantic hairline: a quiet
+            statement of fact, not a second call to action. */}
+        <p
+          data-slot="marketing-footer-status"
+          className="mt-10 border-t pt-6 text-supporting text-muted-foreground"
+        >
           {t("footerStatus")}
         </p>
       </SiteShellFooter>

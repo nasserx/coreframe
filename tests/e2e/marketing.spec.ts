@@ -64,6 +64,17 @@ const COPY = {
       "Review the architecture and safeguards, then adapt the system around your product while preserving its shared contracts.",
     closingPrimary: "Review the architecture",
     closingSecondary: "Inspect the safeguards",
+    footerNavLabel: "Footer navigation",
+    footerContext: "A domain-neutral base for production web applications.",
+    footerStatus: "Built with semantic tokens, typed contracts, and static generation.",
+    footerNavigation: [
+      { label: "Overview", href: "#overview" },
+      { label: "Capabilities", href: "#capability-story" },
+      { label: "Architecture", href: "#architecture" },
+      { label: "Bilingual design", href: "#bilingual-design" },
+      { label: "Quality", href: "#quality" },
+      { label: "FAQ", href: "#faq" },
+    ],
   },
   ar: {
     brand: "أساس الواجهات",
@@ -124,6 +135,17 @@ const COPY = {
       "راجع المعمارية وضوابط الجودة، ثم كيّف النظام حول منتجك مع الحفاظ على عقوده المشتركة.",
     closingPrimary: "راجع المعمارية",
     closingSecondary: "استعرض ضوابط الجودة",
+    footerNavLabel: "تنقل التذييل",
+    footerContext: "أساس محايد المجال لبناء تطبيقات ويب إنتاجية.",
+    footerStatus: "مبني على رموز دلالية وعقود أنواع صريحة وتوليد ثابت.",
+    footerNavigation: [
+      { label: "نظرة عامة", href: "#overview" },
+      { label: "الإمكانات", href: "#capability-story" },
+      { label: "المعمارية", href: "#architecture" },
+      { label: "التصميم ثنائي اللغة", href: "#bilingual-design" },
+      { label: "الجودة", href: "#quality" },
+      { label: "الأسئلة الشائعة", href: "#faq" },
+    ],
   },
 } as const;
 
@@ -202,8 +224,10 @@ const ENGLISH_MARKETING_TEXT = [
   COPY.en.closingDescription,
   COPY.en.closingPrimary,
   COPY.en.closingSecondary,
-  "A domain-neutral base for production web applications.",
-  "Built with semantic tokens, typed contracts, and static generation.",
+  "Bilingual design",
+  "FAQ",
+  COPY.en.footerContext,
+  COPY.en.footerStatus,
 ] as const;
 
 const ARABIC_MARKETING_TEXT = [
@@ -253,8 +277,10 @@ const ARABIC_MARKETING_TEXT = [
   COPY.ar.closingDescription,
   COPY.ar.closingPrimary,
   COPY.ar.closingSecondary,
-  "أساس محايد المجال لبناء تطبيقات ويب إنتاجية.",
-  "مبني على رموز دلالية وعقود أنواع صريحة وتوليد ثابت.",
+  "التصميم ثنائي اللغة",
+  "الأسئلة الشائعة",
+  COPY.ar.footerContext,
+  COPY.ar.footerStatus,
 ] as const;
 
 async function gotoMarketingState(
@@ -1247,6 +1273,267 @@ test("closing CTA is axe-clean in each theme and locale", async ({ page }) => {
     }));
 
     expect(readable, `closing CTA [${theme} ${locale}]`).toEqual([]);
+  }
+});
+
+test("marketing footer closes the page with six real, bilingual page destinations", async ({
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  for (const locale of ["en", "ar"] as const) {
+    await gotoMarketingState(page, "light", locale);
+    const copy = COPY[locale];
+
+    const footer = page.getByRole("contentinfo");
+    await expect(footer).toHaveCount(1);
+
+    const brand = footer.getByRole("link", { name: copy.brand, exact: true });
+    await expect(brand).toHaveAttribute("href", "/");
+    await expect(footer.getByText(copy.footerContext, { exact: true })).toBeVisible();
+    await expect(footer.getByText(copy.footerStatus, { exact: true })).toBeVisible();
+
+    // A footer nav is a labelled region, never a heading level of its own.
+    const footerNavigation = footer.getByRole("navigation", { name: copy.footerNavLabel });
+    await expect(footerNavigation).toHaveCount(1);
+    await expect(footer.locator("h1, h2, h3, h4, h5, h6")).toHaveCount(0);
+
+    const footerLinks = footerNavigation.getByRole("link");
+    await expect(footerLinks).toHaveText(copy.footerNavigation.map(({ label }) => label));
+    // The brand lockup plus these six destinations — nothing else is promised.
+    await expect(footer.getByRole("link")).toHaveCount(copy.footerNavigation.length + 1);
+    await expect(footer.getByRole("button")).toHaveCount(0);
+
+    for (const [index, { href }] of copy.footerNavigation.entries()) {
+      await expect(footerLinks.nth(index)).toHaveAttribute("href", href);
+      // Every destination resolves to exactly one section of this same page.
+      await expect(page.locator(`section${href}`)).toHaveCount(1);
+    }
+
+    const destinations = await footer.getByRole("link").evaluateAll((links) =>
+      links.map((link) => ({
+        href: link.getAttribute("href"),
+        target: link.getAttribute("target"),
+        rel: link.getAttribute("rel"),
+        unavailable: link.hasAttribute("data-unavailable"),
+      })),
+    );
+    for (const destination of destinations) {
+      expect(destination.href, `footer destination [${locale}]`).toMatch(/^(?:\/|#[a-z-]+)$/);
+      expect(destination.target).toBeNull();
+      expect(destination.rel).toBeNull();
+      expect(destination.unavailable).toBe(false);
+    }
+    // The footer indexes the named capability section, not the hero's
+    // unlabelled strip, and never links back to the closing CTA above it.
+    const footerHrefs = destinations.map(({ href }) => href);
+    expect(footerHrefs).not.toContain("#capabilities");
+    expect(footerHrefs).not.toContain("#next-step");
+
+    // The closing CTA still hands off to the footer, in that order.
+    const boundary = await page.evaluate(() => {
+      const step = document.querySelector("section#next-step");
+      const region = document.querySelector('[data-slot="site-shell-footer"]');
+      if (!step || !region) {
+        throw new Error("The footer boundary check requires the closing CTA and the footer.");
+      }
+      return {
+        ctaBeforeFooterInDom:
+          (step.compareDocumentPosition(region) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        ctaAboveFooter:
+          region.getBoundingClientRect().top >= step.getBoundingClientRect().bottom - 1,
+        footerHoldsCta: region.contains(step),
+      };
+    });
+    expect(boundary, `footer boundary [${locale}]`).toEqual({
+      ctaBeforeFooterInDom: true,
+      ctaAboveFooter: true,
+      footerHoldsCta: false,
+    });
+
+    const headingLevels = await page
+      .locator("h1, h2, h3")
+      .evaluateAll((headings) => headings.map((heading) => Number(heading.tagName.slice(1))));
+    expect(headingLevels.filter((level) => level === 1)).toHaveLength(1);
+    for (let index = 1; index < headingLevels.length; index += 1) {
+      expect(headingLevels[index] ?? 0).toBeLessThanOrEqual((headingLevels[index - 1] ?? 0) + 1);
+    }
+
+    const duplicateIds = await page.locator("[id]").evaluateAll((elements) => {
+      const ids = elements.map(({ id }) => id);
+      return ids.filter((id, index) => ids.indexOf(id) !== index);
+    });
+    expect(duplicateIds).toEqual([]);
+  }
+
+  expect(consoleErrors).toEqual([]);
+});
+
+test("marketing footer destinations are keyboard reachable, visibly focused, and navigate", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  for (const locale of ["en", "ar"] as const) {
+    await gotoMarketingState(page, "light", locale);
+    const copy = COPY[locale];
+
+    const footer = page.getByRole("contentinfo");
+    const footerLinks = footer
+      .getByRole("navigation", { name: copy.footerNavLabel })
+      .getByRole("link");
+
+    // Tab in from the brand lockup — the footer's first focusable — so focus
+    // arrives by keyboard and :focus-visible genuinely applies.
+    await footer.getByRole("link", { name: copy.brand, exact: true }).focus();
+    for (const [index] of copy.footerNavigation.entries()) {
+      await page.keyboard.press("Tab");
+      const link = footerLinks.nth(index);
+      await expect(link, `footer tab order [${locale}] ${index}`).toBeFocused();
+      expect(
+        await link.evaluate((element) => getComputedStyle(element).boxShadow),
+        `footer focus ring [${locale}] ${index}`,
+      ).not.toBe("none");
+    }
+
+    // The last destination activates by keyboard and resolves its section.
+    const faq = copy.footerNavigation[5];
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(new RegExp(`${faq.href}$`));
+    await expect(page.locator(`section${faq.href}`)).toBeVisible();
+  }
+});
+
+test("marketing footer follows direction and never overflows at checkpoint widths", async ({
+  page,
+}) => {
+  for (const { theme, locale } of STATES) {
+    await gotoMarketingState(page, theme, locale);
+
+    for (const width of WIDTHS) {
+      await page.setViewportSize({ width, height: 900 });
+
+      const measured = await page.evaluate(() => {
+        const root = document.documentElement;
+        const region = document.querySelector<HTMLElement>('[data-slot="site-shell-footer"]');
+        const identity = document.querySelector<HTMLElement>(
+          '[data-slot="marketing-footer-identity"]',
+        );
+        const navigation = document.querySelector<HTMLElement>(
+          '[data-slot="marketing-footer-nav"]',
+        );
+        if (!region || !identity || !navigation) {
+          throw new Error("The footer geometry check requires the footer, identity, and nav.");
+        }
+
+        const direction = getComputedStyle(region).direction;
+        // Logical inline-start: the left edge in LTR, the right edge in RTL.
+        // Every alignment claim below is expressed this way, so no assertion
+        // depends on a physical side.
+        const inlineStart = (element: Element) => {
+          const bounds = element.getBoundingClientRect();
+          return direction === "rtl" ? bounds.right : bounds.left;
+        };
+        const startOffset = (element: Element) =>
+          direction === "rtl"
+            ? inlineStart(region) - inlineStart(element)
+            : inlineStart(element) - inlineStart(region);
+
+        const container = region.querySelector<HTMLElement>('[data-slot="container"]')!;
+        const containerStyle = getComputedStyle(container);
+        const containerBounds = container.getBoundingClientRect();
+        const contentStart =
+          direction === "rtl"
+            ? containerBounds.right - Number.parseFloat(containerStyle.paddingRight)
+            : containerBounds.left + Number.parseFloat(containerStyle.paddingLeft);
+
+        const status = region.querySelector<HTMLElement>('[data-slot="marketing-footer-status"]')!;
+        const brand = identity.querySelector<HTMLElement>("a")!;
+        const context = identity.querySelector<HTMLElement>("p")!;
+        const links = Array.from(navigation.querySelectorAll<HTMLElement>("a"));
+
+        return {
+          direction,
+          pageOverflow: root.scrollWidth - root.clientWidth,
+          footerOverflow: region.scrollWidth - region.clientWidth,
+          insideViewport: [brand, context, status, ...links].every((element) => {
+            const bounds = element.getBoundingClientRect();
+            return bounds.left >= -1 && bounds.right <= root.clientWidth + 1;
+          }),
+          // The brand, its context copy, and the closing status line all begin
+          // at the container's own content start.
+          identityStartDeltas: [brand, context, status].map((element) =>
+            Math.abs(inlineStart(element) - contentStart),
+          ),
+          // Distinct rounded inline offsets = the number of link columns.
+          linkColumnOffsets: Array.from(
+            new Set(links.map((link) => Math.round(startOffset(link)))),
+          ).sort((a, b) => a - b),
+          linksAfterFooterStart: links.every((link) => startOffset(link) >= -1),
+          navigationBesideIdentity:
+            navigation.getBoundingClientRect().top < identity.getBoundingClientRect().bottom - 1,
+          navigationAfterIdentityInline: startOffset(navigation) > startOffset(identity),
+          statusBelow:
+            status.getBoundingClientRect().top >=
+            Math.max(
+              identity.getBoundingClientRect().bottom,
+              navigation.getBoundingClientRect().bottom,
+            ) -
+              1,
+        };
+      });
+
+      const at = `${theme} ${locale} at ${width}px`;
+      expect(measured.direction, at).toBe(COPY[locale].direction);
+      expect(measured.pageOverflow, at).toBeLessThanOrEqual(1);
+      expect(measured.footerOverflow, at).toBeLessThanOrEqual(1);
+      expect(measured.insideViewport, at).toBe(true);
+      for (const delta of measured.identityStartDeltas) {
+        expect(delta, `footer logical start alignment — ${at}`).toBeLessThanOrEqual(1);
+      }
+      expect(measured.linksAfterFooterStart, at).toBe(true);
+      expect(measured.statusBelow, at).toBe(true);
+
+      // One comfortable column while stacked, two once there is room — the
+      // same responsive grid in both directions, never a dense sitemap.
+      expect(measured.linkColumnOffsets.length, `footer link columns — ${at}`).toBe(
+        width < 640 ? 1 : 2,
+      );
+
+      // The two-column brand/navigation composition is a wide-width decision:
+      // below it the blocks stack, and the navigation always follows the brand
+      // in the inline direction rather than on a physical side.
+      if (width >= 1440) {
+        expect(measured.navigationBesideIdentity, at).toBe(true);
+        expect(measured.navigationAfterIdentityInline, at).toBe(true);
+      } else if (width < 640) {
+        expect(measured.navigationBesideIdentity, at).toBe(false);
+      }
+    }
+  }
+});
+
+test("marketing footer is axe-clean in each theme and locale", async ({ page }) => {
+  for (const { theme, locale } of STATES) {
+    await gotoMarketingState(page, theme, locale);
+
+    const results = await new AxeBuilder({ page })
+      .include('[data-slot="site-shell-footer"]')
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    const readable = results.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      help: violation.help,
+      nodes: violation.nodes.map((node) => node.target.join(" ")),
+    }));
+
+    expect(readable, `marketing footer [${theme} ${locale}]`).toEqual([]);
   }
 });
 
