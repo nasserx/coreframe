@@ -34,15 +34,18 @@ export function ArchitectureSpecimen({ label, steps }: ArchitectureSpecimenProps
       </figcaption>
       <ol className="grid gap-3 sm:grid-cols-3">
         {steps.map(({ kicker, title, description }, index) => (
-          <li key={title} className="flex min-w-0 flex-col rounded-xl border bg-card p-4">
-            <div className="mb-5 flex items-center justify-between gap-3">
+          <li
+            key={title}
+            className="flex min-w-0 flex-col items-center rounded-xl border bg-card p-4 text-center"
+          >
+            <div className="mb-5 flex flex-col items-center gap-2">
               <span className="text-caption font-semibold text-link">{kicker}</span>
               <span aria-hidden="true" className="text-caption text-muted-foreground">
                 {String(index + 1).padStart(2, "0")}
               </span>
             </div>
             <p className="text-small font-semibold">{title}</p>
-            <p className="mt-2 text-supporting text-muted-foreground">{description}</p>
+            <p className="mt-2 max-w-prose text-supporting text-muted-foreground">{description}</p>
           </li>
         ))}
       </ol>
@@ -65,15 +68,14 @@ export function BilingualSystemSpecimen({ label, steps }: BilingualSystemSpecime
       </figcaption>
       <ol className="flex flex-col gap-3">
         {steps.map(({ kicker, title, description }) => (
-          <li
-            key={title}
-            className="grid min-w-0 gap-3 rounded-xl border bg-background p-4 sm:grid-cols-[minmax(0,0.35fr)_minmax(0,1fr)] sm:items-center"
-          >
+          <li key={title} className="min-w-0 rounded-xl border bg-background p-4 text-center">
             <div className="min-w-0">
               <span className="text-caption font-semibold text-link">{kicker}</span>
               <p className="mt-1 text-small font-semibold">{title}</p>
             </div>
-            <p className="text-supporting text-muted-foreground">{description}</p>
+            <p className="mx-auto mt-3 max-w-prose text-supporting text-muted-foreground">
+              {description}
+            </p>
           </li>
         ))}
       </ol>
@@ -91,12 +93,12 @@ export function QualityPipeline({ label, stages }: QualityPipelineProps) {
       aria-labelledby="quality-pipeline-caption"
       className="rounded-2xl border bg-background p-4 sm:p-6"
     >
-      <figcaption id="quality-pipeline-caption" className="text-small font-semibold">
+      <figcaption id="quality-pipeline-caption" className="text-center text-small font-semibold">
         {label}
       </figcaption>
       <ol className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {stages.map((stage, index) => (
-          <li key={stage} className="min-w-0 rounded-lg border bg-card p-3">
+          <li key={stage} className="min-w-0 rounded-lg border bg-card p-3 text-center">
             <span aria-hidden="true" className="text-caption font-semibold text-link">
               {String(index + 1).padStart(2, "0")}
             </span>
