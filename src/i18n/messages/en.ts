@@ -216,6 +216,28 @@ export const en = {
     pipelineUnit: "Unit tests",
     pipelineBuild: "Production build",
     pipelineBrowser: "Browser tests",
+    faqEyebrow: "Questions, answered",
+    faqTitle: "Clear answers about the Foundation.",
+    faqLead:
+      "The Foundation is explicit about what it provides, what remains adaptable, and where its guarantees end.",
+    faqIncludedQuestion: "What does the Foundation include?",
+    faqIncludedAnswer:
+      "It provides a Next.js App Router structure, explicit TypeScript contracts, semantic light and dark themes, Inter and Tajawal typography, SiteShell and AppShell foundations, English/Arabic LTR/RTL behavior, accessibility-oriented Base UI primitives, automated tests, living documentation, and isolated Showcase examples. It is a frontend starting point—not a complete domain product or backend.",
+    faqLanguageQuestion: "How do English, Arabic, LTR, and RTL work together?",
+    faqLanguageAnswer:
+      "English and Arabic share one typed catalogue shape, and the visible page, document lang, and dir switch together at runtime. Inter owns Latin text, Tajawal owns Arabic, and logical layout rules support LTR and RTL. Locale selection is client-state-based rather than URL-routed, so server metadata remains the canonical server value.",
+    faqBrandingQuestion: "Can I replace the branding and design system?",
+    faqBrandingAnswer:
+      "Yes, with deliberate implementation work. Foundation Frame is a replaceable default identity, while semantic tokens centralize brand and theme adaptation. Preserve shared component and accessibility contracts, and replace identity through its existing owners instead of adding one-off colors or duplicated SVGs.",
+    faqShowcaseQuestion: "Is the Showcase included in production?",
+    faqShowcaseAnswer:
+      "Showcase is an isolated development and reference surface, not a production product area. The current release contract can disable it at build time; its routes and API then prerender as static 404 responses while / remains independently available. This is release isolation, not a security sandbox.",
+    faqStaticQuestion: "Is every route statically generated?",
+    faqStaticAnswer:
+      "No. The current / route is statically prerendered because it does not depend on request-time locale state. Static generation remains a route-by-route decision; future authenticated, personalized, or request-dependent routes may need dynamic rendering.",
+    faqSecurityQuestion: "Does the Foundation guarantee zero vulnerabilities?",
+    faqSecurityAnswer:
+      "No. The Foundation uses reviewed safeguards and quality gates to reduce risk, not to promise perfect security. Dependency install scripts are restricted by a reviewed allowlist, and known advisories are documented and reevaluated rather than hidden or cleared through unsafe forced downgrades. Adopters remain responsible for ongoing dependency and application-security review.",
     footerContext: "A domain-neutral base for production web applications.",
     footerNavLabel: "Footer navigation",
     footerOverview: "Overview",
