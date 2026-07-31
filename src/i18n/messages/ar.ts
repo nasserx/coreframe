@@ -228,6 +228,10 @@ export const ar: Messages = {
     footerNavLabel: "تنقل التذييل",
     footerOverview: "نظرة عامة",
     footerCapabilities: "الإمكانات",
+    footerArchitecture: "المعمارية",
+    footerBilingualDesign: "التصميم ثنائي اللغة",
+    footerQuality: "الجودة",
+    footerFaq: "الأسئلة الشائعة",
     footerStatus: "مبني على رموز دلالية وعقود أنواع صريحة وتوليد ثابت.",
   },
   site: {

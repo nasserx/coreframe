@@ -248,6 +248,10 @@ export const en = {
     footerNavLabel: "Footer navigation",
     footerOverview: "Overview",
     footerCapabilities: "Capabilities",
+    footerArchitecture: "Architecture",
+    footerBilingualDesign: "Bilingual design",
+    footerQuality: "Quality",
+    footerFaq: "FAQ",
     footerStatus: "Built with semantic tokens, typed contracts, and static generation.",
   },
   /**
