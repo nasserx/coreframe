@@ -1,4 +1,5 @@
 import { MarketingCapabilityStory } from "@/features/marketing/marketing-capability-story";
+import { MarketingClosingCta } from "@/features/marketing/marketing-closing-cta";
 import { MarketingFaq } from "@/features/marketing/marketing-faq";
 import { MarketingFirstViewport } from "@/features/marketing/marketing-first-viewport";
 import { NeutralPreview } from "@/features/marketing/neutral-preview";
@@ -9,6 +10,7 @@ export default function MarketingPage() {
       <MarketingFirstViewport preview={<NeutralPreview />} />
       <MarketingCapabilityStory />
       <MarketingFaq />
+      <MarketingClosingCta />
     </>
   );
 }

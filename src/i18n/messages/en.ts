@@ -238,6 +238,12 @@ export const en = {
     faqSecurityQuestion: "Does the Foundation guarantee zero vulnerabilities?",
     faqSecurityAnswer:
       "No. The Foundation uses reviewed safeguards and quality gates to reduce risk, not to promise perfect security. Dependency install scripts are restricted by a reviewed allowlist, and known advisories are documented and reevaluated rather than hidden or cleared through unsafe forced downgrades. Adopters remain responsible for ongoing dependency and application-security review.",
+    closingEyebrow: "A clear next step",
+    closingTitle: "Build from a clear foundation.",
+    closingDescription:
+      "Review the architecture and safeguards, then adapt the system around your product while preserving its shared contracts.",
+    closingPrimaryAction: "Review the architecture",
+    closingSecondaryAction: "Inspect the safeguards",
     footerContext: "A domain-neutral base for production web applications.",
     footerNavLabel: "Footer navigation",
     footerOverview: "Overview",

@@ -58,6 +58,12 @@ const COPY = {
     architectureDiagram: "Architecture delivery path",
     bilingualDiagram: "Semantic design-system path",
     pipelineDiagram: "Automated validation pipeline",
+    closingEyebrow: "A clear next step",
+    closingHeading: "Build from a clear foundation.",
+    closingDescription:
+      "Review the architecture and safeguards, then adapt the system around your product while preserving its shared contracts.",
+    closingPrimary: "Review the architecture",
+    closingSecondary: "Inspect the safeguards",
   },
   ar: {
     brand: "أساس الواجهات",
@@ -112,6 +118,12 @@ const COPY = {
     architectureDiagram: "مسار التسليم المعماري",
     bilingualDiagram: "مسار نظام التصميم الدلالي",
     pipelineDiagram: "مسار التحقق الآلي",
+    closingEyebrow: "خطوة تالية واضحة",
+    closingHeading: "ابنِ على أساس واضح.",
+    closingDescription:
+      "راجع المعمارية وضوابط الجودة، ثم كيّف النظام حول منتجك مع الحفاظ على عقوده المشتركة.",
+    closingPrimary: "راجع المعمارية",
+    closingSecondary: "استعرض ضوابط الجودة",
   },
 } as const;
 
@@ -185,6 +197,11 @@ const ENGLISH_MARKETING_TEXT = [
   "Tokens",
   "Themes",
   "Direction",
+  COPY.en.closingEyebrow,
+  COPY.en.closingHeading,
+  COPY.en.closingDescription,
+  COPY.en.closingPrimary,
+  COPY.en.closingSecondary,
   "A domain-neutral base for production web applications.",
   "Built with semantic tokens, typed contracts, and static generation.",
 ] as const;
@@ -231,6 +248,11 @@ const ARABIC_MARKETING_TEXT = [
   "الرموز",
   "المظاهر",
   "الاتجاه",
+  COPY.ar.closingEyebrow,
+  COPY.ar.closingHeading,
+  COPY.ar.closingDescription,
+  COPY.ar.closingPrimary,
+  COPY.ar.closingSecondary,
   "أساس محايد المجال لبناء تطبيقات ويب إنتاجية.",
   "مبني على رموز دلالية وعقود أنواع صريحة وتوليد ثابت.",
 ] as const;
@@ -324,7 +346,14 @@ test("root marketing route owns one landmark set and a resolved primary action",
   const cta = page.getByRole("link", { name: COPY.en.cta });
   await expect(cta).toHaveAttribute("href", "#capabilities");
   await expect(page.locator("section#capabilities")).toHaveCount(1);
-  for (const id of ["capability-story", "architecture", "bilingual-design", "quality", "faq"]) {
+  for (const id of [
+    "capability-story",
+    "architecture",
+    "bilingual-design",
+    "quality",
+    "faq",
+    "next-step",
+  ]) {
     await expect(page.locator(`section#${id}`)).toHaveCount(1);
   }
   await expect(page.locator('[data-slot="marketing-preview"]')).toHaveAttribute(
@@ -445,6 +474,7 @@ test("visible marketing copy, direction, and display metrics follow the live loc
     COPY.en.bilingualHeading,
     COPY.en.qualityHeading,
     COPY.en.faqHeading,
+    COPY.en.closingHeading,
   ]) {
     await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
   }
@@ -492,6 +522,7 @@ test("visible marketing copy, direction, and display metrics follow the live loc
     COPY.ar.bilingualHeading,
     COPY.ar.qualityHeading,
     COPY.ar.faqHeading,
+    COPY.ar.closingHeading,
   ]) {
     await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
   }
@@ -749,7 +780,7 @@ test("post-hero marketing content uses its centered, text-first composition", as
       return { introductions, cards, grids, features, centeredSupportingContent };
     });
 
-    expect(composition.introductions).toHaveLength(5);
+    expect(composition.introductions).toHaveLength(6);
     for (const intro of composition.introductions) {
       expect(intro.centerDelta).toBeLessThanOrEqual(1);
       expect(intro.textAlign).toBe("center");
@@ -1002,6 +1033,220 @@ test("informational story cards keep their static presentation in touch contexts
     }
   } finally {
     await context.close();
+  }
+});
+
+test("closing CTA sits between the FAQ and the footer with resolvable bilingual actions", async ({
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  for (const locale of ["en", "ar"] as const) {
+    await gotoMarketingState(page, "light", locale);
+    const copy = COPY[locale];
+
+    const closing = page.locator("section#next-step");
+    await expect(closing).toHaveCount(1);
+    await expect(closing).toHaveAttribute("aria-labelledby", "next-step-heading");
+    await expect(
+      closing.getByRole("heading", { level: 2, name: copy.closingHeading }),
+    ).toBeVisible();
+    await expect(closing.getByText(copy.closingEyebrow, { exact: true })).toBeVisible();
+    await expect(closing.getByText(copy.closingDescription, { exact: true })).toBeVisible();
+    await expect(closing.locator("h1, h3, h4")).toHaveCount(0);
+
+    const placement = await page.evaluate(() => {
+      const faq = document.querySelector("section#faq");
+      const step = document.querySelector("section#next-step");
+      const footer = document.querySelector('[data-slot="site-shell-footer"]');
+      const main = document.querySelector("main");
+      if (!faq || !step || !footer || !main) {
+        throw new Error("The closing CTA placement check requires the FAQ, section, footer, main.");
+      }
+      return {
+        afterFaqInDom: (faq.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        beforeFooterInDom:
+          (step.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        insideMain: main.contains(step),
+        insideFooter: footer.contains(step),
+        belowFaq: step.getBoundingClientRect().top >= faq.getBoundingClientRect().bottom - 1,
+        aboveFooter: footer.getBoundingClientRect().top >= step.getBoundingClientRect().bottom - 1,
+      };
+    });
+    expect(placement, `closing placement [${locale}]`).toEqual({
+      afterFaqInDom: true,
+      beforeFooterInDom: true,
+      insideMain: true,
+      insideFooter: false,
+      belowFaq: true,
+      aboveFooter: true,
+    });
+
+    const actions = closing.locator('[data-slot="marketing-closing-actions"]');
+    await expect(actions.getByRole("link")).toHaveCount(2);
+    await expect(closing.getByRole("button")).toHaveCount(0);
+
+    const primary = closing.getByRole("link", { name: copy.closingPrimary, exact: true });
+    const secondary = closing.getByRole("link", { name: copy.closingSecondary, exact: true });
+    await expect(primary).toHaveAttribute("href", "#architecture");
+    await expect(secondary).toHaveAttribute("href", "#quality");
+
+    // Both destinations are real, unique sections of this same page.
+    for (const target of ["#architecture", "#quality"]) {
+      await expect(page.locator(`section${target}`)).toHaveCount(1);
+    }
+
+    // Heading order stays valid with the section appended.
+    const headingLevels = await page
+      .locator("h1, h2, h3")
+      .evaluateAll((headings) => headings.map((heading) => Number(heading.tagName.slice(1))));
+    expect(headingLevels[0]).toBe(1);
+    expect(headingLevels.filter((level) => level === 1)).toHaveLength(1);
+    expect(headingLevels.at(-1)).toBe(2);
+    for (let index = 1; index < headingLevels.length; index += 1) {
+      expect(headingLevels[index] ?? 0).toBeLessThanOrEqual((headingLevels[index - 1] ?? 0) + 1);
+    }
+
+    const duplicateIds = await page.locator("[id]").evaluateAll((elements) => {
+      const ids = elements.map(({ id }) => id);
+      return ids.filter((id, index) => ids.indexOf(id) !== index);
+    });
+    expect(duplicateIds).toEqual([]);
+  }
+
+  expect(consoleErrors).toEqual([]);
+});
+
+test("closing CTA actions are keyboard reachable, visibly focused, and navigate", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  for (const locale of ["en", "ar"] as const) {
+    await gotoMarketingState(page, "light", locale);
+    const copy = COPY[locale];
+
+    const closing = page.locator("section#next-step");
+    const primary = closing.getByRole("link", { name: copy.closingPrimary, exact: true });
+    const secondary = closing.getByRole("link", { name: copy.closingSecondary, exact: true });
+
+    // Tab in from the last FAQ trigger — the closest preceding focusable — so
+    // focus arrives by keyboard and :focus-visible genuinely applies.
+    await page.locator('section#faq [data-slot="marketing-faq-trigger"]').last().focus();
+    await page.keyboard.press("Tab");
+    await expect(primary).toBeFocused();
+    expect(await primary.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe(
+      "none",
+    );
+
+    await page.keyboard.press("Tab");
+    await expect(secondary).toBeFocused();
+    expect(await secondary.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe(
+      "none",
+    );
+
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#quality$/);
+    await expect(page.locator("section#quality")).toBeVisible();
+
+    await page.locator('section#faq [data-slot="marketing-faq-trigger"]').last().focus();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#architecture$/);
+    await expect(page.locator("section#architecture")).toBeVisible();
+  }
+});
+
+test("closing CTA action group follows direction and never overflows", async ({ page }) => {
+  for (const { theme, locale } of STATES) {
+    await gotoMarketingState(page, theme, locale);
+
+    for (const width of WIDTHS) {
+      await page.setViewportSize({ width, height: 900 });
+
+      const measured = await page.evaluate(() => {
+        const root = document.documentElement;
+        const group = document.querySelector('[data-slot="marketing-closing-actions"]');
+        const section = document.querySelector("section#next-step");
+        if (!group || !section) {
+          throw new Error("The closing CTA geometry check requires its section and action group.");
+        }
+        const style = getComputedStyle(group);
+        const links = Array.from(group.querySelectorAll("a")).map((link) => {
+          const bounds = link.getBoundingClientRect();
+          return {
+            top: bounds.top,
+            left: bounds.left,
+            right: bounds.right,
+            height: Math.round(bounds.height),
+          };
+        });
+        const [first, second] = links;
+        if (!first || !second) {
+          throw new Error("The closing CTA geometry check requires both actions.");
+        }
+        return {
+          direction: getComputedStyle(section).direction,
+          pageOverflow: root.scrollWidth - root.clientWidth,
+          groupOverflow: group.scrollWidth - group.clientWidth,
+          flexWrap: style.flexWrap,
+          justifyContent: style.justifyContent,
+          sameRow: Math.abs(first.top - second.top) <= 1,
+          heights: links.map(({ height }) => height),
+          insideViewport: links.every(
+            ({ left, right }) => left >= -1 && right <= root.clientWidth + 1,
+          ),
+          first,
+          second,
+        };
+      });
+
+      const at = `${theme} ${locale} at ${width}px`;
+      expect(measured.pageOverflow, at).toBeLessThanOrEqual(1);
+      expect(measured.groupOverflow, at).toBeLessThanOrEqual(1);
+      expect(measured.insideViewport, at).toBe(true);
+      expect(measured.flexWrap, at).toBe("wrap");
+      expect(measured.justifyContent, at).toBe("center");
+      expect(measured.direction, at).toBe(COPY[locale].direction);
+      // One shared target height for both treatments.
+      expect(measured.heights, at).toEqual([48, 48]);
+
+      if (measured.sameRow) {
+        // The primary is first in DOM order, so direction alone decides which
+        // physical edge it takes — no physical utility is involved.
+        if (measured.direction === "rtl") {
+          expect(measured.first.right, at).toBeGreaterThan(measured.second.right);
+        } else {
+          expect(measured.first.left, at).toBeLessThan(measured.second.left);
+        }
+      } else {
+        expect(measured.first.top, at).toBeLessThan(measured.second.top);
+      }
+    }
+  }
+});
+
+test("closing CTA is axe-clean in each theme and locale", async ({ page }) => {
+  for (const { theme, locale } of STATES) {
+    await gotoMarketingState(page, theme, locale);
+
+    const results = await new AxeBuilder({ page })
+      .include("#next-step")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    const readable = results.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      help: violation.help,
+      nodes: violation.nodes.map((node) => node.target.join(" ")),
+    }));
+
+    expect(readable, `closing CTA [${theme} ${locale}]`).toEqual([]);
   }
 });
 
