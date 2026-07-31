@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ReferenceFormSection } from "@/features/showcase/components/reference-form-section";
 import { ShowcasePageHeader } from "@/features/showcase/components/showcase-page-header";
 import { ShowcaseSection } from "@/features/showcase/components/showcase-section";
 
@@ -27,6 +28,7 @@ export default function FormsPage() {
         title="Forms"
         description="Field composition over Input, Textarea, and Label. All wiring is explicit — ids, aria-describedby, and aria-invalid are owned by the caller, exactly as the Field contract documents."
       />
+      <ReferenceFormSection />
       <ShowcaseSection
         title="Field composition"
         description="Label, control, and description connected with standard HTML attributes."

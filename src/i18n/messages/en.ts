@@ -303,4 +303,48 @@ export const en = {
     footerFoundation: "Foundation",
     footerFoundationNote: "Structural chrome only — restyle through tokens and className.",
   },
+  /**
+   * The `/showcase/forms` reference form. The `error*` keys are the schema's
+   * message vocabulary: `src/features/showcase/forms.ts` emits these KEYS (not
+   * prose) as Zod messages, and the route handler returns the same keys on the
+   * wire — so form state never holds one locale's strings and a language switch
+   * re-renders existing errors without re-validating.
+   */
+  showcaseForm: {
+    sectionTitle: "Project setup reference",
+    sectionDescription:
+      "The reference wiring: React Hook Form owns field state, one Zod schema owns the field contract for both sides, and apiFetch carries the submission to this repository's own Showcase endpoint. Nothing is created — the endpoint validates the payload and returns a reference.",
+    legend: "Project setup",
+    projectNameLabel: "Project name",
+    projectNameDescription: "2 to 80 characters. Surrounding spaces are trimmed.",
+    ownerEmailLabel: "Owner email",
+    ownerEmailDescription: "Trimmed and lowercased before validation and submission.",
+    goalLabel: "Implementation goal",
+    goalDescription: "20 to 500 characters. {count} of {max} used.",
+    submit: "Submit example",
+    submitPending: "Submitting",
+    statusPending: "Submitting the example.",
+    statusSuccess: "Example accepted — nothing was created. Reference:",
+    demoTitle: "Deterministic demonstration values",
+    demoFieldError: "The server rejects the owner email field.",
+    demoFormError: "The server returns a form-level service error.",
+    demoSuccess: "Any other valid payload is accepted.",
+    noteTitle: "How this is wired",
+    noteState: "React Hook Form owns field state, submission status, and first-invalid focus.",
+    noteValidation: "One Zod schema validates in the browser and parses on the server.",
+    noteTransport: "apiFetch submits the payload and normalizes every failure into ApiError.",
+    noteMapping:
+      "Server field errors map back to their controls; a form-level error stays separate.",
+    errorProjectNameRequired: "Enter a project name.",
+    errorProjectNameShort: "Use at least 2 characters.",
+    errorProjectNameLong: "Use 80 characters or fewer.",
+    errorOwnerEmailRequired: "Enter an owner email address.",
+    errorOwnerEmailInvalid: "Enter a valid email address.",
+    errorGoalRequired: "Describe the implementation goal.",
+    errorGoalShort: "Use at least 20 characters.",
+    errorGoalLong: "Use 500 characters or fewer.",
+    errorEmailTaken: "This owner email already belongs to another example.",
+    errorServiceUnavailable: "The example service is unavailable. Try again.",
+    errorUnexpected: "The example could not be submitted. Try again.",
+  },
 } as const;

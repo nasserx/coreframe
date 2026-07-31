@@ -164,6 +164,63 @@ Invalidate by the narrowest factory prefix that covers everything the
 mutation could have changed; prefer invalidation over manual cache writes
 until profiling says otherwise.
 
+## Forms: React Hook Form + Zod over the same client
+
+Reference implementation: `/showcase/forms` — the cross-boundary contract in
+`src/features/showcase/reference-form-contract.ts`, browser transport in
+`src/features/showcase/reference-form-client.ts`, the component in
+`src/features/showcase/components/reference-form.tsx`, and the endpoint in
+`src/app/api/showcase/forms/reference/route.ts`.
+
+**The contract module is transport-free, deliberately.** It is the one module
+both sides import, so it owns schemas, wire types, and demonstration values and
+imports neither `apiFetch` nor React — otherwise the server's import graph would
+pull in client code. `submitReferenceForm` and the `ApiError`-to-rejection
+reader live in the client module, which only the component imports. ESLint's
+folder rules do not cover this (`src/app` may import features), so
+`src/app/api/showcase/forms/reference/import-boundary.test.ts` walks the
+handler's transitive import graph and asserts the direction.
+
+Ownership, one concern each:
+
+- **React Hook Form** owns field state, submission status (`isSubmitting`),
+  and focus management (first-invalid on a failed submit, and the rejected
+  field after a server error). Uncontrolled inputs via `register`, so typing
+  does not re-render the form.
+- **Zod** owns the field contract — **one schema, both sides**. `zodResolver`
+  runs it in the browser and the route handler parses the request body with the
+  same object, so client and server cannot drift. Normalization (`.trim()`,
+  `.toLowerCase()`) is part of the schema and runs before the length checks, so
+  a whitespace-only value fails "required" and the submitted payload is the
+  normalized one.
+- **The shared `Field` primitives** own accessible presentation. They are used
+  through their public props; the form adds no wrapper layer around them.
+  Wiring stays explicit and at the call site, exactly as `field.tsx` documents:
+  `htmlFor`/`id`, `aria-invalid`, and an `aria-describedby` that carries the
+  description **and** the error.
+- **`apiFetch`** owns transport. A form never calls `fetch`; every failure
+  arrives as `ApiError`, and a structured rejection is read off `kind: "http"`
+  plus `body`.
+
+**Server errors map back by shape, not by convention.** The endpoint answers
+with a discriminated body: `fieldErrors` (per-field, mapped onto controls with
+`setError`) and `formError` (submission-level, rendered as one focusable
+`role="alert"` outside the fields). They stay separate because a service
+failure belongs to no field. Response bodies carry no internal detail — no
+stack, no path, no exception text.
+
+**Validation messages are catalogue KEYS, not prose.** The schema emits
+`"errorOwnerEmailInvalid"`, and the component translates it at render time
+through `useTranslations`. This is what keeps live locale switching honest: form
+state never holds one language's strings, so switching language re-renders
+errors that are already on screen — including server-owned ones, because the
+wire format carries the same keys. Typos are compile errors: the key list is
+declared `satisfies readonly MessageKey<"…">[]`.
+
+What is deliberately not built: a generic `Form` component, RHF-aware wrappers
+around the primitives, and any change to the shared `Field` API — the existing
+one already expresses accessible errors. See `docs/ROADMAP.md`.
+
 ### Server prefetch / HydrationBoundary
 
 Nothing in the foundation prefetches (every route is static). When a product

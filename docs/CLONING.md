@@ -66,7 +66,10 @@ Three options, in order of product maturity:
 2. **Ship without it** — set `NEXT_PUBLIC_ENABLE_SHOWCASE=false` in the
    production build environment. Every `/showcase` route and the
    `/api/showcase/records` endpoint prerender as a static 404; routes stay
-   static, no code changes. (The flag is inlined at build time — changing it
+   static, no code changes. The reference form's
+   `POST /api/showcase/forms/reference` answers 404 at request time instead —
+   Next never prerenders a non-GET handler, so a runtime gate is the only form
+   the check can take there. (The flag is inlined at build time — changing it
    requires a rebuild. Run the e2e suite with the flag unset/true: route
    discovery expects the pages to exist.)
 3. **Delete it permanently** — remove the three showcase locations:
@@ -78,16 +81,20 @@ Three options, in order of product maturity:
      declaration), from `src/config/env-validation.ts` (its line in the Zod
      schema), and from `.env.example`.
    - **The e2e specs**: route discovery (`tests/e2e/routes.ts`) adjusts
-     automatically, but three specs reference showcase URLs directly and
+     automatically, but six specs reference showcase URLs directly and
      need retargeting at your product's routes: `shell.spec.ts` (drives
      `/showcase` for the AppShell and `/showcase/site` for the SiteShell —
      point at your shell-wrapped routes, or remove until you mount a
-     shell), `fonts.spec.ts` (measures Arabic on `/showcase/direction` —
-     any page with Arabic text works), and `errors.spec.ts` (exercises the
+     shell), `geometry.spec.ts` and `i18n.spec.ts` (both drive
+     `/showcase/site` — point at a shell-wrapped route, Arabic-capable for
+     i18n), `fonts.spec.ts` (measures Arabic on `/showcase/direction` —
+     any page with Arabic text works), `errors.spec.ts` (exercises the
      ErrorBoundary demo on `/showcase/feedback` — keep the 404 test,
-     retarget or drop the boundary test). Production specs are discovered
-     automatically, so deleting or renaming one needs no Playwright config
-     change.
+     retarget or drop the boundary test), and `forms.spec.ts` (drives the
+     reference form on `/showcase/forms` — delete it with the showcase, or
+     copy it as the shape of your own form's coverage). Production specs are
+     discovered automatically, so deleting or renaming one needs no
+     Playwright config change.
    - **`src/features/README.md`**: its "Current contents" line describes
      `showcase/`; update it to describe your product's features (or "none
      yet").

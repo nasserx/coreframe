@@ -66,11 +66,11 @@ Alternatives considered: React Context only, Redux Toolkit, keeping the dependen
 
 ## React Hook Form
 
-Decision (revised 2026-07): Removed from dependencies until the reference form wiring is built; it remains the chosen form library for that moment.
+Decision (revised 2026-07): Reinstated with `@hookform/resolvers` now that the reference form wiring exists and imports them. React Hook Form owns form state; `zodResolver` connects it to the existing validation standard.
 
-Reason: It was declared with zero imports for the entire foundation phase — the same unused-dependency state that led to removing axios and zustand, and a foundation must apply its own rule to itself. The `Field` primitive documents form-library integration as the consumer's job, and `docs/ROADMAP.md` records the RHF + Zod reference wiring as the top-priority addition; reinstall `react-hook-form` + `@hookform/resolvers` when building it.
+Reason: It was removed earlier for being declared with zero imports for the entire foundation phase — the same unused-dependency state that led to removing axios and zustand. That condition no longer holds: `/showcase/forms` ships a real reference form, so the dependency now earns its place by being used rather than by being anticipated. RHF remains the pick for the reason it always was — uncontrolled inputs, no re-render per keystroke, and a resolver interface that lets Zod stay the single validation standard instead of introducing a second one. Neither package runs an install-time lifecycle script, so `strict-allow-scripts` needed no new approval.
 
-Alternatives considered: Controlled form state with React, Formik, keeping the dependency preinstalled (rejected: a foundation must not ship unused dependencies).
+Alternatives considered: Controlled form state with React (rejected: re-renders every keystroke and re-implements touched/dirty/submitting state by hand), Formik (rejected: heavier, less actively maintained, no advantage here), a project-owned `Form` abstraction over the primitives (rejected: an abstraction over one call site — see `docs/ROADMAP.md`).
 
 ## Zod
 

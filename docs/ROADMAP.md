@@ -8,18 +8,24 @@ signal is the failure mode this repo was designed to avoid.
 
 ## Deliberately not built
 
-### Forms wiring (React Hook Form + Zod reference)
+### Forms wiring (React Hook Form + Zod reference) — SHIPPED (2026-07)
 
-- **Missing:** a reference form — RHF `useForm` + `zodResolver` + submit +
-  server-error mapping. `react-hook-form`/`@hookform/resolvers` were removed
-  as unimported (`DECISIONS.md`); reinstall them when building this.
-- **Extension points:** the `Field` primitive (`src/components/ui/field.tsx`)
-  documents form-library integration as the consumer's job; Zod is already
-  the validation standard; `apiFetch` handles the submit transport.
-- **Trigger:** the first product screen that mutates data. Build it as that
-  feature's form, then promote the wiring pattern into a reference (or into
-  this repo) once it has stabilized. This is the top-priority reference to
-  add — the last declared-but-unwired piece of the stack.
+- **Shipped:** the reference form on `/showcase/forms` — RHF `useForm` +
+  `zodResolver`, submission through `apiFetch`, and server-error mapping.
+  `react-hook-form` and `@hookform/resolvers` are reinstalled as the
+  dependencies this wiring needs. One Zod schema
+  (`src/features/showcase/reference-form-contract.ts`, kept transport-free so
+  the server never reaches client code) is authoritative for both the browser
+  and the route handler, and it emits catalogue KEYS rather than prose, so form
+  state stays locale-independent and a language switch re-renders existing
+  errors without re-validating. `docs/DATA_LAYER.md` § Forms owns the pattern.
+- **Deliberately still absent:** any general `Form` abstraction. The example
+  uses the shared `Field`/`Input`/`Textarea` primitives through their public
+  props exactly as a product would; a wrapper layer would be an abstraction
+  over one call site.
+- **A product's own responsibility:** multi-step flows, file uploads,
+  optimistic submission, and persistence. The reference proves the wiring, not
+  a workflow.
 
 ### i18n message translation — SHIPPED (2026-07)
 
