@@ -30,8 +30,9 @@ import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
  * click — never a dead no-op. They also render at real widths, keeping the
  * collapse-breakpoint measurement honest. Header CTAs use the authored
  * navigation treatment (`lg`/h-9 with px-5); drawer copies use the authored
- * mobile treatment (h-10). Utility toggles retain their compact h-8 geometry
- * and the mixed-role cluster is centre-aligned.
+ * mobile treatment (h-10). The icon-only utility toggles use the primitive's
+ * `icon-lg` square, so they share the CTA's h-9 height and the cluster reads as
+ * one row rather than two heights.
  */
 
 /*
@@ -50,7 +51,6 @@ import { UnavailableCta } from "@/features/showcase/components/unavailable-cta";
 export default function ShowcaseSiteLayout({ children }: Readonly<{ children: ReactNode }>) {
   const t = useTranslations("site");
   const tShell = useTranslations("shell");
-  const tTheme = useTranslations("theme");
 
   return (
     // collapseBelow="lg", measured, not assumed (docs/LAYOUT.md §6): above the
@@ -58,9 +58,8 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
     // auth CTAs; below it, nav AND auth collapse into the drawer, leaving only
     // brand + toggles + trigger. The overflow sweep (English, both directions —
     // `overflow.spec.ts`) confirms the bar fits at every width; the Arabic bar
-    // is covered separately in `i18n.spec.ts`. Note the language switcher shows
-    // both autonyms regardless of the active locale, so its width is
-    // locale-independent.
+    // is covered separately in `i18n.spec.ts`. Note both toggles are icon-only
+    // squares, so the cluster's width is identical in every locale.
     <SiteShell collapseBelow="lg" skipLinkLabel={tShell("skipLink")}>
       <SiteShellHeader>
         {/* The brand anchors the bar as its own cluster: two type steps
@@ -134,26 +133,19 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
           </div>
         </SiteShellNav>
         <div className="ms-auto flex items-center gap-3">
-          {/* Two coherent sub-groups, centre-aligned in one cluster: the
-              h-8 utility controls (language + theme) then the h-9 navigation
+          {/* Two coherent sub-groups on ONE h-9 height: the icon-only utility
+              toggles (language + theme, `icon-lg` squares) then the navigation
               CTA pair (docs/DESIGN_TOKENS.md § Control height). Reveal
               breakpoints are measured, not uniform: the
               controls fit beside the brand from `sm`; the CTA pair only from
-              `lg` — the collapse breakpoint — since the wider language switcher
-              (autonym labels, always both) plus the pair overflows the bar
-              between `md` and `lg` (the overflow sweep proves it), so below the
+              `lg` — the collapse breakpoint — since the toggles plus the pair
+              overflow the bar between `md` and `lg` (the overflow sweep proves
+              it), so below the
               collapse line the auth actions live in the drawer with the nav.
               The LocaleControl renders nothing on a single-locale deployment. */}
-          <div className="flex items-center gap-2 max-sm:hidden">
+          <div className="flex items-center gap-1 max-sm:hidden">
             <LocaleControl />
-            <ThemeControl
-              aria-label={tTheme("label")}
-              optionLabels={{
-                light: tTheme("light"),
-                dark: tTheme("dark"),
-                system: tTheme("system"),
-              }}
-            />
+            <ThemeControl />
           </div>
           <div className="flex items-center gap-2 max-lg:hidden">
             <UnavailableCta

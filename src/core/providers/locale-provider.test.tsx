@@ -29,7 +29,7 @@ function Probe({
       <output data-testid="locale">{locale}</output>
       <output data-testid="direction">{direction}</output>
       <output data-testid="can-switch">{String(canSwitchLocale)}</output>
-      <output data-testid="label">{t("label")}</output>
+      <output data-testid="label">{t("toDark")}</output>
       <button type="button" onClick={() => setLocale("ar")}>
         choose arabic
       </button>
@@ -63,7 +63,7 @@ describe("locale runtime", () => {
     await renderLocaleRuntime();
     expect(screen.getByTestId("locale")).toHaveTextContent("en");
     expect(screen.getByTestId("direction")).toHaveTextContent("ltr");
-    expect(screen.getByTestId("label")).toHaveTextContent("Theme");
+    expect(screen.getByTestId("label")).toHaveTextContent("Switch to dark mode");
     expect(document.documentElement.lang).toBe("en");
     expect(document.documentElement.dir).toBe("ltr");
   });
@@ -80,7 +80,7 @@ describe("locale runtime", () => {
     await user.click(screen.getByRole("button", { name: "choose arabic" }));
 
     // The Arabic catalogue is code-split, so the label settles asynchronously.
-    expect(await screen.findByText("المظهر")).toBeInTheDocument();
+    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
     expect(screen.getByTestId("locale")).toHaveTextContent("ar");
     // Direction is derived from the locale (not the catalogue), so it flips
     // immediately — it can never disagree with the language.
@@ -95,7 +95,7 @@ describe("locale runtime", () => {
     await renderLocaleRuntime();
     expect(screen.getByTestId("locale")).toHaveTextContent("ar");
     expect(screen.getByTestId("direction")).toHaveTextContent("rtl");
-    expect(await screen.findByText("المظهر")).toBeInTheDocument();
+    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
   });
 
   it("ignores an unsupported stored locale and falls back to the default", async () => {
@@ -114,7 +114,7 @@ describe("locale runtime", () => {
     });
 
     expect(screen.getByTestId("locale")).toHaveTextContent("ar");
-    expect(await screen.findByText("المظهر")).toBeInTheDocument();
+    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
   });
 
   it("survives blocked storage: the choice still applies, only persistence is lost", async () => {
@@ -130,7 +130,7 @@ describe("locale runtime", () => {
 
     await user.click(screen.getByRole("button", { name: "choose arabic" }));
 
-    expect(await screen.findByText("المظهر")).toBeInTheDocument();
+    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
     expect(screen.getByTestId("direction")).toHaveTextContent("rtl");
   });
 
@@ -169,7 +169,7 @@ describe("locale runtime", () => {
       expect(screen.getByTestId("direction")).toHaveTextContent("ltr");
       expect(document.documentElement.lang).toBe("en");
       expect(document.documentElement.dir).toBe("ltr");
-      expect(screen.getByTestId("label")).toHaveTextContent("Theme");
+      expect(screen.getByTestId("label")).toHaveTextContent("Switch to dark mode");
       // The failed choice must not persist for the next visit either.
       expect(window.localStorage.getItem("locale")).toBe("en");
 

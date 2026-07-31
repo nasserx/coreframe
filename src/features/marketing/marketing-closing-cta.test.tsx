@@ -181,7 +181,7 @@ describe("MarketingClosingCta", () => {
     const user = userEvent.setup();
     renderClosingCta({ withLocaleControl: true });
 
-    await user.click(screen.getByRole("button", { name: "العربية" }));
+    await user.click(screen.getByRole("button", { name: "Switch to Arabic" }));
     await waitFor(() => expect(document.documentElement).toHaveAttribute("dir", "rtl"));
 
     const section = closingSection();

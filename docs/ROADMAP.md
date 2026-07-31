@@ -37,8 +37,9 @@ signal is the failure mode this repo was designed to avoid.
   compile-time safety. Locale, direction, numerals, and the active catalogue
   all derive from the ONE selected locale through `LOCALE_INFO`, so they can
   never disagree. `LocaleControl` replaced the showcase's direction toggle
-  (direction is a property of language, not an independent control) and
-  renders nothing on a single-locale deployment. Every route stays statically
+  (direction is a property of language, not an independent control), is a
+  direct two-language toggle, and renders nothing on a single-locale
+  deployment. Every route stays statically
   prerendered; the default catalogue is bundled and other locales are
   code-split, so a single-locale build carries no second-locale catalogue.
   The `(site)` showcase is translated to Arabic end to end (top bar included)
@@ -162,7 +163,8 @@ Honest defects and frictions, none currently blocking:
    `DialogFooter` (default `"Close"`), the sanctioned "optional label prop"
    extension — localized products pass a translated value instead of hiding
    the button and composing their own `DialogClose`. Consistent with the
-   shells' label props and `ThemeControl.optionLabels`.
+   shells' label props. (`ThemeControl` no longer takes label props: it has one
+   accessible name per state and reads the `theme` catalogue itself.)
 3. **Production E2E spec discovery is automatic; three specs still
    hard-reference showcase URLs.** `chromium-prod` owns every `*.spec.ts`
    except the development-only console suite, so new and renamed production

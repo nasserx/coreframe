@@ -151,7 +151,7 @@ describe("MarketingFaq", () => {
     const user = userEvent.setup();
     renderFaq({ withLocaleControl: true });
 
-    await user.click(screen.getByRole("button", { name: "العربية" }));
+    await user.click(screen.getByRole("button", { name: "Switch to Arabic" }));
     await waitFor(() => expect(document.documentElement).toHaveAttribute("dir", "rtl"));
 
     const faq = document.querySelector("section#faq") as HTMLElement;

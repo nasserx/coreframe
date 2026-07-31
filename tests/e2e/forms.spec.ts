@@ -53,7 +53,7 @@ function form(page: Page) {
 
 /** Switches the LIVE locale through the real control, not a stored preference. */
 async function switchToArabic(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "العربية" }).click();
+  await page.getByRole("button", { name: "Switch to Arabic" }).click();
   await expect(page.getByLabel(AR.projectName)).toBeVisible();
 }
 

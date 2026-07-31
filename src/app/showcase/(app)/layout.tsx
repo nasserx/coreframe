@@ -38,8 +38,10 @@ export default function ShowcaseAppLayout({ children }: Readonly<{ children: Rea
           <p className="text-caption text-muted-foreground max-sm:hidden">
             Engineering sandbox — not a product
           </p>
-          <LocaleControl />
-          <ThemeControl />
+          <div className="flex items-center gap-1">
+            <LocaleControl />
+            <ThemeControl />
+          </div>
         </div>
       </AppShellHeader>
       <AppShellMain>

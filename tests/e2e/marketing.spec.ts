@@ -392,7 +392,7 @@ test("root marketing metadata remains the canonical server value after a locale 
   page,
 }) => {
   await gotoMarketingState(page, "light", "en");
-  await page.getByRole("button", { name: "العربية" }).click();
+  await page.getByRole("button", { name: "Switch to Arabic" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
 
   await expect(page).toHaveTitle("Frontend Foundation");
@@ -505,7 +505,7 @@ test("visible marketing copy, direction, and display metrics follow the live loc
     await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
   }
 
-  await page.getByRole("button", { name: "العربية" }).click();
+  await page.getByRole("button", { name: "Switch to Arabic" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(englishHeading).toHaveCount(0);
@@ -674,7 +674,7 @@ test("marketing FAQ delegates its single-open disclosure contract to Base UI", a
   ).toBeLessThanOrEqual(1);
   expect(englishIndicatorBox?.x ?? 0).toBeGreaterThan(englishQuestionBox?.x ?? 0);
 
-  await page.getByRole("button", { name: "العربية" }).click();
+  await page.getByRole("button", { name: "Switch to Arabic" }).click();
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(faq.getByRole("heading", { level: 2, name: COPY.ar.faqHeading })).toBeVisible();
   const arabicTriggers = faq.getByRole("button");

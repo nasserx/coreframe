@@ -34,13 +34,11 @@ export const ar: Messages = {
     ellipsisLabel: "المزيد من الصفحات",
   },
   theme: {
-    label: "المظهر",
-    light: "فاتح",
-    dark: "داكن",
-    system: "النظام",
+    toDark: "التبديل إلى الوضع الداكن",
+    toLight: "التبديل إلى الوضع الفاتح",
   },
   localeControl: {
-    label: "اللغة",
+    switchLabel: "التبديل إلى الإنجليزية",
   },
   shell: {
     skipLink: "تخطَّ إلى المحتوى الرئيسي",

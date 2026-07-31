@@ -94,6 +94,6 @@ describe("translate", () => {
 
   it("createTranslator binds a catalogue and namespace", () => {
     const t = createTranslator(en, "theme");
-    expect(t("light")).toBe(en.theme.light);
+    expect(t("toDark")).toBe(en.theme.toDark);
   });
 });
