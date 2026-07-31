@@ -120,6 +120,13 @@ unless it is deliberately assigned to the development server.
   distinction between interactive linked-card lift and motionless static
   Cards. These are computed-layout assertions against the production build,
   not duplicated class strings.
+- `forms.spec.ts` — the `/showcase/forms` reference form in its states that
+  route discovery never reaches: first-invalid focus against real DOM focus, a
+  real HTTP round trip to the route handler, server field-error mapping,
+  the form-level alert, pending/duplicate-submit prevention, a live language
+  switch that re-renders an error already on screen, LTR email entry inside the
+  RTL form, and axe scans of the error and success states. Route-level axe,
+  console, and overflow coverage for the page still comes from discovery.
 - `marketing.spec.ts` — the production `/` contract: one landmark set and
   heading hierarchy, canonical server metadata, live English/Arabic copy,
   named informative specimens, the composed sections' own behavior
@@ -141,9 +148,10 @@ lost.
 - **shadcn/Base UI internals** (focus traps, dismissal, positioning) —
   upstream-tested; re-testing them couples this repo to vendored internals.
 - **Visual appearance** — no screenshot baselines (see stack rationale).
-- **Anything requiring an external backend** — the only endpoint is this
-  repo's own static route handler (`/api/showcase/records`), so `query-demo`
-  and the whole browser matrix run offline; the transport contract itself is
+- **Anything requiring an external backend** — the only endpoints are this
+  repo's own route handlers (`/api/showcase/records`, and the reference form's
+  `/api/showcase/forms/reference`), so `query-demo`, the reference form, and
+  the whole browser matrix run offline; the transport contract itself is
   unit-tested against a stubbed fetch (`src/api/client.test.ts`).
 - **Coverage targets** — none are configured on purpose. The reference
   tests establish patterns; a percentage gate on a template repo rewards
@@ -191,23 +199,24 @@ Node comes from `.nvmrc` (currently `24.18.0`, matching the `engines` range in
 version change (cached otherwise).
 
 **The full browser matrix runs on every PR — deliberately.** Current measured
-discovery (`npx playwright test --list`, 2026-07-31) is **180 Playwright tests
-in 9 spec files across 2 projects**, over the **13 app-page routes** that
+discovery (`npx playwright test --list`, 2026-07-31) is **192 Playwright tests
+in 10 spec files across 2 projects**, over the **13 app-page routes** that
 `tests/e2e/routes.ts` discovers:
 
 - 52 `chromium-dev` console cells (13 routes × 2 themes × 2 directions);
 - 52 `chromium-prod` axe cells over the same matrix;
 - 26 `chromium-prod` overflow cells (13 routes × 2 directions);
-- 50 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
-  geometry, and the marketing route.
+- 62 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
+  geometry, the marketing route, and the reference form.
 
 That route number counts `page.*` files under `src/app`. It is deliberately
 not the build's printed route table — which also lists the not-found page, the
-route handler, and the generated icon — and not the count of statically
+route handlers, and the generated icon — and not the count of statically
 generated pages; all three differ, and `npm run build` owns the latter two.
+Route handlers are not pages and never enter route discovery.
 
-These counts are separate from the Vitest unit/component layer, currently 169
-tests in 27 files. A representative-subset-on-PR scheme remains rejected
+These counts are separate from the Vitest unit/component layer, currently 217
+tests in 32 files. A representative-subset-on-PR scheme remains rejected
 because tokens, direction, fonts, and providers can affect every route at
 once. Growth is linear: each discovered page adds four development console
 cells, four production axe cells, and two production overflow cells. Revisit
