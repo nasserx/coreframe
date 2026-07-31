@@ -1,0 +1,54 @@
+.trigger {
+  grid-template-areas: "question indicator";
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.trigger:dir(rtl) {
+  grid-template-areas: "indicator question";
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.question {
+  grid-area: question;
+}
+
+.indicator {
+  grid-area: indicator;
+}
+
+.panel {
+  height: var(--accordion-panel-height);
+  overflow: hidden;
+  opacity: 1;
+  transition:
+    height var(--motion-moderate) var(--ease-standard),
+    opacity var(--motion-quick) var(--ease-standard);
+}
+
+.panel[data-starting-style],
+.panel[data-ending-style] {
+  height: 0;
+  opacity: 0;
+}
+
+.indicatorIcon {
+  rotate: 0deg;
+  transition: rotate var(--motion-quick) var(--ease-standard);
+}
+
+.trigger[data-panel-open] .indicator {
+  border-color: var(--primary);
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.trigger[data-panel-open] .indicatorIcon {
+  rotate: 180deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .indicatorIcon {
+    transition: none;
+  }
+}

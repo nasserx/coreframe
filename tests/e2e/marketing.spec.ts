@@ -22,6 +22,39 @@ const COPY = {
     architectureHeading: "App Router: static where the route allows it.",
     bilingualHeading: "One semantic system, equal care in both directions.",
     qualityHeading: "Risk-reducing defaults, not absolute guarantees.",
+    faqHeading: "Clear answers about the Foundation.",
+    faqItems: [
+      {
+        question: "What does the Foundation include?",
+        answer:
+          "It provides a Next.js App Router structure, explicit TypeScript contracts, semantic light and dark themes, Inter and Tajawal typography, SiteShell and AppShell foundations, English/Arabic LTR/RTL behavior, accessibility-oriented Base UI primitives, automated tests, living documentation, and isolated Showcase examples. It is a frontend starting point—not a complete domain product or backend.",
+      },
+      {
+        question: "How do English, Arabic, LTR, and RTL work together?",
+        answer:
+          "English and Arabic share one typed catalogue shape, and the visible page, document lang, and dir switch together at runtime. Inter owns Latin text, Tajawal owns Arabic, and logical layout rules support LTR and RTL. Locale selection is client-state-based rather than URL-routed, so server metadata remains the canonical server value.",
+      },
+      {
+        question: "Can I replace the branding and design system?",
+        answer:
+          "Yes, with deliberate implementation work. Foundation Frame is a replaceable default identity, while semantic tokens centralize brand and theme adaptation. Preserve shared component and accessibility contracts, and replace identity through its existing owners instead of adding one-off colors or duplicated SVGs.",
+      },
+      {
+        question: "Is the Showcase included in production?",
+        answer:
+          "Showcase is an isolated development and reference surface, not a production product area. The current release contract can disable it at build time; its routes and API then prerender as static 404 responses while / remains independently available. This is release isolation, not a security sandbox.",
+      },
+      {
+        question: "Is every route statically generated?",
+        answer:
+          "No. The current / route is statically prerendered because it does not depend on request-time locale state. Static generation remains a route-by-route decision; future authenticated, personalized, or request-dependent routes may need dynamic rendering.",
+      },
+      {
+        question: "Does the Foundation guarantee zero vulnerabilities?",
+        answer:
+          "No. The Foundation uses reviewed safeguards and quality gates to reduce risk, not to promise perfect security. Dependency install scripts are restricted by a reviewed allowlist, and known advisories are documented and reevaluated rather than hidden or cleared through unsafe forced downgrades. Adopters remain responsible for ongoing dependency and application-security review.",
+      },
+    ],
     architectureDiagram: "Architecture delivery path",
     bilingualDiagram: "Semantic design-system path",
     pipelineDiagram: "Automated validation pipeline",
@@ -43,6 +76,39 @@ const COPY = {
     architectureHeading: "معمارية App Router، وتوليد ثابت حين يسمح المسار.",
     bilingualHeading: "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
     qualityHeading: "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
+    faqHeading: "إجابات واضحة عن الأساس.",
+    faqItems: [
+      {
+        question: "ماذا يتضمن الأساس؟",
+        answer:
+          "يوفّر بنية Next.js App Router، وعقود TypeScript صريحة، ومظهرين دلاليين: الفاتح والداكن، وخطي Inter وTajawal، وأساسَي SiteShell وAppShell، ودعم الإنجليزية والعربية باتجاهي LTR وRTL، ومكوّنات Base UI تراعي الوصول، واختبارات آلية، ووثائق حيّة، وأمثلة معزولة في Showcase. وهو نقطة انطلاق للواجهة الأمامية، لا منتجًا مكتملًا لمجال محدد ولا خلفية خادمية.",
+      },
+      {
+        question: "كيف يعمل دعم الإنجليزية والعربية واتجاهي LTR وRTL؟",
+        answer:
+          "تشترك الإنجليزية والعربية في بنية كتالوج واحدة مضبوطة الأنواع، ويتبدّل المحتوى الظاهر وسمتا lang وdir معًا وقت التشغيل. يتولى Inter النص اللاتيني وTajawal النص العربي، وتدعم قواعد التخطيط المنطقية اتجاهي LTR وRTL. يعتمد اختيار اللغة على حالة العميل لا على مسارات URL، لذلك تبقى البيانات الوصفية للخادم بالقيمة الأساسية المعتمدة.",
+      },
+      {
+        question: "هل يمكن استبدال الهوية ونظام التصميم؟",
+        answer:
+          "نعم، لكن ذلك يتطلب عملاً تنفيذيًا مقصودًا. تمثل Foundation Frame الهوية الافتراضية القابلة للاستبدال، بينما تجمع الرموز الدلالية تكييف الهوية والمظهر في مواضع مركزية. ينبغي الحفاظ على عقود المكوّنات المشتركة والوصول، وتغيير الهوية عبر مواضع ملكيتها الحالية بدل إضافة ألوان منفردة أو نسخ SVG مكررة.",
+      },
+      {
+        question: "هل يدخل Showcase ضمن إصدار الإنتاج؟",
+        answer:
+          "Showcase سطح معزول للتطوير والمرجعية، وليس جزءًا من المنتج الإنتاجي. يتيح عقد الإصدار الحالي تعطيله وقت البناء؛ وعندها تُولَّد مساراته وواجهة API كاستجابات 404 ثابتة، بينما يبقى المسار / متاحًا باستقلال. هذا عزل للإصدار، وليس صندوقًا أمنيًا معزولًا.",
+      },
+      {
+        question: "هل تُولَّد جميع المسارات مسبقًا؟",
+        answer:
+          "لا. يُولَّد المسار / حاليًا مسبقًا لأنه لا يعتمد على حالة اللغة وقت الطلب. ويبقى التوليد الثابت قرارًا يخص كل مسار؛ فقد تحتاج المسارات المستقبلية التي تتطلب مصادقة أو تخصيصًا أو بيانات وقت الطلب إلى عرض ديناميكي.",
+      },
+      {
+        question: "هل يضمن الأساس انعدام الثغرات؟",
+        answer:
+          "لا. يستخدم الأساس ضوابط مراجَعة وبوابات جودة لتقليل المخاطر، لا ليَعِد بأمان كامل. تُقيَّد سكربتات تثبيت الاعتمادات بقائمة سماح مراجَعة، وتُوثَّق التنبيهات المعروفة وتُعاد مراجعتها بدل إخفائها أو إزالة أثرها بخفض قسري غير آمن للإصدارات. ويبقى المتبنّون مسؤولين عن المراجعة المستمرة للاعتمادات وأمن التطبيق.",
+      },
+    ],
     architectureDiagram: "مسار التسليم المعماري",
     bilingualDiagram: "مسار نظام التصميم الدلالي",
     pipelineDiagram: "مسار التحقق الآلي",
@@ -57,6 +123,26 @@ const STATES = [
 ] as const satisfies ReadonlyArray<{ theme: MarketingTheme; locale: MarketingLocale }>;
 
 const WIDTHS = [320, 390, 1024, 1440] as const;
+
+const FAQ_TECHNICAL_TERMS = [
+  "API",
+  "App Router",
+  "AppShell",
+  "Base UI",
+  "Foundation Frame",
+  "Inter",
+  "LTR",
+  "Next.js",
+  "RTL",
+  "SVG",
+  "Showcase",
+  "SiteShell",
+  "Tajawal",
+  "TypeScript",
+  "URL",
+  "dir",
+  "lang",
+] as const;
 
 const ENGLISH_MARKETING_TEXT = [
   "Frontend Foundation",
@@ -83,6 +169,10 @@ const ENGLISH_MARKETING_TEXT = [
   "App Router: static where the route allows it.",
   "One semantic system, equal care in both directions.",
   "Risk-reducing defaults, not absolute guarantees.",
+  "Questions, answered",
+  "Clear answers about the Foundation.",
+  "The Foundation is explicit about what it provides, what remains adaptable, and where its guarantees end.",
+  ...COPY.en.faqItems.map(({ question }) => question),
   "The landing route prerenders from server-owned route composition and does not read request-time locale state.",
   "Inter is bundled through Next.js, while Tajawal is served from local Arabic subsets. Browser tests verify script ownership without runtime Google Fonts requests.",
   "Known dependency advisories are documented and reviewed rather than hidden or cleared through an unsafe forced downgrade. This reduces uncertainty; it does not mean the dependency tree is risk-free.",
@@ -125,6 +215,10 @@ const ARABIC_MARKETING_TEXT = [
   "معمارية App Router، وتوليد ثابت حين يسمح المسار.",
   "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
   "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
+  "أسئلة وإجابات",
+  "إجابات واضحة عن الأساس.",
+  "يوضح الأساس ما يقدّمه، وما يمكن تكييفه، وأين تنتهي ضماناته.",
+  ...COPY.ar.faqItems.map(({ question }) => question),
   "يُولَّد المسار الرئيسي مسبقًا من تركيب مملوك للخادم، ولا يقرأ حالة اللغة وقت الطلب.",
   "يُحزَّم Inter عبر Next.js، بينما يُقدَّم Tajawal من ملفات محلية مخصّصة للعربية. وتتحقق اختبارات المتصفح من اختيار الخط المناسب دون طلب Google Fonts وقت التشغيل.",
   "تُوثَّق تنبيهات الاعتمادات المعروفة وتُراجع بدل إخفائها أو إزالتها بخفض قسري غير آمن للإصدارات. يقلّل ذلك الغموض، لكنه لا يعني أن شجرة الاعتمادات خالية من المخاطر.",
@@ -184,7 +278,7 @@ test("root marketing route owns one landmark set and a resolved primary action",
   const cta = page.getByRole("link", { name: COPY.en.cta });
   await expect(cta).toHaveAttribute("href", "#capabilities");
   await expect(page.locator("section#capabilities")).toHaveCount(1);
-  for (const id of ["capability-story", "architecture", "bilingual-design", "quality"]) {
+  for (const id of ["capability-story", "architecture", "bilingual-design", "quality", "faq"]) {
     await expect(page.locator(`section#${id}`)).toHaveCount(1);
   }
   await expect(page.locator('[data-slot="marketing-preview"]')).toHaveAttribute(
@@ -304,6 +398,7 @@ test("visible marketing copy, direction, and display metrics follow the live loc
     COPY.en.architectureHeading,
     COPY.en.bilingualHeading,
     COPY.en.qualityHeading,
+    COPY.en.faqHeading,
   ]) {
     await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
   }
@@ -350,6 +445,7 @@ test("visible marketing copy, direction, and display metrics follow the live loc
     COPY.ar.architectureHeading,
     COPY.ar.bilingualHeading,
     COPY.ar.qualityHeading,
+    COPY.ar.faqHeading,
   ]) {
     await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
   }
@@ -404,6 +500,176 @@ test("root marketing page and header do not overflow at checkpoint widths", asyn
       ).toBeLessThanOrEqual(1);
     }
   }
+});
+
+test("marketing FAQ delegates its single-open disclosure contract to Base UI", async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await gotoMarketingState(page, "light", "en");
+
+  const faq = page.locator("section#faq");
+  await expect(faq.getByRole("heading", { level: 2, name: COPY.en.faqHeading })).toHaveCount(1);
+  const englishTriggers = faq.getByRole("button");
+  await expect(englishTriggers).toHaveCount(6);
+  await expect(englishTriggers).toHaveText(COPY.en.faqItems.map(({ question }) => question));
+  for (const trigger of await englishTriggers.all()) {
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  }
+  await expect(faq.getByRole("region")).toHaveCount(0);
+
+  const relationshipIds = new Set<string>();
+  for (const [index, item] of COPY.en.faqItems.entries()) {
+    const trigger = englishTriggers.nth(index);
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    if (index > 0) {
+      await expect(englishTriggers.nth(index - 1)).toHaveAttribute("aria-expanded", "false");
+    }
+    await expect(faq.getByText(item.answer, { exact: true })).toBeVisible();
+
+    const triggerId = await trigger.getAttribute("id");
+    const panelId = await trigger.getAttribute("aria-controls");
+    expect(triggerId).toBeTruthy();
+    expect(panelId).toBeTruthy();
+    relationshipIds.add(triggerId ?? "");
+    relationshipIds.add(panelId ?? "");
+    const panel = page.locator(`#${panelId ?? "missing-faq-panel"}`);
+    await expect(panel).toHaveAttribute("role", "region");
+    await expect(panel).toHaveAttribute("aria-labelledby", triggerId ?? "missing-faq-trigger");
+  }
+  expect(relationshipIds.size).toBe(12);
+
+  const firstTrigger = englishTriggers.first();
+  await firstTrigger.focus();
+  await page.keyboard.press("Enter");
+  await expect(firstTrigger).toHaveAttribute("aria-expanded", "true");
+  await expect(firstTrigger).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(firstTrigger).toHaveAttribute("aria-expanded", "false");
+  await expect(firstTrigger).toBeFocused();
+
+  const englishQuestionBox = await firstTrigger
+    .locator('[data-slot="marketing-faq-question"]')
+    .boundingBox();
+  const englishIndicatorBox = await firstTrigger
+    .locator('[data-slot="marketing-faq-indicator"]')
+    .boundingBox();
+  expect(englishQuestionBox).not.toBeNull();
+  expect(englishIndicatorBox).not.toBeNull();
+  expect(englishIndicatorBox?.x ?? 0).toBeGreaterThan(englishQuestionBox?.x ?? 0);
+
+  await page.getByRole("button", { name: "العربية" }).click();
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expect(faq.getByRole("heading", { level: 2, name: COPY.ar.faqHeading })).toBeVisible();
+  const arabicTriggers = faq.getByRole("button");
+  await expect(arabicTriggers).toHaveText(COPY.ar.faqItems.map(({ question }) => question));
+
+  const isolatedTechnicalTerms = new Set<string>();
+  for (const [index, item] of COPY.ar.faqItems.entries()) {
+    const trigger = arabicTriggers.nth(index);
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(faq.getByText(item.answer, { exact: true })).toBeVisible();
+    for (const term of await faq.locator('bdi[dir="ltr"]').allTextContents()) {
+      isolatedTechnicalTerms.add(term);
+    }
+  }
+  expect(Array.from(isolatedTechnicalTerms).sort()).toEqual([...FAQ_TECHNICAL_TERMS].sort());
+
+  const arabicQuestionBox = await arabicTriggers
+    .first()
+    .locator('[data-slot="marketing-faq-question"]')
+    .boundingBox();
+  const arabicIndicatorBox = await arabicTriggers
+    .first()
+    .locator('[data-slot="marketing-faq-indicator"]')
+    .boundingBox();
+  expect(arabicQuestionBox).not.toBeNull();
+  expect(arabicIndicatorBox).not.toBeNull();
+  expect(arabicIndicatorBox?.x ?? 0).toBeLessThan(arabicQuestionBox?.x ?? 0);
+
+  const duplicateIds = await page.locator("[id]").evaluateAll((elements) => {
+    const ids = elements.map(({ id }) => id);
+    return ids.filter((id, index) => ids.indexOf(id) !== index);
+  });
+  expect(duplicateIds).toEqual([]);
+  expect(consoleErrors).toEqual([]);
+});
+
+test("marketing FAQ open states remain accessible, reduced, and overflow-free", async ({
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const { theme, locale } of STATES) {
+    await gotoMarketingState(page, theme, locale);
+    const item = COPY[locale].faqItems[5];
+    await page.getByRole("button", { name: item.question }).click();
+    await expect(page.getByText(item.answer, { exact: true })).toBeVisible();
+
+    const results = await new AxeBuilder({ page })
+      .include("#faq")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    const readable = results.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      help: violation.help,
+      nodes: violation.nodes.map((node) => node.target.join(" ")),
+    }));
+    expect(readable, `open FAQ [${theme} ${locale}]`).toEqual([]);
+  }
+
+  for (const locale of ["en", "ar"] as const) {
+    const item = COPY[locale].faqItems[0];
+    for (const width of WIDTHS) {
+      await page.setViewportSize({ width, height: 900 });
+      await gotoMarketingState(page, "light", locale);
+      await page.getByRole("button", { name: item.question }).click();
+      await expect(page.getByText(item.answer, { exact: true })).toBeVisible();
+
+      const faq = page.locator("section#faq");
+      const panel = faq.locator('[data-slot="marketing-faq-panel"]');
+      const indicator = faq
+        .getByRole("button", { name: item.question })
+        .locator('[data-slot="marketing-faq-indicator-icon"]');
+      await expect(panel).toHaveCSS("transition-property", "none");
+      await expect(indicator).toHaveCSS("transition-property", "none");
+
+      const measured = await page.evaluate(() => {
+        const root = document.documentElement;
+        const overflowingElements = Array.from(document.querySelectorAll("body *"))
+          .filter((element) => {
+            const bounds = element.getBoundingClientRect();
+            return bounds.left < -1 || bounds.right > root.clientWidth + 1;
+          })
+          .map((element) => ({
+            tag: element.tagName,
+            slot: element.getAttribute("data-slot"),
+            text: element.textContent,
+            bounds: element.getBoundingClientRect().toJSON(),
+          }));
+        return {
+          pageOverflow: root.scrollWidth - root.clientWidth,
+          overflowingElements,
+        };
+      });
+      expect(
+        measured.pageOverflow,
+        `open FAQ [${locale}] at ${width}px\n${JSON.stringify(measured.overflowingElements, null, 2)}`,
+      ).toBeLessThanOrEqual(1);
+    }
+  }
+
+  expect(consoleErrors).toEqual([]);
 });
 
 test("informational story cards coordinate restrained hover feedback and reduced motion", async ({
