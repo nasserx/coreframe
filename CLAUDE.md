@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Frontend Foundation — Engineering Context
+# Coreframe — Engineering Context
 
 This is a concise implementation index for Claude Code. It does not own
 architecture, design, code-style, or workflow contracts.
@@ -57,7 +57,7 @@ before adding code. Promote code to shared folders only after reuse is real.
 - **Testing:** `docs/TESTING.md` owns Vitest/component and Playwright/browser
   responsibilities and CI parity. Browser routes are discovered from
   `src/app`; do not hard-code route lists.
-- **Showcase:** `/showcase` is Foundation inspection code, not product UI.
+- **Showcase:** `/showcase` is Coreframe inspection code, not product UI.
   `docs/CLONING.md` owns the build-time static-404 gate and permanent deletion
   procedure; `docs/ROADMAP.md` owns deliberate omissions and triggers.
 

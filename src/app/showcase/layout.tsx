@@ -9,8 +9,8 @@ import { ENV_CONFIG } from "@/config/env";
 export const metadata: Metadata = ENV_CONFIG.NEXT_PUBLIC_ENABLE_SHOWCASE
   ? {
       title: {
-        template: "%s — Foundation Showcase",
-        default: "Foundation Showcase",
+        template: "%s — Coreframe Showcase",
+        default: "Coreframe Showcase",
       },
     }
   : {};

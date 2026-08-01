@@ -42,9 +42,20 @@ export const LOCALE_INFO = {
   { direction: TextDirection; numerals: NumberingSystem; label: string }
 >;
 
+/**
+ * Project identity (DECISIONS.md → _Project identity: Coreframe_).
+ *
+ * `name` is the brand on its own — the short form every lockup, tab title, and
+ * error-page title uses. `descriptor` is the official descriptor that says what
+ * the brand is; the two composed with an em dash are the full presentation
+ * ("Coreframe — Frontend Architecture Foundation"), which the root layout uses
+ * as the document title. Keeping them as two fields means the full presentation
+ * is derived in one place instead of duplicated as a third string.
+ */
 export const APP_CONFIG = {
-  name: "Frontend Foundation",
-  description: "A reusable frontend foundation for production web applications.",
+  name: "Coreframe",
+  descriptor: "Frontend Architecture Foundation",
+  description: "A reusable frontend architecture foundation for production web applications.",
   defaultLocale: APP_LOCALES.DEFAULT,
   supportedLocales: APP_LOCALES.SUPPORTED,
   direction: LOCALE_INFO[APP_LOCALES.DEFAULT].direction,

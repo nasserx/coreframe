@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { BrandMark } from "./brand-mark";
 
 describe("BrandMark", () => {
-  it("renders Foundation Frame as one decorative currentColor glyph", () => {
+  it("renders the Coreframe mark as one decorative currentColor glyph", () => {
     render(<BrandMark data-testid="brand-mark" className="size-8" />);
 
     const mark = screen.getByTestId("brand-mark");

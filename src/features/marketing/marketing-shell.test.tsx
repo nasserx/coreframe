@@ -232,7 +232,13 @@ describe("MarketingShell footer", () => {
     for (const { key } of FOOTER_DESTINATIONS) {
       expect(region).not.toHaveTextContent(en.marketing[key]);
     }
-    for (const key of ["brand", "footerContext", "footerNavLabel", "footerStatus"] as const) {
+    // `brand` is excluded on purpose: Coreframe is a proper name, so it is
+    // locale-invariant and both catalogues carry the same string (DECISIONS.md
+    // → _Project identity: Coreframe_). Its presence in Arabic is asserted
+    // above via `ar.marketing.brand`; asserting it absent would be asserting
+    // that the brand gets translated.
+    expect(en.marketing.brand).toBe(ar.marketing.brand);
+    for (const key of ["footerContext", "footerNavLabel", "footerStatus"] as const) {
       expect(region).not.toHaveTextContent(en.marketing[key]);
     }
   });

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export type BrandMarkProps = ComponentProps<"svg">;
 
 /*
- * Foundation Frame geometry, shared with the static favicon glyph in
+ * Coreframe mark geometry, shared with the static favicon glyph in
  * src/app/icon.svg. One nonzero path avoids <mask>/<defs> ids because shell
  * navigation content can render in both persistent and drawer surfaces.
  * Integer coordinates on a 24-unit grid keep the three filled modules crisp
@@ -14,7 +14,7 @@ export type BrandMarkProps = ComponentProps<"svg">;
 const BRAND_MARK_PATH = "M3 3h9v3H6v6H3V3Z" + "M18 12h3v9h-9v-3h6v-6Z" + "M9 9h6v6H9V9Z";
 
 /**
- * Foundation Frame: two opposing open structural corners around a replaceable
+ * The Coreframe mark: two opposing open structural corners around a replaceable
  * central module. The rotationally balanced mark carries no reading direction
  * and stays fixed under RTL. It fills with `currentColor` and owns
  * `text-primary` by default, so every foundation identity lockup follows the

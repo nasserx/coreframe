@@ -1,5 +1,5 @@
 /**
- * Original, Foundation-owned decorative interface specimen. It uses semantic
+ * Original, Coreframe-owned decorative interface specimen. It uses semantic
  * surfaces and status roles only; there is no copied artwork, product data, or
  * reference-specific structure. Because it adds no information beyond the
  * adjacent hero copy, the whole preview is hidden from assistive technology.

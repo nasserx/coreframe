@@ -2,7 +2,7 @@
 
 ## Philosophy
 
-This project is a reusable frontend foundation. Architecture should stay simple at the start and become more specific only when product needs justify it. Code should be easy to locate, easy to test, and hard to accidentally couple across unrelated areas.
+Coreframe is a reusable frontend architecture foundation. Architecture should stay simple at the start and become more specific only when product needs justify it. Code should be easy to locate, easy to test, and hard to accidentally couple across unrelated areas.
 
 The application uses `src` as the single source root. Next.js routing lives in `src/app`, while product behavior should grow primarily through feature-owned modules under `src/features`.
 

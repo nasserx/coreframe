@@ -1,10 +1,14 @@
-# Frontend Foundation
+# Coreframe — Frontend Architecture Foundation
 
-A reusable, domain-neutral Next.js (App Router) application base for future
-web products: agreed tooling, folder boundaries, a token-driven theme system,
-testing, and standards — no product features or business logic. The Showcase
-routes are Foundation inspection code, not product pages. This README is the
-entry point; every deeper topic links to its owning document.
+**Coreframe** is a reusable, domain-neutral Next.js (App Router) application
+base for future web products: agreed tooling, folder boundaries, a token-driven
+theme system, testing, and standards — no product features or business logic.
+The Showcase routes are Coreframe inspection code, not product pages. This
+README is the entry point; every deeper topic links to its owning document.
+
+The identity contract — the brand, its official descriptor, and the `coreframe`
+technical identifier — is recorded in `DECISIONS.md` → _Project identity:
+Coreframe_.
 
 ## Start here
 
@@ -63,7 +67,7 @@ when a product first needs them, not preinstalled. Every dependency has a
 - `src/components`: intentionally cross-feature presentation components;
   primitives in `src/components/ui`.
 - `src/features`: feature-first product modules. `marketing` owns the production
-  public composition for `/`; `showcase` remains the Foundation inspection
+  public composition for `/`; `showcase` remains the Coreframe inspection
   surface.
 - `src/api`: the API boundary — `apiFetch` and the typed `ApiError` contract.
 - `src/i18n`: the message layer — typed catalogues and the pure translation
@@ -87,7 +91,7 @@ token, layout, and data-layer contract rendered and exercised by the browser
 test matrix. It is **not** product UI.
 
 The root `/` route is the production marketing surface and is owned separately
-under `src/features/marketing`; it may demonstrate Foundation capabilities, but
+under `src/features/marketing`; it may demonstrate Coreframe capabilities, but
 it must not import Showcase components or depend on Showcase routes being
 enabled.
 

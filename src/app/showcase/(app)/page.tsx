@@ -8,7 +8,7 @@ export default function ShowcaseIndexPage() {
   return (
     <>
       <PageHeader>
-        <PageHeaderTitle>Foundation Showcase</PageHeaderTitle>
+        <PageHeaderTitle>Coreframe Showcase</PageHeaderTitle>
         <PageHeaderDescription>
           An integration test for the reusable foundation: every page composes the real primitives,
           providers, and tokens exactly as a future product would. If something here feels awkward,

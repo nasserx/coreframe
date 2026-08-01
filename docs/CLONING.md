@@ -6,9 +6,18 @@ developer from clone to a first product page in under 30 minutes.
 
 ## 1. Template setup (repository owner, once)
 
+Coreframe's canonical repository is `https://github.com/nasserx/coreframe`.
+
+```bash
+git clone https://github.com/nasserx/coreframe.git
+cd coreframe
+```
+
+The examples below use `D:\projects\coreframe` as the local working copy.
+
 When this repository is pushed to GitHub, the owner enables
 **Settings → General → Template repository** (or runs
-`gh repo edit <owner>/frontend-foundation --template`). From then on new
+`gh repo edit nasserx/coreframe --template`). From then on new
 products start with **Use this template → Create a new repository** — a
 clean single-commit history with no coupling to this repo's history.
 
@@ -17,24 +26,68 @@ prefer the template path for products.
 
 ## 2. Where the foundation's identity lives
 
-The name and description appear in exactly two source locations —
-everything else derives from them:
+Identity has **two kinds of owner, and `APP_CONFIG` is only one of them.**
+Configuration owns what the document reports about itself; the message
+catalogues own what a visitor reads on the page. Nothing derives one from
+the other — a rename that edits only `src/config/app.ts` changes the browser
+tab and leaves the visible brand untouched.
 
-| Location            | What to change                                    |
-| ------------------- | ------------------------------------------------- |
-| `package.json`      | `name` (and `version` if you version differently) |
-| `src/config/app.ts` | `APP_CONFIG.name`, `APP_CONFIG.description`       |
+**Configuration — non-localized application config and document metadata**
 
-`APP_CONFIG` feeds the root layout's `<title>`/description metadata, the
-error pages, and everything else that displays the app's identity — no
-component references the name directly.
+| Value                    | Renders as                                                              |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `APP_CONFIG.name`        | first half of the root `<title>`; the `{app}` slot in the error title   |
+| `APP_CONFIG.descriptor`  | second half of the root `<title>`                                       |
+| `APP_CONFIG.description` | the root `<meta name="description">`                                    |
+| `package.json#name`      | the package identifier (mirror it in `package-lock.json`'s root `name`) |
 
-**Two exceptions, both showcase-scoped:** `src/app/showcase/layout.tsx`
-hardcodes `"Foundation Showcase"` in its metadata title template, and the
-`site` message namespace (`src/i18n/messages/en.ts`, `ar.ts`) carries
-`site.brand`. Both disappear with the showcase (option 3 below); if you keep
-it, rename them too or a renamed product still shows "Foundation Showcase" in
-showcase tab titles.
+`src/app/layout.tsx` composes the document title as `name — descriptor`, so
+a product that wants a bare title sets `descriptor` to its own words rather
+than editing the layout. `src/app/global-error.tsx` interpolates
+`APP_CONFIG.name` into the localized `errors.documentTitle` string. This
+metadata is server-rendered once and **does not follow the client locale**
+(`docs/DIRECTION_AND_I18N.md`).
+
+**Catalogues — every brand string a visitor actually sees**
+
+| Value                    | Renders as                                                   |
+| ------------------------ | ------------------------------------------------------------ |
+| `marketing.brand`        | the header and footer brand lockups on `/`                   |
+| other `marketing.*` copy | the product name inside headings, story leads, and FAQ prose |
+| `site.brand`             | the SiteShell demo top bar at `/showcase/site`               |
+| `site.footerFoundation`  | that demo's footer column heading                            |
+
+Each lives in **both** `src/i18n/messages/en.ts` and `ar.ts` and is rendered
+through `useTranslations`, not read from `APP_CONFIG`.
+
+**The proper name is identical across locales; the copy around it is not.**
+`marketing.brand` is the same `Coreframe` string in both catalogues, because
+a name is not translated — `site.brand` pairs that invariant name with a
+localized wrapper (`Coreframe Showcase` / `معرض Coreframe`), which is the
+pattern to copy. Two consequences when you rename: change the brand in
+**both** catalogues even though they read identically, and update the
+`TECHNICAL_TERMS` set and `TECHNICAL_TERM_PATTERN` in
+`src/features/marketing/marketing-faq.tsx` — that pair wraps the name in
+`<bdi dir="ltr">` so a Latin brand stays correctly isolated inside Arabic
+FAQ prose.
+
+**Showcase identity outside the catalogues.** Three places hardcode
+`"Coreframe Showcase"` because they are not localized:
+`src/app/showcase/layout.tsx` (metadata title template **and** default),
+`src/app/showcase/(app)/page.tsx` (the index heading), and
+`src/features/showcase/components/showcase-nav.tsx` (the sidebar lockup).
+All of them, plus the `site` keys above, disappear with the showcase
+(option 3 below); if you keep it, rename them too or a renamed product still
+shows "Coreframe Showcase" in showcase tab titles and chrome.
+
+**The mark is separate from the name.** `src/components/ui/brand-mark.tsx`
+owns the runtime glyph and `src/app/icon.svg` repeats its path for the
+favicon; a colocated test enforces that the two stay identical. Replacing
+the identity means editing both — `docs/DESIGN_TOKENS.md` §4 step 8.
+
+When you have worked through the tables, `grep -ri coreframe src` is the
+backstop: it catches incidental prose mentions (documentation comments, the
+Showcase's own explanatory text) that no table can enumerate.
 
 **Non-English products translate the message catalogue, not the boundary
 files.** All user-facing copy — the error routes (`not-found.tsx`,
@@ -167,11 +220,28 @@ Do these in order; each step states what proves it worked.
 1. **Toolchain** — install Node 24.18.0 (`nvm use` reads `.nvmrc`). `node -v`
    prints `v24.18.0`.
 2. **Install** — `npm ci`. Exits 0; `prepare` installs the git hooks.
-3. **First run** — `npm run dev`, open `http://localhost:3000`. The home
-   page shows the app name from `APP_CONFIG`; `/showcase` renders the
-   component library.
-4. **Rename** — edit `package.json#name` and `APP_CONFIG` (§2). The browser
-   tab title and home page now show your product's name.
+3. **First run** — `npm run dev`, open `http://localhost:3000`. The browser
+   tab reads `Coreframe — Frontend Architecture Foundation` from
+   `APP_CONFIG`, while the header and footer lockups on the page read
+   `Coreframe` from `marketing.brand` in the catalogues — two owners, which
+   is why step 4 has two halves. `/showcase` renders the component library.
+4. **Rename** — work through both owners in §2:
+   1. **Configuration** — `package.json#name` (mirrored in
+      `package-lock.json`'s root `name`) and `APP_CONFIG.name`,
+      `.descriptor`, `.description`. Proof: the browser tab title and the
+      page source's `<meta name="description">` change.
+   2. **Visible copy** — `marketing.brand` in **both** `en.ts` and `ar.ts`,
+      plus any `marketing.*` copy that names the product, and the bidi term
+      pair in `marketing-faq.tsx`. Proof: the lockups on `/` change in both
+      languages. Editing only step 4.1 leaves them saying `Coreframe`.
+   3. **Showcase**, if you are keeping it — `site.brand` and
+      `site.footerFoundation` in both catalogues, and the three hardcoded
+      `"Coreframe Showcase"` sites listed in §2. Proof: `/showcase` and
+      `/showcase/site` carry your name in their tab titles and chrome.
+
+   Finish with `grep -ri coreframe src` — it should return nothing but
+   incidental prose you have chosen to keep.
+
 5. **Gates** — `npm run lint && npm run typecheck && npm test`. All exit 0
    untouched; you now know the gates are green before your first change.
    (The browser layer, `npm run test:e2e`, is **not** in this line: it has two
@@ -179,7 +249,25 @@ Do these in order; each step states what proves it worked.
    `npx playwright install chromium` — and CI runs it for you on every push.
    Run it locally only when you touch layout, fonts, or accessibility; see
    `docs/TESTING.md`.)
-6. **First page** — create `src/app/(home)/hello/page.tsx`:
+6. **First page** — a page never renders its own `<main>`; the layout that
+   provides the chrome owns that landmark (`docs/LAYOUT.md` § The main
+   landmark). The only route group that ships is `(marketing)`, and its
+   layout mounts the production `MarketingShell` — so adding a page there
+   would wrap it in the marketing header, navigation, and footer. A bare
+   product page needs its own route group, which is **two** files.
+
+   First the group's layout, `src/app/(product)/layout.tsx` — it exists
+   only to own the landmark:
+
+   ```tsx
+   import type { ReactNode } from "react";
+
+   export default function ProductLayout({ children }: Readonly<{ children: ReactNode }>) {
+     return <main className="flex flex-1 flex-col">{children}</main>;
+   }
+   ```
+
+   Then the page itself, `src/app/(product)/hello/page.tsx`:
 
    ```tsx
    import { PageHeader, PageHeaderTitle } from "@/components/ui/page-header";
@@ -195,14 +283,18 @@ Do these in order; each step states what proves it worked.
    }
    ```
 
-   `/hello` renders with the foundation's type ramp and tokens. Note that
-   the page renders no `<main>` — the layout owns that landmark
-   (`docs/LAYOUT.md` § The main landmark): here the `(home)` group's bare
-   layout provides it. A page that needs full application or site chrome
-   instead composes a shell **in its own route-group layout** — copy the
-   shape of `src/app/showcase/(app)/layout.tsx` (`AppShell`) or
-   `src/app/showcase/(site)/site/layout.tsx` (`SiteShell`), which mount the
-   shell and its `<main>` for every route in the group.
+   The group name is in parentheses, so it is URL-transparent: the route is
+   `/hello`, not `/product/hello`, and every later bare page joins the same
+   group and inherits the same landmark. `/hello` renders with the
+   foundation's type ramp and tokens.
+
+   A page that needs full application or site chrome instead composes a
+   shell **in its own route-group layout** — copy the shape of
+   `src/app/showcase/(app)/layout.tsx` (`AppShell`),
+   `src/app/showcase/(site)/site/layout.tsx` (`SiteShell`), or
+   `src/app/(marketing)/layout.tsx` (the production `SiteShell`
+   composition), which mount the shell and its `<main>` for every route in
+   the group.
 
 7. **First feature slice** — when the page needs data or components, create
    `src/features/<name>/` and copy the shape of

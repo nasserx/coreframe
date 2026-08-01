@@ -25,7 +25,7 @@ export function ShowcaseNav() {
         className="flex h-9 items-center gap-2 rounded-md px-3 text-small font-bold outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
       >
         <BrandMark className="size-4.5" />
-        Foundation Showcase
+        Coreframe Showcase
       </Link>
       <ul className="flex flex-col gap-1">
         {SHOWCASE_SECTIONS.map((section) => {

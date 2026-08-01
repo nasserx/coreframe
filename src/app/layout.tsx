@@ -5,7 +5,10 @@ import { FONT_VARIABLE_CLASSES } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: APP_CONFIG.name,
+  // The full identity presentation — brand plus official descriptor
+  // (src/config/app.ts). Segments that own a title, such as the showcase,
+  // override this with their own template.
+  title: `${APP_CONFIG.name} — ${APP_CONFIG.descriptor}`,
   description: APP_CONFIG.description,
 };
 
