@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { useTranslations } from "@/core/providers/locale-provider";
 
+import { marketingReveal } from "./marketing-motion";
 import { MarketingSectionIntro } from "./marketing-section-intro";
 
 /**
@@ -36,8 +37,8 @@ export function MarketingClosingCta() {
         />
 
         <div
+          {...marketingReveal("mt-10 flex flex-wrap items-center justify-center gap-3")}
           data-slot="marketing-closing-actions"
-          className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Link
             href="#architecture"

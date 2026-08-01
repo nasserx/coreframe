@@ -160,6 +160,23 @@ unless it is deliberately assigned to the development server.
   navigation. It stays route-specific because these are production composition
   claims, not SiteShell mechanics, and it is the one spec that grows with a
   page's composition rather than with route discovery.
+- `marketing-motion.spec.ts` — motion behaviour over time, covering two
+  deliberately separate contracts. The **global** one is verified beyond
+  marketing: computed `scroll-behavior` is `smooth` and
+  `scroll-padding-block-start` is `64px` on `/` and on Showcase routes alike,
+  and reduced motion turns every one of them to `auto`. The **route-owned** one
+  is verified to stay put: Showcase routes carry no reveal unit, no reveal
+  state, and run no keyframe animation when scrolled. Around those, anchors
+  stay real links that land clear of the sticky bar (on click, on keypress, and
+  on direct hash load) and the reveal runs once per unit without replaying.
+  Two rules keep it from becoming a timing test. First,
+  nothing asserts an elapsed duration: entry is awaited through the reveal's
+  own state attribute and then through `getAnimations()`, so a scan can never
+  read a half-faded element, and "smooth versus immediate" is decided by
+  counting the trip's own scroll events rather than by how long it took.
+  Second, the enhancement's absence is tested as directly as its presence —
+  with JavaScript disabled, with `IntersectionObserver` deleted, and under
+  reduced motion, every section must still be visible and unhidden.
 
 Routes are **discovered** (`tests/e2e/routes.ts` walks `src/app` for
 `page.*`), so a new page is covered automatically. Dynamic or parallel
@@ -224,15 +241,16 @@ Node comes from `.nvmrc` (currently `24.18.0`, matching the `engines` range in
 version change (cached otherwise).
 
 **The full browser matrix runs on every PR — deliberately.** Current measured
-discovery (`npx playwright test --list`, 2026-08-01) is **220 Playwright tests
-in 11 spec files across 2 projects**, over the **13 app-page routes** that
+discovery (`npx playwright test --list`, 2026-08-01) is **235 Playwright tests
+in 12 spec files across 2 projects**, over the **13 app-page routes** that
 `tests/e2e/routes.ts` discovers:
 
 - 52 `chromium-dev` console cells (13 routes × 2 themes × 2 directions);
 - 52 `chromium-prod` axe cells over the same matrix;
 - 26 `chromium-prod` overflow cells (13 routes × 2 directions);
-- 90 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
-  geometry, the marketing route, the reference form, and the shared controls.
+- 105 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
+  geometry, the marketing route and its motion, the reference form, and the
+  shared controls.
 
 That route number counts `page.*` files under `src/app`. It is deliberately
 not the build's printed route table — which also lists the not-found page, the
@@ -240,8 +258,8 @@ route handlers, and the generated icon — and not the count of statically
 generated pages; all three differ, and `npm run build` owns the latter two.
 Route handlers are not pages and never enter route discovery.
 
-These counts are separate from the Vitest unit/component layer, currently 251
-tests in 34 files. A representative-subset-on-PR scheme remains rejected
+These counts are separate from the Vitest unit/component layer, currently 261
+tests in 35 files. A representative-subset-on-PR scheme remains rejected
 because tokens, direction, fonts, and providers can affect every route at
 once. Growth is linear: each discovered page adds four development console
 cells, four production axe cells, and two production overflow cells. Revisit

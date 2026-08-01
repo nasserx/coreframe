@@ -7,6 +7,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { useTranslations } from "@/core/providers/locale-provider";
 
+import { marketingReveal } from "./marketing-motion";
 import { MarketingSectionIntro } from "./marketing-section-intro";
 import styles from "./marketing-faq.module.css";
 
@@ -102,9 +103,11 @@ export function MarketingFaq() {
           lead={t("faqLead")}
         />
 
+        {/* The list enters once as a whole. Disclosure open/close motion stays
+            entirely Base UI's and is never touched by the reveal. */}
         <Accordion.Root
+          {...marketingReveal("mx-auto mt-10 max-w-prose border-y")}
           data-slot="marketing-faq-accordion"
-          className="mx-auto mt-10 max-w-prose border-y"
         >
           {items.map(({ id, question, answer }) => (
             <Accordion.Item

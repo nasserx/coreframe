@@ -1,0 +1,98 @@
+/*
+ * Marketing reveal: the landing page's one-time viewport entrance — opacity
+ * plus a small block-axis displacement — with a short stagger between sibling
+ * cards.
+ *
+ * This is an optional, route-owned enhancement. It is deliberately NOT a
+ * global reveal framework: nothing outside `src/features/marketing` renders
+ * these classes, and no other surface animates on scroll. Smooth anchor
+ * scrolling is a separate, unrelated contract owned globally by
+ * `src/app/globals.css`.
+ *
+ * Durations and easing come from the existing motion tokens
+ * (docs/DESIGN_TOKENS.md § Motion); nothing here introduces a new one.
+ */
+
+@keyframes marketingReveal {
+  from {
+    opacity: 0;
+    translate: 0 var(--marketing-reveal-distance);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.reveal,
+.stagger {
+  /* Restrained displacement along the block axis. In a horizontal writing
+     mode the block axis is vertical in both LTR and RTL, so one value is
+     correct in English and Arabic with no direction fork. */
+  --marketing-reveal-distance: 10px;
+  --marketing-reveal-stagger: 60ms;
+}
+
+/*
+ * Pre-reveal state. Only elements the observer actually took over ever carry
+ * it, and it is only ever applied to content that was below the fold at that
+ * moment — server-rendered content is never hidden from a reader, and nothing
+ * already on screen can flash out.
+ */
+.reveal[data-reveal-state="hidden"],
+.stagger[data-reveal-state="hidden"] > * {
+  opacity: 0;
+}
+
+/*
+ * `backwards` holds the `from` frame through the stagger delay (so a delayed
+ * card is never briefly painted before it animates) and then releases the
+ * element back to its own styles once the run finishes. `forwards` would pin
+ * `translate`, permanently blocking the cards' existing hover lift.
+ */
+.reveal[data-reveal-state="shown"],
+.stagger[data-reveal-state="shown"] > * {
+  animation: marketingReveal var(--motion-moderate) var(--ease-standard) backwards;
+}
+
+/*
+ * Stagger, in DOM order — which is reading order in both directions, so the
+ * sequence is identical in English and Arabic. Only siblings inside one
+ * revealed group are staggered; sections themselves never are. The step is
+ * enumerated because CSS cannot multiply by a child index, and it stops at the
+ * sixth item so a longer group can never stretch the total beyond 300ms.
+ */
+.stagger[data-reveal-state="shown"] > :nth-child(2) {
+  animation-delay: calc(1 * var(--marketing-reveal-stagger));
+}
+
+.stagger[data-reveal-state="shown"] > :nth-child(3) {
+  animation-delay: calc(2 * var(--marketing-reveal-stagger));
+}
+
+.stagger[data-reveal-state="shown"] > :nth-child(4) {
+  animation-delay: calc(3 * var(--marketing-reveal-stagger));
+}
+
+.stagger[data-reveal-state="shown"] > :nth-child(5) {
+  animation-delay: calc(4 * var(--marketing-reveal-stagger));
+}
+
+.stagger[data-reveal-state="shown"] > :nth-child(n + 6) {
+  animation-delay: calc(5 * var(--marketing-reveal-stagger));
+}
+
+/*
+ * The observer already declines to enhance anything when reduced motion is
+ * preferred at load, so this block exists for the preference being turned on
+ * mid-session: whatever is parked in the hidden state becomes visible
+ * immediately, with no animation and no residual stagger delay (the global
+ * reduced-motion rule collapses animation *duration*, never delay).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal[data-reveal-state],
+  .stagger[data-reveal-state] > * {
+    animation: none;
+    opacity: 1;
+  }
+}
