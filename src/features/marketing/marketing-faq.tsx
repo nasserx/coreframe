@@ -22,7 +22,7 @@ const TECHNICAL_TERMS = new Set([
   "API",
   "AppShell",
   "Base UI",
-  "Foundation Frame",
+  "Coreframe",
   "Inter",
   "LTR",
   "Next.js",
@@ -38,7 +38,7 @@ const TECHNICAL_TERMS = new Set([
 ]);
 
 const TECHNICAL_TERM_PATTERN =
-  /(Foundation Frame|App Router|Base UI|Next\.js|TypeScript|SiteShell|AppShell|Showcase|Tajawal|Inter|LTR|RTL|URL|API|SVG|lang|dir)/g;
+  /(Coreframe|App Router|Base UI|Next\.js|TypeScript|SiteShell|AppShell|Showcase|Tajawal|Inter|LTR|RTL|URL|API|SVG|lang|dir)/g;
 
 function BidiText({ children }: Readonly<{ children: string }>): ReactNode {
   return children.split(TECHNICAL_TERM_PATTERN).map((part, index) =>

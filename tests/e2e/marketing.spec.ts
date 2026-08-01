@@ -6,7 +6,7 @@ type MarketingTheme = "light" | "dark";
 
 const COPY = {
   en: {
-    brand: "Frontend Foundation",
+    brand: "Coreframe",
     direction: "ltr",
     heading: "A dependable starting point for modern web products.",
     cta: "Explore the capabilities",
@@ -22,10 +22,10 @@ const COPY = {
     architectureHeading: "App Router: static where the route allows it.",
     bilingualHeading: "One semantic system, equal care in both directions.",
     qualityHeading: "Risk-reducing defaults, not absolute guarantees.",
-    faqHeading: "Clear answers about the Foundation.",
+    faqHeading: "Clear answers about Coreframe.",
     faqItems: [
       {
-        question: "What does the Foundation include?",
+        question: "What does Coreframe include?",
         answer:
           "It provides a Next.js App Router structure, explicit TypeScript contracts, semantic light and dark themes, Inter and Tajawal typography, SiteShell and AppShell foundations, English/Arabic LTR/RTL behavior, accessibility-oriented Base UI primitives, automated tests, living documentation, and isolated Showcase examples. It is a frontend starting point—not a complete domain product or backend.",
       },
@@ -37,7 +37,7 @@ const COPY = {
       {
         question: "Can I replace the branding and design system?",
         answer:
-          "Yes, with deliberate implementation work. Foundation Frame is a replaceable default identity, while semantic tokens centralize brand and theme adaptation. Preserve shared component and accessibility contracts, and replace identity through its existing owners instead of adding one-off colors or duplicated SVGs.",
+          "Yes, with deliberate implementation work. Coreframe is a replaceable default identity, while semantic tokens centralize brand and theme adaptation. Preserve shared component and accessibility contracts, and replace identity through its existing owners instead of adding one-off colors or duplicated SVGs.",
       },
       {
         question: "Is the Showcase included in production?",
@@ -50,9 +50,9 @@ const COPY = {
           "No. The current / route is statically prerendered because it does not depend on request-time locale state. Static generation remains a route-by-route decision; future authenticated, personalized, or request-dependent routes may need dynamic rendering.",
       },
       {
-        question: "Does the Foundation guarantee zero vulnerabilities?",
+        question: "Does Coreframe guarantee zero vulnerabilities?",
         answer:
-          "No. The Foundation uses reviewed safeguards and quality gates to reduce risk, not to promise perfect security. Dependency install scripts are restricted by a reviewed allowlist, and known advisories are documented and reevaluated rather than hidden or cleared through unsafe forced downgrades. Adopters remain responsible for ongoing dependency and application-security review.",
+          "No. Coreframe uses reviewed safeguards and quality gates to reduce risk, not to promise perfect security. Dependency install scripts are restricted by a reviewed allowlist, and known advisories are documented and reevaluated rather than hidden or cleared through unsafe forced downgrades. Adopters remain responsible for ongoing dependency and application-security review.",
       },
     ],
     architectureDiagram: "Architecture delivery path",
@@ -77,7 +77,7 @@ const COPY = {
     ],
   },
   ar: {
-    brand: "أساس الواجهات",
+    brand: "Coreframe",
     direction: "rtl",
     heading: "نقطة انطلاق موثوقة لمنتجات ويب حديثة.",
     cta: "استكشف الإمكانات",
@@ -93,10 +93,10 @@ const COPY = {
     architectureHeading: "معمارية App Router، وتوليد ثابت حين يسمح المسار.",
     bilingualHeading: "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
     qualityHeading: "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
-    faqHeading: "إجابات واضحة عن الأساس.",
+    faqHeading: "إجابات واضحة عن Coreframe.",
     faqItems: [
       {
-        question: "ماذا يتضمن الأساس؟",
+        question: "ماذا يتضمن Coreframe؟",
         answer:
           "يوفّر بنية Next.js App Router، وعقود TypeScript صريحة، ومظهرين دلاليين: الفاتح والداكن، وخطي Inter وTajawal، وأساسَي SiteShell وAppShell، ودعم الإنجليزية والعربية باتجاهي LTR وRTL، ومكوّنات Base UI تراعي الوصول، واختبارات آلية، ووثائق حيّة، وأمثلة معزولة في Showcase. وهو نقطة انطلاق للواجهة الأمامية، لا منتجًا مكتملًا لمجال محدد ولا خلفية خادمية.",
       },
@@ -108,7 +108,7 @@ const COPY = {
       {
         question: "هل يمكن استبدال الهوية ونظام التصميم؟",
         answer:
-          "نعم، لكن ذلك يتطلب عملاً تنفيذيًا مقصودًا. تمثل Foundation Frame الهوية الافتراضية القابلة للاستبدال، بينما تجمع الرموز الدلالية تكييف الهوية والمظهر في مواضع مركزية. ينبغي الحفاظ على عقود المكوّنات المشتركة والوصول، وتغيير الهوية عبر مواضع ملكيتها الحالية بدل إضافة ألوان منفردة أو نسخ SVG مكررة.",
+          "نعم، لكن ذلك يتطلب عملاً تنفيذيًا مقصودًا. تمثل Coreframe الهوية الافتراضية القابلة للاستبدال، بينما تجمع الرموز الدلالية تكييف الهوية والمظهر في مواضع مركزية. ينبغي الحفاظ على عقود المكوّنات المشتركة والوصول، وتغيير الهوية عبر مواضع ملكيتها الحالية بدل إضافة ألوان منفردة أو نسخ SVG مكررة.",
       },
       {
         question: "هل يدخل Showcase ضمن إصدار الإنتاج؟",
@@ -121,9 +121,9 @@ const COPY = {
           "لا. يُولَّد المسار / حاليًا مسبقًا لأنه لا يعتمد على حالة اللغة وقت الطلب. ويبقى التوليد الثابت قرارًا يخص كل مسار؛ فقد تحتاج المسارات المستقبلية التي تتطلب مصادقة أو تخصيصًا أو بيانات وقت الطلب إلى عرض ديناميكي.",
       },
       {
-        question: "هل يضمن الأساس انعدام الثغرات؟",
+        question: "هل يضمن Coreframe انعدام الثغرات؟",
         answer:
-          "لا. يستخدم الأساس ضوابط مراجَعة وبوابات جودة لتقليل المخاطر، لا ليَعِد بأمان كامل. تُقيَّد سكربتات تثبيت الاعتمادات بقائمة سماح مراجَعة، وتُوثَّق التنبيهات المعروفة وتُعاد مراجعتها بدل إخفائها أو إزالة أثرها بخفض قسري غير آمن للإصدارات. ويبقى المتبنّون مسؤولين عن المراجعة المستمرة للاعتمادات وأمن التطبيق.",
+          "لا. يستخدم Coreframe ضوابط مراجَعة وبوابات جودة لتقليل المخاطر، لا ليَعِد بأمان كامل. تُقيَّد سكربتات تثبيت الاعتمادات بقائمة سماح مراجَعة، وتُوثَّق التنبيهات المعروفة وتُعاد مراجعتها بدل إخفائها أو إزالة أثرها بخفض قسري غير آمن للإصدارات. ويبقى المتبنّون مسؤولين عن المراجعة المستمرة للاعتمادات وأمن التطبيق.",
       },
     ],
     architectureDiagram: "مسار التسليم المعماري",
@@ -163,7 +163,7 @@ const FAQ_TECHNICAL_TERMS = [
   "App Router",
   "AppShell",
   "Base UI",
-  "Foundation Frame",
+  "Coreframe",
   "Inter",
   "LTR",
   "Next.js",
@@ -178,8 +178,16 @@ const FAQ_TECHNICAL_TERMS = [
   "lang",
 ] as const;
 
+/**
+ * English copy that must disappear entirely once the page switches to Arabic.
+ *
+ * The brand is deliberately absent: `Coreframe` is a proper name, so it is
+ * locale-invariant and stays rendered in both languages (`COPY.en.brand ===
+ * COPY.ar.brand`). Asserting it removed would contradict the identity
+ * contract. Brand presence is covered by the shared brand-lockup test, which
+ * checks the header and footer lockups in both locales.
+ */
 const ENGLISH_MARKETING_TEXT = [
-  "Frontend Foundation",
   "Overview",
   "Capabilities",
   "Architecture",
@@ -204,8 +212,8 @@ const ENGLISH_MARKETING_TEXT = [
   "One semantic system, equal care in both directions.",
   "Risk-reducing defaults, not absolute guarantees.",
   "Questions, answered",
-  "Clear answers about the Foundation.",
-  "The Foundation is explicit about what it provides, what remains adaptable, and where its guarantees end.",
+  "Clear answers about Coreframe.",
+  "Coreframe is explicit about what it provides, what remains adaptable, and where its guarantees end.",
   ...COPY.en.faqItems.map(({ question }) => question),
   "The landing route prerenders from server-owned route composition and does not read request-time locale state.",
   "Inter is bundled through Next.js, while Tajawal is served from local Arabic subsets. Browser tests verify script ownership without runtime Google Fonts requests.",
@@ -231,7 +239,8 @@ const ENGLISH_MARKETING_TEXT = [
 ] as const;
 
 const ARABIC_MARKETING_TEXT = [
-  "أساس الواجهات",
+  // The untranslated brand — visible in Arabic exactly as it is in English.
+  "Coreframe",
   "نظرة عامة",
   "القدرات",
   "المعمارية",
@@ -257,8 +266,8 @@ const ARABIC_MARKETING_TEXT = [
   "نظام دلالي واحد، وعناية متكافئة في الاتجاهين.",
   "إعدادات تقلّل المخاطر، لا ضمانات مطلقة.",
   "أسئلة وإجابات",
-  "إجابات واضحة عن الأساس.",
-  "يوضح الأساس ما يقدّمه، وما يمكن تكييفه، وأين تنتهي ضماناته.",
+  "إجابات واضحة عن Coreframe.",
+  "يوضح Coreframe ما يقدّمه، وما يمكن تكييفه، وأين تنتهي ضماناته.",
   ...COPY.ar.faqItems.map(({ question }) => question),
   "يُولَّد المسار الرئيسي مسبقًا من تركيب مملوك للخادم، ولا يقرأ حالة اللغة وقت الطلب.",
   "يُحزَّم Inter عبر Next.js، بينما يُقدَّم Tajawal من ملفات محلية مخصّصة للعربية. وتتحقق اختبارات المتصفح من اختيار الخط المناسب دون طلب Google Fonts وقت التشغيل.",
@@ -395,10 +404,10 @@ test("root marketing metadata remains the canonical server value after a locale 
   await page.getByRole("button", { name: "Switch to Arabic" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
 
-  await expect(page).toHaveTitle("Frontend Foundation");
+  await expect(page).toHaveTitle("Coreframe — Frontend Architecture Foundation");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
-    "A reusable frontend foundation for production web applications.",
+    "A reusable frontend architecture foundation for production web applications.",
   );
 });
 

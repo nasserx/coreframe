@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /*
- * Foundation defaults only — product caching policy belongs at the query
+ * Coreframe defaults only — product caching policy belongs at the query
  * call site, not here.
  *
  * - `staleTime: 60s` prevents immediate client refetches of data that was
@@ -44,7 +44,7 @@ export type QueryProviderProps = Readonly<{
 }>;
 
 /**
- * Provides the application-wide React Query client. Foundation
+ * Provides the application-wide React Query client. Coreframe
  * configuration only — no product caching decisions and no Devtools.
  */
 export function QueryProvider({ children }: QueryProviderProps) {

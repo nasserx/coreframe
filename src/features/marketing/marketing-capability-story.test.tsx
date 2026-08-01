@@ -24,9 +24,7 @@ describe("MarketingCapabilityStory", () => {
     renderMarketingPage();
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(
-      screen.getByRole("heading", { level: 2, name: "Foundation capabilities" }),
-    ).toBeVisible();
+    expect(screen.getByRole("heading", { level: 2, name: "Coreframe capabilities" })).toBeVisible();
     expect(
       screen.getByRole("heading", {
         level: 2,

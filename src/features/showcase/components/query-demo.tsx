@@ -59,7 +59,7 @@ export function QueryDemo() {
         </Button>
         <p className="text-xs text-muted-foreground">
           Fetched from this app&apos;s own route handler (/api/showcase/records) through apiFetch
-          with Zod validation. Foundation defaults: 60s stale time, no automatic retries.
+          with Zod validation. Coreframe defaults: 60s stale time, no automatic retries.
         </p>
       </div>
       {isPending ? (

@@ -5,7 +5,7 @@ Purpose: Groups user-facing product capabilities by domain or workflow.
 Current contents:
 
 - `marketing/` — the production public composition for `/`: translated chrome,
-  landing content, and Foundation-owned visual specimens. It composes shared
+  landing content, and Coreframe-owned visual specimens. It composes shared
   primitives but remains feature-owned. It also owns an optional one-time
   viewport reveal for that route only — no other surface animates content into
   view (`docs/DESIGN_TOKENS.md` § Motion). Smooth anchor scrolling is not part

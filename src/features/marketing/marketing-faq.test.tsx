@@ -35,7 +35,7 @@ const TECHNICAL_TERMS_FOR_TEST = [
   "API",
   "AppShell",
   "Base UI",
-  "Foundation Frame",
+  "Coreframe",
   "Inter",
   "LTR",
   "Next.js",
@@ -66,20 +66,20 @@ describe("MarketingFaq", () => {
 
     expect(arabicFaqKeys).toEqual(englishFaqKeys);
     expect(FAQ_QUESTION_KEYS.map((key) => en.marketing[key])).toEqual([
-      "What does the Foundation include?",
+      "What does Coreframe include?",
       "How do English, Arabic, LTR, and RTL work together?",
       "Can I replace the branding and design system?",
       "Is the Showcase included in production?",
       "Is every route statically generated?",
-      "Does the Foundation guarantee zero vulnerabilities?",
+      "Does Coreframe guarantee zero vulnerabilities?",
     ]);
     expect(FAQ_QUESTION_KEYS.map((key) => ar.marketing[key])).toEqual([
-      "ماذا يتضمن الأساس؟",
+      "ماذا يتضمن Coreframe؟",
       "كيف يعمل دعم الإنجليزية والعربية واتجاهي LTR وRTL؟",
       "هل يمكن استبدال الهوية ونظام التصميم؟",
       "هل يدخل Showcase ضمن إصدار الإنتاج؟",
       "هل تُولَّد جميع المسارات مسبقًا؟",
-      "هل يضمن الأساس انعدام الثغرات؟",
+      "هل يضمن Coreframe انعدام الثغرات؟",
     ]);
     expect(FAQ_ANSWER_KEYS).toHaveLength(6);
 
@@ -89,7 +89,7 @@ describe("MarketingFaq", () => {
     expect(
       within(section as HTMLElement).getAllByRole("heading", {
         level: 2,
-        name: "Clear answers about the Foundation.",
+        name: "Clear answers about Coreframe.",
       }),
     ).toHaveLength(1);
     expect(within(section as HTMLElement).getAllByRole("heading", { level: 3 })).toHaveLength(6);

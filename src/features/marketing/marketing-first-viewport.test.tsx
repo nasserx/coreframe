@@ -21,7 +21,7 @@ describe("MarketingFirstViewport", () => {
     );
     expect(document.querySelector("section#capabilities")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Foundation capabilities" }),
+      screen.getByRole("heading", { level: 2, name: "Coreframe capabilities" }),
     ).toBeInTheDocument();
     expect(document.querySelector('[data-slot="marketing-preview"]')).toHaveAttribute(
       "aria-hidden",

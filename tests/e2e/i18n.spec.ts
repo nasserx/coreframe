@@ -17,8 +17,8 @@ import { expect, type Page, test } from "@playwright/test";
  *
  * Runs in chromium-prod (against `next start`) — exactly what ships.
  */
-const AR_BRAND = "معرض الأساس";
-const EN_BRAND = "Foundation Showcase";
+const AR_BRAND = "معرض Coreframe";
+const EN_BRAND = "Coreframe Showcase";
 
 // Same practical viewport range the English overflow sweep uses.
 const WIDTHS = [320, 360, 393, 480, 640, 768, 834, 1024, 1280, 1536] as const;

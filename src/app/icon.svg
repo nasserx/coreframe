@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <!-- Foundation Frame uses the same glyph path as BrandMark. The static
-       favicon adds a fixed Foundation cobalt field because browser chrome
+  <!-- The Coreframe mark uses the same glyph path as BrandMark. The static
+       favicon adds a fixed Coreframe cobalt field because browser chrome
        cannot resolve application CSS tokens reliably; the white glyph keeps
        the opposing frames and central module legible on light and dark tabs. -->
   <rect width="24" height="24" rx="3" fill="#0c74e4"/>
