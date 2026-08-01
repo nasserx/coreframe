@@ -52,6 +52,21 @@
      * matched pair; if the bar height changes, change this with it.
      */
     scroll-padding-block-start: 4rem;
+    /*
+     * Same-document anchor scrolling is animated across the whole foundation,
+     * not per route: a fragment jump is orientation — it shows the reader
+     * where the destination sits relative to where they were — which is
+     * exactly what this system's motion is for (docs/DESIGN_TOKENS.md,
+     * Motion). It belongs on `html` because the document itself is the
+     * scroller in both shells (docs/LAYOUT.md).
+     *
+     * This is a declaration, not a mechanism: links stay native anchors, and
+     * Next.js routes hash navigation through the platform's own
+     * `scrollIntoView()`, so pointer activation, keyboard activation, and
+     * history traversal all inherit it with no JavaScript of any kind. The
+     * reduced-motion block below restores immediate jumps.
+     */
+    scroll-behavior: smooth;
   }
   /*
    * Code is LTR content categorically: identifiers, paths, and snippets must

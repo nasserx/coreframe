@@ -495,6 +495,56 @@ reduced motion removes both card and icon translation. Nav hover remains
 color-only so a dropdown trigger does not fight the panel (see `docs/LAYOUT.md`
 §6).
 
+**Smooth same-document anchor scrolling is a global foundation contract.** One
+declaration, `scroll-behavior: smooth` on `html` in `src/app/globals.css`,
+applies to every route and to every application built from this foundation —
+there is nothing to opt into. A fragment jump is orientation, which is precisely
+what this system's motion is for: it shows the reader where the destination sat
+relative to where they were. It belongs on `html` because the document itself is
+the scroller in both shells (`docs/LAYOUT.md`).
+
+This is a declaration, not a mechanism. Links remain native anchors and Next.js
+routes hash navigation through the platform's own `scrollIntoView()`, so pointer
+activation, keyboard activation, and history traversal all inherit it with no
+JavaScript: no scroll listener, no `preventDefault`, no scrolling controller.
+Two companion globals complete it, both on the same element: the
+reduced-motion block restores `scroll-behavior: auto !important`, so the
+operating-system preference turns every anchor back into an immediate jump; and
+`scroll-padding-block-start: 4rem` clears the sticky bar, so **no route and no
+section owns a scroll offset of its own**.
+
+**The viewport reveal, by contrast, is an optional route-owned enhancement.**
+The public landing page is the one surface where a reader is being led through
+an argument rather than operating a tool, so it alone animates content into
+view. It is owned entirely by `src/features/marketing`
+(`marketing-motion.module.css`, `use-marketing-reveal.ts`) and built from the
+tokens above. Showcase, application pages, forms, and any future product surface
+render their content statically — **there is no global reveal framework and no
+route-transition system**, and no dependency was added. Keep the two contracts
+separate when extending: scrolling is shared, entrance motion is opted into by a
+feature that has a reason for it.
+
+- **A one-time reveal** for post-hero sections and card groups: `opacity` plus
+  a ~10px displacement along the **block** axis (vertical in both directions,
+  so English and Arabic run identically), at `--motion-moderate` and
+  `--ease-standard`. Siblings inside one card group stagger by 60ms in DOM
+  order, capped at the sixth item; sections are never staggered against each
+  other. No scale, blur, rotation, parallax, or looping, and no
+  layout-affecting property — the boxes never move.
+- **Progressive enhancement, in that order.** Content is server-rendered in its
+  final position; a single IntersectionObserver _adds_ the hidden state, and
+  only to units still below the fold, so nothing visible can flash out and no
+  reader ever waits on JavaScript to see a section. Missing JavaScript, a
+  missing IntersectionObserver, delayed hydration, and unmounting all leave —
+  or return — every section visible.
+- **Reduced motion opts out before anything is hidden**, so there is no state
+  to recover from and no stagger delay left to sit through; a preference
+  switched on mid-session releases whatever is still hidden. Hover, focus, and
+  every other state signal survive untouched — only movement goes.
+
+This is also why "nothing on page load" above still holds: the reveal never
+runs on content that is already on screen when the page arrives.
+
 ## 3. Verified contrast (WCAG AA)
 
 Computed via OKLCH → linear sRGB → relative luminance (WCAG formula).

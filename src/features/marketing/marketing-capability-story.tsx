@@ -24,6 +24,7 @@ import {
   type MarketingSpecimenStep,
   QualityPipeline,
 } from "./marketing-specimens";
+import { marketingReveal, marketingRevealGroup } from "./marketing-motion";
 import { MarketingSectionIntro } from "./marketing-section-intro";
 import styles from "./marketing-capability-story.module.css";
 
@@ -60,8 +61,8 @@ function CenteredFeature({
     <Container data-slot="marketing-centered-feature" className="py-20 sm:py-24">
       <MarketingSectionIntro eyebrow={eyebrow} headingId={headingId} title={title} lead={lead} />
       <div
+        {...marketingReveal("mx-auto mt-6 max-w-prose space-y-4 text-center text-body")}
         data-slot="marketing-feature-copy"
-        className="mx-auto mt-6 max-w-prose space-y-4 text-center text-body"
       >
         {body}
         <div className="mt-8 border-t pt-4">
@@ -69,7 +70,10 @@ function CenteredFeature({
           <p className="mt-1 text-supporting text-muted-foreground">{verification}</p>
         </div>
       </div>
-      <div data-slot="marketing-feature-specimen" className="mx-auto mt-12 max-w-5xl min-w-0">
+      <div
+        {...marketingReveal("mx-auto mt-12 max-w-5xl min-w-0")}
+        data-slot="marketing-feature-specimen"
+      >
         {specimen}
       </div>
     </Container>
@@ -270,8 +274,8 @@ export function MarketingCapabilityStory() {
           />
 
           <div
+            {...marketingRevealGroup("mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3")}
             data-slot="marketing-story-grid"
-            className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
           >
             {capabilities.map((capability) => (
               <StoryCard key={capability.title} {...capability} />
@@ -353,8 +357,8 @@ export function MarketingCapabilityStory() {
           />
 
           <div
+            {...marketingRevealGroup("mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3")}
             data-slot="marketing-story-grid"
-            className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
           >
             {safeguards.map((safeguard) => (
               <StoryCard key={safeguard.title} {...safeguard} />
@@ -362,7 +366,9 @@ export function MarketingCapabilityStory() {
           </div>
 
           <aside
-            className="mx-auto mt-6 max-w-prose rounded-xl border bg-background p-6 text-center"
+            {...marketingReveal(
+              "mx-auto mt-6 max-w-prose rounded-xl border bg-background p-6 text-center",
+            )}
             aria-labelledby="dependency-posture-heading"
           >
             <h3 id="dependency-posture-heading" className="text-subheading">
@@ -371,7 +377,7 @@ export function MarketingCapabilityStory() {
             <p className="mt-3 text-small">{t("dependencyPostureDescription")}</p>
           </aside>
 
-          <div className="mx-auto mt-8 max-w-5xl">
+          <div {...marketingReveal("mx-auto mt-8 max-w-5xl")}>
             <QualityPipeline label={t("pipelineLabel")} stages={pipeline} />
           </div>
         </Container>

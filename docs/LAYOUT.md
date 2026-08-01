@@ -153,7 +153,11 @@ scrollable; the header is sticky at `z-40` (below the overlay layer's
 `z-50`). Both shells' headers stand at `h-16` (64px); `globals.css` reserves
 that height as `scroll-padding-block-start` on `html`, so anchor jumps and
 programmatic focus land below the sticky bar rather than behind it — the two
-values are a hand-kept matched pair.
+values are a hand-kept matched pair. That clearance is global: no route or
+section defines a scroll offset of its own. The same element also carries the
+foundation's global `scroll-behavior: smooth`, so same-document anchor jumps
+are animated everywhere (and immediate under `prefers-reduced-motion`) —
+`docs/DESIGN_TOKENS.md` § Motion owns that contract.
 
 **The header boundary is scroll-dependent** (both shells), with presentation
 owned by each shell. `AppShell` keeps its integrated-at-top / hairline-when-

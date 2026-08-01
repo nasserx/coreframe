@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 
@@ -17,6 +18,8 @@ import {
 import { ThemeControl } from "@/components/ui/theme-control";
 import { useTranslations } from "@/core/providers/locale-provider";
 import { cn } from "@/lib/utils";
+
+import { useMarketingReveal } from "./use-marketing-reveal";
 
 export type MarketingShellProps = Readonly<{
   children: ReactNode;
@@ -56,10 +59,20 @@ const FOOTER_FOCUS_RING =
  * controls, and footer must all follow the active client-side locale. Route
  * children remain server-owned slots and do not enter this module's client
  * graph.
+ *
+ * It is also the marketing route's single reveal owner: one observer created
+ * here serves every reveal unit the page renders, scoped to the main region
+ * (see `use-marketing-reveal.ts`). Owning it at this level adds no client
+ * boundary — this module is already one — and keeps the page's sections free
+ * of browser-API code. Anchor scrolling is not this module's concern: it is a
+ * global foundation contract in `src/app/globals.css`.
  */
 export function MarketingShell({ children }: MarketingShellProps) {
   const t = useTranslations("marketing");
   const tShell = useTranslations("shell");
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  useMarketingReveal(mainRef);
 
   const navigationItems = [
     { href: "#overview", label: t("navOverview") },
@@ -101,7 +114,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
         </div>
       </SiteShellHeader>
 
-      <SiteShellMain>{children}</SiteShellMain>
+      <SiteShellMain ref={mainRef}>{children}</SiteShellMain>
 
       <SiteShellFooter>
         {/* Stacks on narrow viewports and only becomes a two-column
