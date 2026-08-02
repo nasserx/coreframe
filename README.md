@@ -46,6 +46,8 @@ npm run dev        # http://localhost:3000 — /showcase is the living demo
 | `CODE_STYLE.md`              | Naming, imports, exports, TypeScript usage                               |
 | `CONTRIBUTING.md`            | Feature placement, shared-code promotion, PR expectations                |
 | `DECISIONS.md`               | The decision log — every stack choice with reasoning                     |
+| `LICENSE`                    | MIT terms for Coreframe's original work                                  |
+| `THIRD_PARTY_NOTICES.md`     | Notices for redistributed or adapted third-party material                |
 | `docs/audit/`                | Historical point-in-time reviews (do not read as current state)          |
 
 ## Tech stack
@@ -132,21 +134,14 @@ in `env.ts` for how to add a variable.
 
 ## License
 
-This repository is **private** and carries **no open-source license** —
-default copyright applies (all rights reserved). It is not
-distributed publicly; do not add a project license unless it is deliberately
-made public (see `DECISIONS.md` → _Private repository, no project license_ for
-the checklist that reversal would require).
+Coreframe is released under the [MIT License](LICENSE), copyright © 2026
+Nasser Ahmed.
 
-This says nothing about the fonts, whose licences are third-party obligations
-independent of the repo's own status. The built application self-hosts and
-redistributes **all three** families — **Tajawal** (Arabic), **Inter**
-(Latin identity face), and **Geist Mono** (code face) — each under the **SIL
-Open Font License 1.1**. Tajawal is the only one committed to this repo as
-source files, so its full OFL text is vendored at `src/assets/fonts/OFL.txt` and
-must keep shipping alongside those files. Inter and Geist Mono are fetched
-by `next/font` at build time, and the woff2 files it generates carry their
-copyright notice and OFL licence reference in the font's name-table metadata.
+Third-party material retains its own licenses and notices; see
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and the Tajawal font's
+colocated [`OFL.txt`](src/assets/fonts/OFL.txt). The package remains marked
+`"private": true` to guard against accidental npm publication. The MIT grant
+does not establish or authorize an official npm publication.
 
 ## Direction & internationalization
 
