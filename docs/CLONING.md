@@ -163,12 +163,10 @@ historical reviews) and `docs/ROADMAP.md` (or repurpose it as your own).
   same-origin); the server-only Zod contract in
   `src/config/env-validation.ts` validates them at startup.
 - `src/config/app.ts` — locale (see §3a for the language a product ships in).
-- `next.config.ts` — **`allowedDevOrigins` is a per-developer value.** It
-  carries this repo's author's LAN IP so the dev server accepts requests from
-  a phone or tablet on the same network. Replace it with your own machine's
-  address, or delete the entry if you only ever browse `localhost`. It affects
-  the dev server only — there is no production exposure — but it is a security
-  control, so an inherited allowlist entry should not be left unexamined.
+- Local development origins — no configuration is required for `localhost`,
+  which Next.js permits by default. A clone that deliberately serves the dev
+  site through another origin can add a reviewed `allowedDevOrigins` entry to
+  `next.config.ts`; Coreframe does not ship a machine-specific allowlist.
 - CI works with zero configuration: `.github/workflows/ci.yml` needs no
   secrets, no environment, no registry access — it runs on the first PR of
   a fresh clone as-is.

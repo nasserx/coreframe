@@ -47,6 +47,7 @@ npm run dev        # http://localhost:3000 — /showcase is the living demo
 | `CONTRIBUTING.md`            | Feature placement, shared-code promotion, PR expectations                |
 | `DECISIONS.md`               | The decision log — every stack choice with reasoning                     |
 | `LICENSE`                    | MIT terms for Coreframe's original work                                  |
+| `SECURITY.md`                | Supported versions and private vulnerability reporting                   |
 | `THIRD_PARTY_NOTICES.md`     | Notices for redistributed or adapted third-party material                |
 | `docs/audit/`                | Historical point-in-time reviews (do not read as current state)          |
 
@@ -131,6 +132,14 @@ imports `src/config/env-validation.ts` (the Zod validator, kept separate so
 Zod never ships to the client — `src/config/env.ts` holds the client-safe
 typed values). It throws with the offending variable names. See the comment
 in `env.ts` for how to add a variable.
+
+## Security
+
+Do not report vulnerabilities through public Issues. Supported versions,
+private reporting instructions, and response expectations are defined in
+[`SECURITY.md`](SECURITY.md). Current dependency-advisory analysis lives in
+[`docs/ROADMAP.md`](docs/ROADMAP.md); archived audits are historical evidence,
+not the current posture.
 
 ## License
 
