@@ -44,3 +44,7 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# local Claude state (shared files under .claude remain trackable)
+/.claude/settings.local.json
+/.claude/scheduled_tasks.lock
