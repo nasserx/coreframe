@@ -251,7 +251,11 @@ The audit file is a point-in-time record. Version and vulnerability counts in
 this section are refreshed from the installed tree and current `npm audit`
 output; archived counts inside `docs/audit/` remain unchanged.
 
-> **Current state (since removed):** `LICENSE` and `SECURITY.md` no longer exist — the repo is now private with no project licence. The record above of what the hardening pass did stays true; for the reversal see `DECISIONS.md` → _Private repository, no project license_.
+> **Historical state:** `LICENSE` and `SECURITY.md` were later removed under the
+> now-superseded private/no-project-license posture. The record above of what
+> the hardening pass did stays true. `LICENSE` was restored under the MIT
+> decision in 2026-08; restoring `SECURITY.md` remains outside this licensing
+> stage. See `DECISIONS.md` → _MIT project license and npm-private package_.
 
 1. **Three production `npm audit` findings remain (all unreachable).**
    _Posture refreshed 2026-07-29 against measured output._ The production tree

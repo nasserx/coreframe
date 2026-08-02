@@ -202,9 +202,39 @@ Trade-off accepted: a visitor who wants the page to track their OS _continuously
 
 Alternatives considered: keeping `"system"` in the runtime while hiding it from the UI (rejected — a state no control can reach is dead weight that still has to be handled everywhere, and it leaves the two-value hook contract in place); a three-position toggle cycling light → dark → system (rejected — an unlabelled third position is the least discoverable form of the option that was already the least used); persisting the system-derived value on first load (rejected — it silently converts a non-choice into a choice and permanently detaches the visitor from their OS setting).
 
-## Private repository, no project license
+## MIT project license and npm-private package
 
-Decision (2026-07): This repository stays **private** and carries **no license of its own**. `package.json` sets `"private": true` and has no `license` field; there is no `LICENSE` file. Under default copyright this means all rights reserved. The `LICENSE` (MIT) and `SECURITY.md` files added during the 2026-07 template-hardening pass were removed as artifacts that only serve a public, openly distributed repo.
+Decision (2026-08): Coreframe is licensed under the MIT License, copyright ©
+2026 Nasser Ahmed. `package.json` retains `"private": true` as an accidental
+npm-publication guard; the project license does not establish or authorize an
+official npm publication.
+
+The visual reference previously called `template-forntend` was created by
+Nasser Ahmed. Coreframe is a restructured evolution of that owner-created work,
+so the reference is not an external licensing dependency. Third-party material
+redistributed or adapted by Coreframe retains its own licenses, copyright
+notices, and attribution; `THIRD_PARTY_NOTICES.md` records the useful project-
+level notices, while colocated license files remain authoritative for their
+material.
+
+Reason: Public source needs an explicit grant that lets people use, copy,
+modify, and redistribute Coreframe while preserving a simple permissive model.
+The MIT License supplies that grant for the project's own work without
+relicensing third-party material. npm publication is a separate distribution
+decision and remains disabled.
+
+This decision supersedes _Private repository, no project license_ (2026-07).
+That entry remains below as historical context rather than being rewritten.
+
+Alternatives considered: retaining the no-license posture (rejected because it
+would not grant public users permission to reuse or redistribute Coreframe);
+removing `"private": true` (rejected because publishing an npm package is not
+part of this decision); treating the owner-created visual reference as an
+external dependency (rejected because it was created by the same owner).
+
+## Private repository, no project license (superseded)
+
+Superseded decision (2026-07; superseded 2026-08): This repository stays **private** and carries **no license of its own**. `package.json` sets `"private": true` and has no `license` field; there is no `LICENSE` file. Under default copyright this means all rights reserved. The `LICENSE` (MIT) and `SECURITY.md` files added during the 2026-07 template-hardening pass were removed as artifacts that only serve a public, openly distributed repo.
 
 Reason: The earlier MIT license and vulnerability-disclosure policy were justified by an assumed public template audience (`docs/audit/2026-07-health-audit.md` §3.1). That assumption no longer holds — the repo is private and cloned by its own author, so a permissive grant to unknown third parties and a public disclosure channel have no audience. `"private": true` also guards against an accidental `npm publish`, which matters more here than the removed `license` field did.
 
