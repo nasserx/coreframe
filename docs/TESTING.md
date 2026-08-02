@@ -240,6 +240,17 @@ Node comes from `.nvmrc` (currently `24.18.0`, matching the `engines` range in
 `package.json`). The browser step downloads Chromium only on a Playwright
 version change (cached otherwise).
 
+### Required-check contract
+
+The workflow name is **`CI`** and its single job/check name is **`quality`**
+(shown with its workflow context as `CI / quality`). Both names are stable API
+for repository governance: the later GitHub launch-settings stage should make
+`quality` a required check on `main` and restrict it to the GitHub Actions app.
+The check is produced for every `pull_request` targeting `main` and every
+`push` to `main`. Branch protection is not configured by this repository file
+and remains a GitHub settings task. If a merge queue is enabled later, add the
+`merge_group` trigger before requiring this check for queued merges.
+
 **The full browser matrix runs on every PR — deliberately.** Current measured
 discovery (`npx playwright test --list`, 2026-08-01) is **235 Playwright tests
 in 12 spec files across 2 projects**, over the **13 app-page routes** that
