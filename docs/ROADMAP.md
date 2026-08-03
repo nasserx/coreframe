@@ -264,7 +264,7 @@ output; archived counts inside `docs/audit/` remain unchanged.
 > package_ and the current root security policy.
 
 1. **Dependency advisories are tracked by tree and reachability.** _Posture
-   refreshed 2026-08-02 against the installed lockfile and npm registry._
+   refreshed 2026-08-03 against the merged lockfile and npm registry._
    `npm audit` reports **6 vulnerable packages: 4 high, 2 moderate, 0 low, 0
    critical**. `npm audit --omit=dev` reports **3 high, 0 moderate, 0 low, 0
    critical**. The package counts include parent packages whose severity is
@@ -297,7 +297,7 @@ output; archived counts inside `docs/audit/` remain unchanged.
 
    **Development dependency paths:**
 
-   - `shadcn@4.15.0` → `@modelcontextprotocol/sdk@1.29.0` →
+   - `shadcn@4.16.0` → `@modelcontextprotocol/sdk@1.29.0` →
      `@hono/node-server@1.19.14` accounts for two moderate vulnerable-package
      entries. The advisory is a Windows encoded-backslash path traversal in
      Hono's static-file serving. These packages are dev-only; Coreframe source,
@@ -305,13 +305,15 @@ output; archived counts inside `docs/audit/` remain unchanged.
      The standard workflows therefore do not reach the affected server path.
      Published `@modelcontextprotocol/sdk@1.30.0` accepts fixed
      `@hono/node-server@^2.0.5` (latest observed `2.0.12`), and
-     `shadcn@4.16.1` is a compatible minor update. Handle that refresh in a
-     focused dependency-remediation change.
+     `shadcn@4.16.1` is a compatible patch update admitted by the current
+     `^4.16.0` constraint. The merged shadcn update did not refresh this
+     transitive chain, so handle the SDK/Hono lockfile refresh in a focused
+     dependency-remediation change.
    - Three installed `brace-expansion` paths account for one high
      vulnerable-package entry: `eslint@9.39.5` → `minimatch@3.1.5` →
      `brace-expansion@1.1.16`; `eslint-config-next@16.2.12` →
      `typescript-eslint` → `minimatch@10.2.5` → `brace-expansion@5.0.7`; and
-     `shadcn@4.15.0` → `ts-morph` → `@ts-morph/common` → `minimatch@10.2.5`
+     `shadcn@4.16.0` → `ts-morph` → `@ts-morph/common` → `minimatch@10.2.5`
      → `brace-expansion@5.0.7`. Lint loads the first two tooling chains, but
      Coreframe supplies fixed repository-owned glob patterns rather than
      attacker-controlled brace expressions; the shadcn CLI chain is not part
