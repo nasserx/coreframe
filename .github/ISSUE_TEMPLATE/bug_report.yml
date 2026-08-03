@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible problem in Coreframe itself.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Coreframe. Do not disclose vulnerabilities here; follow [SECURITY.md](https://github.com/nasserx/coreframe/blob/main/SECURITY.md) instead.
+
+  - type: input
+    id: version
+    attributes:
+      label: Coreframe version or commit
+      description: Identify the affected release, tag, or full commit SHA.
+      placeholder: v2.0.0 or 0123456789abcdef...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include operating system, Node.js and npm versions, and browser/version when relevant.
+      placeholder: Windows 11; Node 24.18.0; npm ...; Chrome ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest sequence or repository link that reproduces the problem.
+      placeholder: |
+        1. Start from...
+        2. Run...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: ui_context
+    attributes:
+      label: UI context, when relevant
+      description: Include locale, LTR/RTL direction, light/dark theme, browser, and viewport size.
+      placeholder: Arabic; RTL; dark; Chrome; 390 × 844
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      description: Remove credentials, tokens, private URLs, personal data, and other sensitive values before posting.
+
+  - type: checkboxes
+    id: coreframe_scope
+    attributes:
+      label: Coreframe scope
+      options:
+        - label: I confirmed that the problem reproduces in Coreframe itself and is not only caused by downstream product customization.
+          required: true

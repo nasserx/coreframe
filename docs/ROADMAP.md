@@ -6,6 +6,10 @@ records what is missing, what already exists as the extension point, and the
 product signal that justifies building it. Building any of these without the
 signal is the failure mode this repo was designed to avoid.
 
+This roadmap is directional, not a delivery commitment. Entries describe
+current extension points and reevaluation signals; they do not promise that a
+feature will be implemented or accepted on a particular schedule.
+
 ## Deliberately not built
 
 ### Forms wiring (React Hook Form + Zod reference) — SHIPPED (2026-07)
@@ -39,8 +43,8 @@ signal is the failure mode this repo was designed to avoid.
   never disagree. `LocaleControl` replaced the showcase's direction toggle
   (direction is a property of language, not an independent control), is a
   direct two-language toggle, and renders nothing on a single-locale
-  deployment. Every route stays statically
-  prerendered; the default catalogue is bundled and other locales are
+  deployment. Every application page stays statically prerendered; the default
+  catalogue is bundled and other locales are
   code-split, so a single-locale build carries no second-locale catalogue.
   The `(site)` showcase is translated to Arabic end to end (top bar included)
   as the proof. Full
@@ -173,8 +177,9 @@ Honest defects and frictions, none currently blocking:
    §3 lists those call sites precisely.
 4. **The showcase gate requires a rebuild to flip.**
    `NEXT_PUBLIC_ENABLE_SHOWCASE` is inlined at build time — the price of
-   keeping every route statically prerendered. A runtime kill-switch would
-   force dynamic rendering; not worth it.
+   keeping every Showcase page and its GET reference handler statically
+   prerendered. A runtime page kill-switch would force dynamic rendering; not
+   worth it. The reference form's POST handler remains request-time dynamic.
 5. **Browser-matrix CI grows linearly with routes** (~4 console cells + ~4
    axe scans per page). Currently cheap (see `docs/TESTING.md` § CI for the
    measured numbers and the decision); revisit the full-matrix-on-PR policy

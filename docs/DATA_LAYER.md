@@ -223,8 +223,8 @@ one already expresses accessible errors. See `docs/ROADMAP.md`.
 
 ### Server prefetch / HydrationBoundary
 
-Nothing in the foundation prefetches (every route is static). When a product
-adds a dynamic route that should render with data:
+Nothing in the foundation prefetches because every current application page is
+static. When a product adds a dynamic page that should render with data:
 
 ```tsx
 // page.tsx (Server Component)

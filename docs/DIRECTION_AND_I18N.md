@@ -17,14 +17,15 @@ locale runtime (see below).
 Localization slot in `AppProvider`). The two decisions that shaped it:
 
 **Routing: static locale per deployment, plus an optional client runtime — no
-locale routing.** The foundation's hard constraint is that every route is
-statically prerendered. Each strategy was judged against it: a **cookie**-read
-locale opts every route into dynamic rendering (a regression); **domain**
+locale routing.** The foundation's hard constraint is that every renderable
+application page is statically prerendered. Each strategy was judged against
+it: a **cookie**-read locale opts every page into dynamic rendering (a
+regression); **domain**
 routing needs host detection via middleware; **sub-path `/[locale]/…`** can
 stay static with `generateStaticParams` but forces the `/`→`/locale` redirect
 through middleware (dynamic), nests the whole route tree under a `[locale]`
 segment, and taxes the common case — a single-locale product pays for routing
-it never uses. So the base is **build-time static locale** (every route
+it never uses. So the base is **build-time static locale** (every page
 prerenders in the configured locale), and multi-locale deployments layer a
 **client-side switch** modelled exactly on the theme runtime: localStorage +
 cross-tab `storage` sync + a pre-paint script that sets `<html lang/dir>` with
@@ -111,7 +112,7 @@ and **per-locale-URL routing** (see the routing decision above).
 from switching _locale_.** Direction follows locale, never the reverse — nobody
 wants English rendered right-to-left, so there is no standalone direction
 control. The server-rendered `<html dir>` is the configured default (keeping
-every route statically prerenderable); when a multi-locale deployment's visitor
+every application page statically prerenderable); when a multi-locale deployment's visitor
 selects a locale, `LocaleProvider` sets `lang`/`dir` from `LOCALE_INFO` in one
 move (pre-paint on return visits, so direction never flashes). A cookie- or
 storage-driven `dir` divorced from a locale choice was rejected: it would force

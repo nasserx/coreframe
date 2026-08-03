@@ -1,8 +1,7 @@
 # Cloning this foundation
 
 How to start a product from this repository: template setup, the
-clone-and-rename procedure, and a first-run checklist designed to take a
-developer from clone to a first product page in under 30 minutes.
+clone-and-rename procedure, and a verifiable first-run checklist.
 
 ## 1. Template setup (repository owner, once)
 
@@ -12,8 +11,6 @@ Coreframe's canonical repository is `https://github.com/nasserx/coreframe`.
 git clone https://github.com/nasserx/coreframe.git
 cd coreframe
 ```
-
-The examples below use `D:\projects\coreframe` as the local working copy.
 
 When this repository is pushed to GitHub, the owner enables
 **Settings → General → Template repository** (or runs
@@ -167,9 +164,10 @@ historical reviews) and `docs/ROADMAP.md` (or repurpose it as your own).
   which Next.js permits by default. A clone that deliberately serves the dev
   site through another origin can add a reviewed `allowedDevOrigins` entry to
   `next.config.ts`; Coreframe does not ship a machine-specific allowlist.
-- CI works with zero configuration: `.github/workflows/ci.yml` needs no
-  secrets, no environment, no registry access — it runs on the first PR of
-  a fresh clone as-is.
+- The repository CI workflow needs no project secrets, deployment environment,
+  or private registry access. GitHub Actions must still be enabled, and GitHub
+  may require maintainer approval before a first-time fork contributor's
+  workflow runs.
 
 ## 3a. Ship in one language (the common case)
 
@@ -203,21 +201,24 @@ shape):
    default direction. Review the `[dir="rtl"]` ramp metrics in
    `src/styles/theme.css` as well.
 
-That is the whole path: one config change and one catalogue. Every route stays
-statically prerendered, the bundle carries no multi-locale machinery, and the
-product is fully in your language, RTL and all. To serve **two** locales at
-once instead, keep `SUPPORTED` at two entries and translate both catalogues —
-`LocaleControl` then appears automatically; see
+That is the whole path: one config change and one catalogue. Application pages
+stay statically prerendered, the bundle carries no multi-locale routing
+machinery, and the configured language and direction apply throughout the
+page UI. The Showcase reference form's POST handler remains request-time
+dynamic; locale configuration does not change its rendering mode. To serve
+**two** locales at once instead, keep `SUPPORTED` at two entries and translate
+both catalogues — `LocaleControl` then appears automatically; see
 `docs/DIRECTION_AND_I18N.md` for the full add-a-locale procedure and the
 routing decision.
 
-## 4. First-run checklist (~30 minutes)
+## 4. First-run checklist
 
 Do these in order; each step states what proves it worked.
 
 1. **Toolchain** — install Node 24.18.0 (`nvm use` reads `.nvmrc`). `node -v`
    prints `v24.18.0`.
-2. **Install** — `npm ci`. Exits 0; `prepare` installs the git hooks.
+2. **Install** — `npm ci`. A successful install runs the root `prepare` script,
+   which configures the Git hooks.
 3. **First run** — `npm run dev`, open `http://localhost:3000`. The browser
    tab reads `Coreframe — Frontend Architecture Foundation` from
    `APP_CONFIG`, while the header and footer lockups on the page read
@@ -240,13 +241,14 @@ Do these in order; each step states what proves it worked.
    Finish with `grep -ri coreframe src` — it should return nothing but
    incidental prose you have chosen to keep.
 
-5. **Gates** — `npm run lint && npm run typecheck && npm test`. All exit 0
-   untouched; you now know the gates are green before your first change.
+5. **Gates** — `npm run lint && npm run typecheck && npm test`. These should
+   pass in a compatible clean clone; investigate and report any baseline
+   failure before building on it.
    (The browser layer, `npm run test:e2e`, is **not** in this line: it has two
    prerequisites — a prior `npm run build` and a one-time
-   `npx playwright install chromium` — and CI runs it for you on every push.
-   Run it locally only when you touch layout, fonts, or accessibility; see
-   `docs/TESTING.md`.)
+   `npx playwright install chromium` — and CI runs it for pull requests to
+   `main` and pushes to `main`. Run it locally when you touch rendered browser
+   behavior; see `docs/TESTING.md`.)
 6. **First page** — a page never renders its own `<main>`; the layout that
    provides the chrome owns that landmark (`docs/LAYOUT.md` § The main
    landmark). The only route group that ships is `(marketing)`, and its
@@ -301,8 +303,9 @@ Do these in order; each step states what proves it worked.
    wrong.
 8. **Commit** — `git add -A && git commit -m "feat: first product page"`.
    The pre-commit hook formats and lints; commitlint enforces the message
-   format. A push/PR runs the full CI pipeline including the browser matrix
-   over your new route — route discovery picked it up automatically.
+   format. A pull request targeting `main` (or a push to `main`) runs the full
+   CI pipeline including the browser matrix over your new route — route
+   discovery picks it up automatically.
 
 Where to go next: `ARCHITECTURE.md` for placement rules,
 `docs/DATA_LAYER.md` to point at your backend, `docs/DESIGN_TOKENS.md` §4

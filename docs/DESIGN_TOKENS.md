@@ -718,8 +718,9 @@ rejects it.
 An explicit choice persists in `localStorage` under the key `theme` and syncs
 across tabs through the `storage` event (a cleared key returns that tab to the
 OS fallback). **Tradeoff accepted:** a cookie would let the server render the
-correct theme class, but reading it forces every route into dynamic rendering —
-this foundation prerenders all routes statically and keeps it that way. The
+correct theme class, but reading it forces every application page into dynamic
+rendering — this foundation prerenders all application pages statically and
+keeps them that way. The
 costs of localStorage are (a) the server never knows the theme, and (b) a
 pre-paint script is required — which is needed for the OS fallback anyway,
 since no server can know `prefers-color-scheme` at static-generation time. If
@@ -757,7 +758,8 @@ message outside the provider.
 ### Hydration-safe consumption
 
 The runtime reads its store through `useSyncExternalStore` with a server
-snapshot of `"light"` — the value every route is statically prerendered in.
+snapshot of `"light"` — the value every application page is statically
+prerendered in.
 Server markup and the first client render therefore always agree; the value
 settles to the resolved theme immediately after hydration. The document class
 itself is always correct before first paint via the inline script, so
