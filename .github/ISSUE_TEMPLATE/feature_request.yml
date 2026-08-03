@@ -1,0 +1,60 @@
+name: Feature request
+description: Propose a reusable capability for the Coreframe foundation.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Coreframe accepts capabilities that belong in a reusable foundation. Product-specific requirements should remain in the downstream product. Do not disclose security vulnerabilities here; follow [SECURITY.md](https://github.com/nasserx/coreframe/blob/main/SECURITY.md).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the reusable problem without assuming a particular implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: capability
+    attributes:
+      label: Proposed capability
+      description: Explain the behavior or contract Coreframe should provide.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Primary architectural layer
+      options:
+        - App and routing
+        - Core infrastructure
+        - Feature pattern
+        - Shared UI or design system
+        - Data or forms
+        - Internationalization or RTL
+        - Testing, tooling, or documentation
+        - Other or uncertain
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include existing project/platform capabilities and downstream-only solutions.
+
+  - type: textarea
+    id: implications
+    attributes:
+      label: Cross-cutting implications
+      description: Describe RTL/LTR, accessibility, testing, compatibility, migration, and maintenance effects where applicable.
+
+  - type: textarea
+    id: foundation_fit
+    attributes:
+      label: Why this belongs in Coreframe
+      description: Explain why more than one downstream product would benefit and why an extension point is insufficient.
+    validations:
+      required: true

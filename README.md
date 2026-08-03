@@ -1,182 +1,155 @@
 # Coreframe — Frontend Architecture Foundation
 
-**Coreframe** is a reusable, domain-neutral Next.js (App Router) application
-base for future web products: agreed tooling, folder boundaries, a token-driven
-theme system, testing, and standards — no product features or business logic.
-The Showcase routes are Coreframe inspection code, not product pages. This
-README is the entry point; every deeper topic links to its owning document.
+Coreframe is a reusable, domain-neutral frontend architecture foundation for
+building Next.js applications. It provides an opinionated structure, shared UI
+contracts, and a layered validation baseline; it is not a completed business
+product and contains no product-specific backend, authentication, deployment,
+or operational model.
 
-The identity contract — the brand, its official descriptor, and the `coreframe`
-technical identifier — is recorded in `DECISIONS.md` → _Project identity:
-Coreframe_.
+The repository includes:
 
-## Start here
+- Next.js App Router, React, and strict TypeScript;
+- Tailwind CSS v4 with semantic design tokens, light/dark themes, and restrained
+  motion;
+- English/Arabic message catalogues with LTR/RTL behavior and script-aware
+  Inter/Tajawal typography;
+- reusable application, site, and marketing shell patterns;
+- shadcn/ui components adapted to the Base UI runtime;
+- React Hook Form and Zod reference wiring, a typed fetch boundary, and TanStack
+  Query integration;
+- accessibility-oriented component contracts and axe-assisted browser checks;
+- Vitest component tests and a Playwright matrix covering routes, themes,
+  directions, responsive behavior, forms, fonts, errors, and browser console
+  output.
 
-1. **Building a product from this repo?** Follow **[`docs/CLONING.md`](docs/CLONING.md)** —
-   the clone-and-rename procedure and a first-run checklist that takes you
-   from clone to your first product page in under 30 minutes.
-2. **Contributing to the foundation itself?** Read `ARCHITECTURE.md`, then
-   `CONTRIBUTING.md` and `CODE_STYLE.md`.
-3. **Wondering why something is missing?** It is probably deliberate — see
-   **[`docs/ROADMAP.md`](docs/ROADMAP.md)** for what is intentionally absent
-   and what signal triggers building it.
+## Requirements and local setup
 
-Requirements: **Node 24.18.0** (`.nvmrc` pins the CI and local runtime;
-`package.json#engines` supports Node `>=24.18.0 <25`) and npm.
+- Node.js **24.18.0** (`.nvmrc`); `package.json#engines` accepts
+  `>=24.18.0 <25`.
+- npm from the supported Node.js installation.
+
+Use the committed lockfile for a reproducible installation:
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000 — /showcase is the living demo
+git clone https://github.com/nasserx/coreframe.git
+cd coreframe
+nvm use
+npm ci
+npm run dev
 ```
 
-## Documentation map
+Open <http://localhost:3000>. The demonstrative Showcase is available at
+<http://localhost:3000/showcase> while its build-time flag is enabled.
 
-| Document                     | Owns                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| `ARCHITECTURE.md`            | Layers, folder charters, dependency direction, theme runtime overview    |
-| `docs/CLONING.md`            | Using this repo as a template: rename, configure, first-run checklist    |
-| `docs/ROADMAP.md`            | What is deliberately not built yet, and known open issues                |
-| `docs/DESIGN_TOKENS.md`      | The full token contract, verified contrast, rebranding procedure         |
-| `docs/LAYOUT.md`             | Layout vocabulary: measure, rhythm, PageHeader, AppShell                 |
-| `docs/DATA_LAYER.md`         | `apiFetch`, `ApiError`, React Query contract, route-level error handling |
-| `docs/DIRECTION_AND_I18N.md` | RTL/Arabic support, logical properties, the message translation layer    |
-| `docs/TESTING.md`            | Both test layers, what is deliberately untested, CI                      |
-| `docs/UI_LIBRARY.md`         | The shadcn/Base UI adaptation standard for `src/components/ui`           |
-| `DESIGN_SYSTEM.md`           | Primitive design philosophy and completion checklist                     |
-| `CODE_STYLE.md`              | Naming, imports, exports, TypeScript usage                               |
-| `CONTRIBUTING.md`            | Feature placement, shared-code promotion, PR expectations                |
-| `DECISIONS.md`               | The decision log — every stack choice with reasoning                     |
-| `LICENSE`                    | MIT terms for Coreframe's original work                                  |
-| `SECURITY.md`                | Supported versions and private vulnerability reporting                   |
-| `THIRD_PARTY_NOTICES.md`     | Notices for redistributed or adapted third-party material                |
-| `docs/audit/`                | Historical point-in-time reviews (do not read as current state)          |
+To adapt Coreframe into a product, follow [`docs/CLONING.md`](docs/CLONING.md).
+It identifies every rename/configuration owner, the available Showcase removal
+paths, and the first feature/page boundaries. A product should replace the
+foundation presentation and make its own decisions about authentication,
+data, deployment, monitoring, privacy, and compliance.
 
-## Tech stack
+## Architecture at a glance
 
-Next.js App Router · React · TypeScript (strict) · Tailwind CSS v4
-(CSS-first) · shadcn/ui on the Base UI runtime · React Query · Zod · sonner.
-HTTP goes through the foundation's own `apiFetch` (native fetch + one typed
-error shape, `src/api`) — no axios. Form and client-state libraries (React
-Hook Form, zustand — both already decided in `DECISIONS.md`) are installed
-when a product first needs them, not preinstalled. Every dependency has a
-`DECISIONS.md` entry.
+- `src/app` owns routes and framework wiring.
+- `src/features` owns product capabilities and their private implementation.
+- `src/core` owns cross-cutting application infrastructure.
+- `src/components` contains intentionally reusable presentation and shell
+  components.
+- `src/api` owns the HTTP/error boundary.
+- `src/i18n` owns typed message catalogues and translation access.
+- `src/styles` is the runtime source of truth for semantic tokens and themes.
+- Foundation folders such as `config`, `lib`, `utils`, `types`, and `constants`
+  must stay independent from product features.
 
-## Folder overview
+The complete layer responsibilities and dependency direction live in
+[`ARCHITECTURE.md`](ARCHITECTURE.md). Durable choices and rejected alternatives
+are recorded in [`DECISIONS.md`](DECISIONS.md).
 
-- `src/app`: App Router files only (routes, layouts, route-level error files).
-- `src/core`: cross-cutting infrastructure — provider composition (theme,
-  locale, query, error boundary, toaster) and shared error UI; logger/
-  monitoring/analytics/guards/accessibility are chartered placeholders.
-- `src/components`: intentionally cross-feature presentation components;
-  primitives in `src/components/ui`.
-- `src/features`: feature-first product modules. `marketing` owns the production
-  public composition for `/`; `showcase` remains the Coreframe inspection
-  surface.
-- `src/api`: the API boundary — `apiFetch` and the typed `ApiError` contract.
-- `src/i18n`: the message layer — typed catalogues and the pure translation
-  resolver; its client runtime is `LocaleProvider` in `src/core/providers`.
-- `src/services`: application service boundaries (chartered placeholder).
-- `src/store`: shared client state (empty by design; see `docs/DATA_LAYER.md`).
-- `src/styles`: the CSS token system — the single source of truth for theming.
-- `src/theme`: the TypeScript breakpoint mirror only (matchMedia cannot read
-  CSS variables).
-- `src/config`: app identity, environment validation, flags, route constants.
-- `src/assets`: source-controlled fonts/icons/images; third-party assets ship
-  with their licenses (Tajawal Arabic subsets: SIL OFL 1.1,
-  `src/assets/fonts/OFL.txt`).
-- `src/hooks`, `src/lib`, `src/utils`, `src/types`, `src/constants`:
-  foundation folders — each README states what belongs and what must not.
+## Showcase and route model
 
-## The showcase
+`/showcase` is demonstrative inspection code for Coreframe's primitives,
+tokens, shells, forms, and data contracts. It is not downstream product UI.
 
-`/showcase` is the foundation's living integration test: every primitive,
-token, layout, and data-layer contract rendered and exercised by the browser
-test matrix. It is **not** product UI.
+- Keep it during foundation/product development.
+- Set `NEXT_PUBLIC_ENABLE_SHOWCASE=false` during a production build to make the
+  Showcase pages and GET reference endpoint return statically generated 404s.
+- Remove the Showcase source permanently by following
+  [`docs/CLONING.md`](docs/CLONING.md).
 
-The root `/` route is the production marketing surface and is owned separately
-under `src/features/marketing`; it may demonstrate Coreframe capabilities, but
-it must not import Showcase components or depend on Showcase routes being
-enabled.
-
-- **Development:** enabled by default; keep it while building.
-- **Release:** set `NEXT_PUBLIC_ENABLE_SHOWCASE=false` at build time and every
-  `/showcase` route (and its `/api/showcase/records` endpoint) prerenders as a
-  static 404 — no dynamic rendering, no code changes.
-- **Permanently:** delete the three showcase locations (`docs/CLONING.md`).
+The current application pages are statically prerendered. The GET reference
+handler at `/api/showcase/records` is also static. The reference form's
+`POST /api/showcase/forms/reference` handler is intentionally dynamic because
+POST requests are processed on demand; it returns 404 at request time when the
+Showcase is disabled.
 
 ## Commands
 
 ```bash
-npm run dev           # dev server
-npm run build         # production build (all routes statically prerendered)
-npm run lint          # ESLint (includes the dependency-direction and
-                      # logical-properties rules)
-npm run format        # Prettier write; format:check verifies (CI)
-npm run typecheck     # tsc --noEmit
-npm test              # unit/component layer (Vitest + Testing Library)
-npm run test:e2e      # browser layer (Playwright); needs `npm run build`
-                      # first and a one-time `npx playwright install chromium`
+npm run dev           # local development server
+npm run format:check  # verify Prettier formatting
+npm run lint          # ESLint, including architecture and logical-CSS rules
+npm run typecheck     # TypeScript without emitting files
+npm test              # Vitest unit/component tests
+npm run build         # optimized production build and route summary
+npm run test:e2e      # Playwright browser matrix; build and Chromium required
 ```
 
-## Quality gates
+The CI workflow runs a clean `npm ci` followed by formatting, lint, type
+checking, unit tests, a production build, and browser tests. See
+[`docs/TESTING.md`](docs/TESTING.md) for responsibilities, prerequisites, and
+the stable required-check contract.
 
-- **On commit** (Husky): lint-staged (`eslint --fix` + `prettier --write` on
-  staged files); commitlint enforces Conventional Commits.
-- **In CI** (`.github/workflows/ci.yml`, PRs and pushes to `main`): `npm ci`,
-  then `format:check → lint → typecheck → unit tests → build → browser
-tests`, failing fast. Node version comes from `.nvmrc`. The workflow needs
-  no secrets or configuration — it works on day one in a fresh clone/fork.
+## Documentation map
 
-Environment variables are validated fail-fast at startup: `next.config.ts`
-imports `src/config/env-validation.ts` (the Zod validator, kept separate so
-Zod never ships to the client — `src/config/env.ts` holds the client-safe
-typed values). It throws with the offending variable names. See the comment
-in `env.ts` for how to add a variable.
+| Document                                                   | Owns                                                    |
+| ---------------------------------------------------------- | ------------------------------------------------------- |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md)                       | Layers, folder ownership, and dependency direction      |
+| [`DECISIONS.md`](DECISIONS.md)                             | Durable technical and project decisions                 |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)                       | External setup, validation, PR, and review expectations |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)                 | Community participation and conduct reporting           |
+| [`docs/CLONING.md`](docs/CLONING.md)                       | Adapting, renaming, and configuring the foundation      |
+| [`docs/TESTING.md`](docs/TESTING.md)                       | Vitest, Playwright, CI, and test ownership              |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md)                       | Deliberate omissions, open issues, and revisit signals  |
+| [`docs/DESIGN_TOKENS.md`](docs/DESIGN_TOKENS.md)           | Tokens, typography, motion, contrast, and rebranding    |
+| [`docs/LAYOUT.md`](docs/LAYOUT.md)                         | Layout vocabulary and shell contracts                   |
+| [`docs/DATA_LAYER.md`](docs/DATA_LAYER.md)                 | Typed fetch, errors, forms, queries, and route errors   |
+| [`docs/DIRECTION_AND_I18N.md`](docs/DIRECTION_AND_I18N.md) | English/Arabic, LTR/RTL, bidi, and locale behavior      |
+| [`docs/UI_LIBRARY.md`](docs/UI_LIBRARY.md)                 | shadcn/Base UI adaptation workflow                      |
+| [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)                     | Primitive design philosophy and completion checks       |
+| [`CODE_STYLE.md`](CODE_STYLE.md)                           | Naming, imports, exports, and TypeScript conventions    |
+| [`SECURITY.md`](SECURITY.md)                               | Supported versions and private vulnerability reporting  |
+| [`LICENSE`](LICENSE)                                       | MIT terms for Coreframe's original work                 |
+| [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)         | Redistributed/adapted third-party notices               |
 
-## Security
+Files under `docs/audit/` are historical point-in-time evidence, not current
+project guidance.
 
-Do not report vulnerabilities through public Issues. Supported versions,
-private reporting instructions, and response expectations are defined in
-[`SECURITY.md`](SECURITY.md). Current dependency-advisory analysis lives in
-[`docs/ROADMAP.md`](docs/ROADMAP.md); archived audits are historical evidence,
-not the current posture.
+## Downstream responsibilities
+
+Coreframe's tests and documented contracts are a starting point, not a
+certification or production guarantee. Every application created from it must
+perform its own security, accessibility, privacy, legal/compliance,
+performance, browser-support, deployment, and operational review for its data,
+users, integrations, and threat model.
+
+## Support and maintenance
+
+Security fixes currently cover `main` and the `2.0.x` release line as defined
+in [`SECURITY.md`](SECURITY.md). General maintenance and community support are
+best-effort unless explicitly stated otherwise. A proposal or pull request may
+be declined when it does not fit the reusable foundation, maintenance capacity,
+or documented architecture. The [`roadmap`](docs/ROADMAP.md) is directional
+and records triggers for reconsideration; it is not a delivery commitment.
+
+Security reports must never be submitted through public Issues. Follow the
+private process in [`SECURITY.md`](SECURITY.md).
 
 ## License
 
 Coreframe is released under the [MIT License](LICENSE), copyright © 2026
-Nasser Ahmed.
-
-Third-party material retains its own licenses and notices; see
+Nasser Ahmed. Third-party material retains its own licenses and notices; see
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and the Tajawal font's
-colocated [`OFL.txt`](src/assets/fonts/OFL.txt). The package remains marked
-`"private": true` to guard against accidental npm publication. The MIT grant
-does not establish or authorize an official npm publication.
+colocated [`OFL.txt`](src/assets/fonts/OFL.txt).
 
-## Direction & internationalization
-
-The foundation is direction-agnostic and Arabic-ready: all styling uses CSS
-logical properties (lint-enforced), and the sans stack lists Tajawal first —
-vendored as Arabic-only subsets and scoped by `unicode-range`, so Latin renders
-in Inter while Arabic cannot be intercepted by the Latin metric fallback.
-Locale/direction/numeral configuration lives in `src/config/app.ts`.
-
-**Message translation ships.** It is a typed in-repo layer — `src/i18n`
-(catalogues typed against canonical English, so a missing key fails
-`typecheck`, plus a pure `{placeholder}` resolver) with `LocaleProvider` in
-`src/core/providers` as its client runtime and `LocaleControl` as the
-switcher. Two decisions shaped it, both recorded in `DECISIONS.md`:
-
-- **Static locale per deployment, no locale routing.** Every route stays
-  statically prerendered, which rules out cookie, domain, and sub-path
-  strategies; a multi-locale deployment layers a client-side switch modelled
-  on the theme runtime (localStorage + cross-tab sync + a pre-paint
-  `lang`/`dir` script). Direction always follows the selected language — it is
-  never an independent toggle.
-- **No i18n library.** Since the foundation does not use locale routing or
-  negotiation, what remained is ~150 lines; shipping a library's runtime on
-  the single-locale common path to use a fraction of it is the opposite of the
-  discipline that removed axios and zustand.
-
-The default catalogue is bundled and every other locale is code-split, so a
-single-locale deployment pays effectively nothing and never downloads a second
-locale's bytes. Full architecture: `docs/DIRECTION_AND_I18N.md`.
+The package remains marked `"private": true` to prevent accidental npm
+publication. The MIT license does not establish or authorize an official npm
+publication.

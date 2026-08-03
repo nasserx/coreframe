@@ -3,6 +3,24 @@
   "version": "2.0.0",
   "private": true,
   "license": "MIT",
+  "description": "Reusable Next.js frontend architecture foundation with semantic design tokens, RTL support, accessible UI patterns, and layered testing.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nasserx/coreframe"
+  },
+  "homepage": "https://github.com/nasserx/coreframe#readme",
+  "bugs": {
+    "url": "https://github.com/nasserx/coreframe/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "typescript",
+    "frontend",
+    "design-system",
+    "rtl",
+    "accessibility"
+  ],
   "engines": {
     "node": ">=24.18.0 <25"
   },

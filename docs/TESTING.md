@@ -235,10 +235,11 @@ a `CI=1` run.
 
 `.github/workflows/ci.yml` runs `format:check → lint → typecheck → unit
 tests → build → browser tests` in one job, on every PR and push to `main`,
-with no secrets or configuration — a fresh clone's CI is green on day one.
+without project secrets, deployment environments, or private registry access.
 Node comes from `.nvmrc` (currently `24.18.0`, matching the `engines` range in
-`package.json`). The browser step downloads Chromium only on a Playwright
-version change (cached otherwise).
+`package.json`). GitHub may require approval before a first-time fork
+contributor's workflow runs. The browser step downloads Chromium only on a
+Playwright version change (cached otherwise).
 
 ### Required-check contract
 
