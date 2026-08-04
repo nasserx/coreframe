@@ -10,10 +10,10 @@ import { en } from "@/i18n/messages/en";
 import { MarketingShell } from "./marketing-shell";
 
 /*
- * Contract of the marketing footer composition. Structure, destinations, and
- * bilingual behavior are DOM facts and belong here; direction geometry,
- * responsive columns, overflow, and axe live in the browser layer
- * (tests/e2e/marketing.spec.ts).
+ * Contract of the marketing shell composition. Structure, destinations, and
+ * bilingual behavior are DOM facts and belong here; resolved responsive
+ * interaction states, direction geometry, overflow, and axe live in the
+ * browser layer (tests/e2e/marketing.spec.ts).
  */
 
 // SiteShell dismisses its drawer on route change via usePathname; component
@@ -31,6 +31,13 @@ const FOOTER_DESTINATIONS = [
   { key: "footerBilingualDesign", href: "#bilingual-design" },
   { key: "footerQuality", href: "#quality" },
   { key: "footerFaq", href: "#faq" },
+] as const;
+
+const HEADER_DESTINATIONS = [
+  { key: "navOverview", href: "#overview" },
+  { key: "navCapabilities", href: "#capability-story" },
+  { key: "navArchitecture", href: "#architecture" },
+  { key: "navQuality", href: "#quality" },
 ] as const;
 
 function installBrowserStubs(): void {
@@ -76,6 +83,12 @@ function footer(): HTMLElement {
   return screen.getByRole("contentinfo");
 }
 
+function headerNav(): HTMLElement {
+  return within(screen.getByRole("banner")).getByRole("navigation", {
+    name: en.marketing.navLabel,
+  });
+}
+
 function footerNav(): HTMLElement {
   const nav = footer().querySelector('[data-slot="marketing-footer-nav"]');
   if (!(nav instanceof HTMLElement)) {
@@ -83,6 +96,39 @@ function footerNav(): HTMLElement {
   }
   return nav;
 }
+
+describe("MarketingShell header navigation", () => {
+  beforeEach(() => {
+    installBrowserStubs();
+  });
+
+  it("keeps ordered fragment destinations and applies only the desktop interaction override", () => {
+    renderMarketingShell();
+
+    const links = within(headerNav()).getAllByRole("link");
+    expect(links.map((link) => link.textContent)).toEqual(
+      HEADER_DESTINATIONS.map(({ key }) => en.marketing[key]),
+    );
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(
+      HEADER_DESTINATIONS.map(({ href }) => href),
+    );
+
+    for (const link of links) {
+      expect(link).not.toHaveAttribute("aria-current");
+      expect(link).toHaveClass(
+        "font-semibold",
+        "text-foreground",
+        "hover:text-muted-foreground",
+        "focus-visible:ring-2",
+        "md:text-muted-foreground",
+        "md:hover:text-foreground",
+        "md:focus-visible:text-foreground",
+        "md:active:text-foreground",
+        "md:aria-[current=page]:text-foreground",
+      );
+    }
+  });
+});
 
 describe("MarketingShell footer", () => {
   beforeEach(() => {

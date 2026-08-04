@@ -358,6 +358,29 @@ async function getCardSemanticColors(page: Page) {
   });
 }
 
+async function getNavigationSemanticColors(page: Page) {
+  return page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.position = "fixed";
+    probe.style.visibility = "hidden";
+    const tokenOwner = document.querySelector('[data-slot="site-shell-nav"]');
+    if (!tokenOwner) throw new Error("The navigation color check requires its token owner.");
+    tokenOwner.append(probe);
+
+    const resolveColor = (value: string) => {
+      probe.style.color = value;
+      return getComputedStyle(probe).color;
+    };
+    const result = {
+      foreground: resolveColor("var(--foreground)"),
+      mutedForeground: resolveColor("var(--muted-foreground)"),
+    };
+
+    probe.remove();
+    return result;
+  });
+}
+
 test("root marketing route owns one landmark set and a resolved primary action", async ({
   page,
 }) => {
@@ -481,6 +504,83 @@ test("desktop and drawer navigation share four ordered, unique page targets", as
       return ids.filter((id, index) => ids.indexOf(id) !== index);
     });
     expect(duplicateIds).toEqual([]);
+  }
+});
+
+test("marketing header navigation preserves responsive interaction states", async ({ page }) => {
+  for (const { theme, locale } of STATES) {
+    await page.setViewportSize({ width: 1024, height: 900 });
+    await gotoMarketingState(page, theme, locale);
+
+    const colors = await getNavigationSemanticColors(page);
+    const banner = page.getByRole("banner");
+    const desktopNavigation = banner.getByRole("navigation", { name: COPY[locale].navLabel });
+    const desktopLinks = desktopNavigation.getByRole("link");
+    await expect(desktopLinks).toHaveText(COPY[locale].navigation.map(({ label }) => label));
+
+    for (const [index, { href }] of COPY[locale].navigation.entries()) {
+      const link = desktopLinks.nth(index);
+      await expect(link, `desktop idle [${theme}/${locale}] ${href}`).toHaveCSS(
+        "color",
+        colors.mutedForeground,
+      );
+      await expect(link).toHaveCSS("font-weight", "600");
+      await expect(link).not.toHaveAttribute("aria-current");
+    }
+
+    const first = desktopLinks.first();
+    await first.hover();
+    await expect(first, `desktop hover [${theme}/${locale}]`).toHaveCSS("color", colors.foreground);
+
+    const brand = banner.getByRole("link", { name: COPY[locale].brand, exact: true });
+    await brand.focus();
+    await page.keyboard.press("Tab");
+    await expect(first, `desktop keyboard order [${theme}/${locale}]`).toBeFocused();
+    expect(await first.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+    await expect(first, `desktop focus color [${theme}/${locale}]`).toHaveCSS(
+      "color",
+      colors.foreground,
+    );
+    expect(
+      await first.evaluate((element) => getComputedStyle(element).boxShadow),
+      `desktop focus ring [${theme}/${locale}]`,
+    ).not.toBe("none");
+
+    const second = desktopLinks.nth(1);
+    const bounds = await second.boundingBox();
+    if (!bounds) throw new Error("The pressed-state check requires a visible navigation link.");
+    await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(1, 899);
+    expect(await second.evaluate((element) => element.matches(":active"))).toBe(true);
+    expect(await second.evaluate((element) => element.matches(":hover"))).toBe(false);
+    await expect(second, `desktop pressed [${theme}/${locale}]`).toHaveCSS(
+      "color",
+      colors.foreground,
+    );
+    await page.mouse.up();
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole("button", { name: COPY[locale].openNav }).click();
+    const drawer = page.getByRole("dialog", { name: COPY[locale].navLabel });
+    const drawerLinks = drawer.getByRole("link");
+    await expect(drawerLinks).toHaveText(COPY[locale].navigation.map(({ label }) => label));
+
+    for (const [index, { href }] of COPY[locale].navigation.entries()) {
+      const link = drawerLinks.nth(index);
+      await expect(link, `drawer idle [${theme}/${locale}] ${href}`).toHaveCSS(
+        "color",
+        colors.foreground,
+      );
+      await expect(link).not.toHaveAttribute("aria-current");
+    }
+
+    const drawerFirst = drawerLinks.first();
+    await drawerFirst.hover();
+    await expect(drawerFirst, `drawer hover [${theme}/${locale}]`).toHaveCSS(
+      "color",
+      colors.mutedForeground,
+    );
   }
 });
 

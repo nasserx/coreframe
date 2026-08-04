@@ -47,8 +47,9 @@ const FOOTER_LINKS = [
 ] as const;
 
 // Shared by the footer brand lockup and every footer destination: a focus ring
-// on the semantic ring token, and the same recede-on-hover feedback the header
-// navigation uses (SiteShellNavItem) so both chrome regions read as one system.
+// on the semantic ring token. Footer destinations retain the shared
+// recede-on-hover treatment; the marketing header inverts that hierarchy only
+// for its desktop navigation at the SiteShellNavItem call site.
 const FOOTER_FOCUS_RING =
   "rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
@@ -94,7 +95,11 @@ export function MarketingShell({ children }: MarketingShellProps) {
 
         <SiteShellNav label={t("navLabel")} closeLabel={tShell("closeNav")}>
           {navigationItems.map(({ href, label }) => (
-            <SiteShellNavItem key={href} href={href}>
+            <SiteShellNavItem
+              key={href}
+              href={href}
+              className="md:text-muted-foreground md:hover:text-foreground md:focus-visible:text-foreground md:active:text-foreground md:aria-[current=page]:text-foreground"
+            >
               {label}
             </SiteShellNavItem>
           ))}
