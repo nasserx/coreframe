@@ -6,6 +6,13 @@ contracts, and a layered validation baseline; it is not a completed business
 product and contains no product-specific backend, authentication, deployment,
 or operational model.
 
+## Live Demo
+
+- [Coreframe demo](https://coreframe-one.vercel.app)
+- [Component showcase](https://coreframe-one.vercel.app/showcase)
+
+The hosted site demonstrates Coreframe and is not a completed business product.
+
 The repository includes:
 
 - Next.js App Router, React, and strict TypeScript;
