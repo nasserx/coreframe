@@ -90,7 +90,7 @@ function StoryCard({ title, description, evidence, technologies, icon: Icon }: S
     >
       <div
         data-slot="marketing-story-icon"
-        className={`${styles["storyIcon"]} flex size-10 items-center justify-center self-start rounded-lg border bg-surface text-foreground`}
+        className={`${styles["storyIcon"]} flex size-10 items-center justify-center self-start rounded-lg border border-transparent bg-transparent text-foreground`}
       >
         <Icon
           aria-hidden={true}

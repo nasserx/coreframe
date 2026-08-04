@@ -349,8 +349,7 @@ async function getCardSemanticColors(page: Page) {
       foregroundLuminance:
         0.2126 * linearize(red) + 0.7152 * linearize(green) + 0.0722 * linearize(blue),
       primary: resolveColor("var(--primary)"),
-      border: resolveColor("var(--border)"),
-      surface: resolveBackground("var(--surface)"),
+      transparent: resolveBackground("transparent"),
       primaryTint: resolveBackground("color-mix(in oklab, var(--primary) 10%, transparent)"),
     };
 
@@ -953,10 +952,47 @@ test("informational story cards coordinate restrained hover feedback and reduced
         text: element.textContent,
         backgroundColor: getComputedStyle(element).backgroundColor,
       }));
+      const geometry = await iconWrapper.evaluate((element) => {
+        const wrapperBounds = element.getBoundingClientRect();
+        const glyph = element.querySelector<HTMLElement>(
+          '[data-slot="marketing-story-icon-glyph"]',
+        );
+        const technologies = element.nextElementSibling;
+        if (!glyph || !(technologies instanceof HTMLElement)) {
+          throw new Error("A story icon requires its glyph and technologies line.");
+        }
+        const glyphBounds = glyph.getBoundingClientRect();
+        const technologiesBounds = technologies.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          width: wrapperBounds.width,
+          height: wrapperBounds.height,
+          borderWidth: style.borderWidth,
+          glyphWidth: glyphBounds.width,
+          glyphHeight: glyphBounds.height,
+          glyphCenterDeltaX: Math.abs(
+            glyphBounds.x + glyphBounds.width / 2 - (wrapperBounds.x + wrapperBounds.width / 2),
+          ),
+          glyphCenterDeltaY: Math.abs(
+            glyphBounds.y + glyphBounds.height / 2 - (wrapperBounds.y + wrapperBounds.height / 2),
+          ),
+          gapToTechnologies: technologiesBounds.top - wrapperBounds.bottom,
+        };
+      });
 
       await expect(icon).toHaveCSS("color", semantic.foreground);
-      await expect(iconWrapper).toHaveCSS("background-color", semantic.surface);
-      await expect(iconWrapper).toHaveCSS("border-color", semantic.border);
+      await expect(iconWrapper).toHaveCSS("background-color", semantic.transparent);
+      await expect(iconWrapper).toHaveCSS("border-color", semantic.transparent);
+      expect(geometry).toEqual({
+        width: 40,
+        height: 40,
+        borderWidth: "1px",
+        glyphWidth: 20,
+        glyphHeight: 20,
+        glyphCenterDeltaX: 0,
+        glyphCenterDeltaY: 0,
+        gapToTechnologies: 20,
+      });
       await expect(card).not.toHaveAttribute("tabindex");
       await expect(card).not.toHaveAttribute("role");
       await expect(card).toHaveCSS("cursor", "auto");
@@ -995,7 +1031,9 @@ test("informational story cards coordinate restrained hover feedback and reduced
   await expect(reducedCard).toHaveCSS("translate", "none");
   await expect(reducedIcon).toHaveCSS("translate", "none");
   await expect(reducedIcon).toHaveCSS("color", lightSemantic.primary);
+  await expect(reducedIconWrapper).toHaveCSS("color", lightSemantic.primary);
   await expect(reducedIconWrapper).toHaveCSS("background-color", lightSemantic.primaryTint);
+  await expect(reducedIconWrapper).toHaveCSS("border-color", lightSemantic.primary);
   expect(consoleErrors).toEqual([]);
 });
 
@@ -1037,8 +1075,8 @@ test("informational story cards keep their static presentation in touch contexts
           color: getComputedStyle(element).color,
         }));
         expect(beforeIcon).toEqual({
-          backgroundColor: semantic.surface,
-          borderColor: semantic.border,
+          backgroundColor: semantic.transparent,
+          borderColor: semantic.transparent,
           color: semantic.foreground,
         });
 
