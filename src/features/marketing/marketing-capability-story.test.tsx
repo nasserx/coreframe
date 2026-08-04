@@ -126,10 +126,17 @@ describe("MarketingCapabilityStory", () => {
       expect(card.className).toContain("items-start");
       expect(card.className).toContain("text-start");
 
-      const icon = card.querySelector('[data-slot="marketing-story-icon"]');
-      expect(icon?.className).toContain("self-start");
-      expect(icon?.className).toContain("text-foreground");
-      expect(icon?.className).not.toContain("text-info");
+      const iconWrapper = card.querySelector('[data-slot="marketing-story-icon"]');
+      expect(iconWrapper).toHaveClass(
+        "size-10",
+        "self-start",
+        "rounded-lg",
+        "border",
+        "border-transparent",
+        "bg-transparent",
+        "text-foreground",
+      );
+      expect(iconWrapper).not.toHaveClass("bg-surface", "text-info");
 
       for (const slot of [
         "marketing-story-technologies",
@@ -142,10 +149,9 @@ describe("MarketingCapabilityStory", () => {
         expect(content?.className).toContain("w-full");
         expect(content?.className).toContain("text-start");
       }
-      expect(card.querySelector('[data-slot="marketing-story-icon-glyph"]')).toHaveAttribute(
-        "aria-hidden",
-        "true",
-      );
+      const iconGlyph = card.querySelector('[data-slot="marketing-story-icon-glyph"]');
+      expect(iconGlyph).toHaveAttribute("aria-hidden", "true");
+      expect(iconGlyph?.getAttribute("class")).toContain("size-5");
     }
 
     for (const specimen of document.querySelectorAll("figure")) {
