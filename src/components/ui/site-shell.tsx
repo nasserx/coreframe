@@ -351,19 +351,18 @@ export function SiteShellNav({
  * pill, no underline — weight and color distinguish states on a three-step
  * ladder that keeps nav items subordinate to the (larger, bolder) brand:
  *
- *   - idle link    → `text-foreground` + `font-semibold`; on hover it
- *                    LIGHTENS to `text-muted-foreground` (the item recedes
- *                    under the cursor rather than lighting up).
+ *   - idle link    → below `md`, `text-foreground` + `font-semibold` and
+ *                    `text-muted-foreground` on hover; from `md`, subdued
+ *                    `text-muted-foreground` that strengthens to
+ *                    `text-foreground` on hover, focus-visible, and active.
  *   - current page → `text-foreground` + `font-bold` (`aria-current`).
- *                    Weight is what marks it: idle links already sit at
- *                    full foreground strength, so color cannot carry
- *                    current — and weight, unlike an underline, does not
- *                    fight a dropdown menu opening beneath the item. Idle is
- *                    semibold (600) so a primary navigation label reads
- *                    clearly; current remains bold (700) as the persistent cue.
+ *                    Weight remains the persistent cue, while foreground
+ *                    color keeps the route distinct from subdued desktop
+ *                    idle links. An underline would fight a dropdown menu
+ *                    opening beneath the item. Idle remains semibold (600);
+ *                    current remains bold (700).
  *   - unavailable  → `text-muted-foreground` + `font-medium`, muted at
- *                    rest so it reads distinct from a full-strength idle
- *                    link; non-interactive, non-focusable, sr-only hint.
+ *                    rest; non-interactive, non-focusable, sr-only hint.
  *
  * Hover is color-only (no moving/growing element) so an item can later
  * host a dropdown trigger without the affordance fighting the menu.
@@ -417,12 +416,11 @@ export function SiteShellNavItem({
         : {})}
       className={cn(
         base,
-        // Idle: full-strength foreground at semibold weight (a primary
-        // interactive element should not read as thin), lightening
-        // (receding) on hover. Current: same color, distinguished by weight
-        // — see the component doc for why weight, not color or an underline,
-        // carries current.
-        "font-semibold text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        // Mobile preserves the foreground-to-muted-hover treatment. From md,
+        // inactive links are subdued and strengthen on interaction; the
+        // aria-current selector restores foreground independently of class
+        // merge order, while the calculated state continues to own weight.
+        "font-semibold text-foreground transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:text-muted-foreground md:hover:text-foreground md:focus-visible:text-foreground md:active:text-foreground md:aria-[current=page]:text-foreground",
         isCurrent && "font-bold hover:text-foreground",
         className,
       )}

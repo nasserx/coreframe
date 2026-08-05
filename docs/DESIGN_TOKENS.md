@@ -193,7 +193,7 @@ annotates, or demotes_):**
   `DialogDescription`, `AlertDialogDescription`, empty-state secondary lines,
   the error/`not-found` elaboration under the bold title, query-error detail.
 - Secondary navigation and de-emphasised affordances: breadcrumb trails, footer
-  link columns, the idle→hover recede on nav.
+  link columns, and inactive desktop SiteShell navigation before interaction.
 
 **The tie-breaker** when a paragraph sits inside a bordered/contained widget:
 if it is that widget's _supporting_ text next to a title that carries the

@@ -278,25 +278,28 @@ the navigation group's own item spacing remains `gap-1` (4px). The mark stays
 `currentColor` and receives `text-primary` from the composition; its
 inset glyph makes that outer box read in balance with the 36px header CTA
 without resizing the CTA. Nav items are secondary wayfinding at `text-small`,
-semibold weight, on a three-step ladder that inverts the usual "light up on
-hover":
+semibold weight, on a responsive three-step ladder:
 
-- **idle** → `text-foreground` + `font-semibold`, _lightening_ to
-  `text-muted-foreground` on hover (the item recedes under the cursor).
-  Semibold gives a primary interactive label the intended 600 UI weight.
+- **idle** → below `md`, `text-foreground` + `font-semibold`, changing to
+  `text-muted-foreground` on hover (the preserved drawer/mobile treatment).
+  From `md`, `text-muted-foreground` strengthens to `text-foreground` on
+  hover, focus-visible, and active. Semibold gives an interactive label the
+  intended 600 UI weight in both presentations.
 - **current** → `text-foreground` + `font-bold` (`aria-current`).
-  Because idle links already sit at full foreground strength, color cannot
-  carry current — **weight does**, and weight (unlike an underline) does
-  not fight a dropdown menu opening beneath the item. Current is bold, not
-  semibold, preserving a distinct persistent title cue without making normal
+  On desktop, foreground separates the route from subdued idle links; **weight
+  remains the persistent cue** in both presentations. Weight (unlike an
+  underline) does not fight a dropdown menu opening beneath the item. Current
+  is bold, not semibold, preserving a distinct route cue without making normal
   navigation bold.
 - **unavailable** → `text-muted-foreground` + `font-medium`, muted at rest
-  so it reads distinct from a full-strength idle link.
+  and unchanged across breakpoints.
 
-Hover is color-only — no growing underline or moving element — precisely
-so a nav item can later host a dropdown trigger without the affordance
-fighting the menu. The SiteShell-specific scrolled glass boundary described in
-§5 applies.
+Interaction feedback is color-only — no growing underline or moving element —
+precisely so a nav item can later host a dropdown trigger without the
+affordance fighting the menu. Focus-visible retains the shared 2px semantic
+ring and offset; route links remain native links, and only the current pathname
+receives `aria-current="page"`. The SiteShell-specific scrolled glass boundary
+described in §5 applies.
 
 **Actions below the collapse line** are the caller's decision, made by
 measuring (same rule as the breakpoint): if the compact action set fits

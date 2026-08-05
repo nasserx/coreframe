@@ -77,6 +77,7 @@ function renderShell() {
         <a href="/brand-home">Brand</a>
         <SiteShellNav label="Site sections">
           <SiteShellNavItem href="/products">Products</SiteShellNavItem>
+          <SiteShellNavItem href="/company">Company</SiteShellNavItem>
           <SiteShellNavItem>Pricing</SiteShellNavItem>
         </SiteShellNav>
         <SiteShellNavTrigger />
@@ -149,9 +150,36 @@ describe("SiteShell", () => {
   it("marks the current page's nav item with aria-current", () => {
     renderShell();
     const nav = screen.getByRole("navigation", { name: "Site sections" });
-    expect(within(nav).getByRole("link", { name: "Products" })).toHaveAttribute(
-      "aria-current",
-      "page",
+    const current = within(nav).getByRole("link", { name: "Products" });
+    expect(current).toHaveAttribute("aria-current", "page");
+    expect(current).toHaveClass(
+      "font-bold",
+      "text-foreground",
+      "hover:text-foreground",
+      "md:aria-[current=page]:text-foreground",
+    );
+  });
+
+  it("preserves mobile link colors and strengthens subdued desktop links on interaction", () => {
+    renderShell();
+    const nav = screen.getByRole("navigation", { name: "Site sections" });
+    const inactive = within(nav).getByRole("link", { name: "Company" });
+
+    expect(inactive).not.toHaveAttribute("aria-current");
+    expect(inactive).toHaveClass(
+      "font-semibold",
+      "text-foreground",
+      "hover:text-muted-foreground",
+      "transition-colors",
+      "md:text-muted-foreground",
+      "md:hover:text-foreground",
+      "md:focus-visible:text-foreground",
+      "md:active:text-foreground",
+      "md:aria-[current=page]:text-foreground",
+      "focus-visible:ring-2",
+      "focus-visible:ring-ring",
+      "focus-visible:ring-offset-2",
+      "focus-visible:ring-offset-background",
     );
   });
 

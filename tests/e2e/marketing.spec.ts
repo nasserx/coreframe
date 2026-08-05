@@ -588,9 +588,12 @@ test("desktop and drawer navigation share four ordered, unique page targets", as
   }
 });
 
-test("marketing header navigation preserves responsive interaction states", async ({ page }) => {
+test("marketing header navigation inherits shared responsive interaction states", async ({
+  page,
+}) => {
   for (const { theme, locale } of STATES) {
-    await page.setViewportSize({ width: 1024, height: 900 });
+    // Exercise the shared desktop contract at its exact md boundary.
+    await page.setViewportSize({ width: 768, height: 900 });
     await gotoMarketingState(page, theme, locale);
 
     const colors = await getNavigationSemanticColors(page);
@@ -641,7 +644,9 @@ test("marketing header navigation preserves responsive interaction states", asyn
     );
     await page.mouse.up();
 
-    await page.setViewportSize({ width: 390, height: 844 });
+    // One pixel below md proves the existing drawer treatment remains the
+    // base/mobile contract rather than inheriting the desktop hierarchy.
+    await page.setViewportSize({ width: 767, height: 844 });
     await page.getByRole("button", { name: COPY[locale].openNav }).click();
     const drawer = page.getByRole("dialog", { name: COPY[locale].navLabel });
     const drawerLinks = drawer.getByRole("link");
