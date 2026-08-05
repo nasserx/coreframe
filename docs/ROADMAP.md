@@ -264,69 +264,42 @@ output; archived counts inside `docs/audit/` remain unchanged.
 > package_ and the current root security policy.
 
 1. **Dependency advisories are tracked by tree and reachability.** _Posture
-   refreshed 2026-08-03 against the merged lockfile and npm registry._
-   `npm audit` reports **6 vulnerable packages: 4 high, 2 moderate, 0 low, 0
-   critical**. `npm audit --omit=dev` reports **3 high, 0 moderate, 0 low, 0
-   critical**. The package counts include parent packages whose severity is
-   inherited from vulnerable dependencies.
+   refreshed 2026-08-05 against the current lockfile and npm registry._ Before
+   remediation, `npm audit` reported **10 vulnerable package nodes: 7 high, 3
+   moderate, 0 low, 0 critical**; `npm audit --omit=dev` reported **4 high, 0
+   moderate, 0 low, 0 critical**. Counts include parent packages whose severity
+   was inherited from vulnerable dependencies.
 
-   **Production dependency paths:**
+   The compatible remediation aligned `next` and `eslint-config-next` at the
+   stable `16.3.0` release. Next now carries `postcss@8.5.23` and optional
+   `sharp@0.35.3`, clearing the production PostCSS and Sharp findings. The
+   remaining affected transitives were refreshed within their existing parent
+   ranges: `fast-uri@3.1.5`; `brace-expansion@1.1.18` and `5.0.9`;
+   `@modelcontextprotocol/sdk@1.30.0`; `@hono/node-server@2.1.0`;
+   `hono@4.13.0`; `ip-address@10.4.0`; and `undici@7.29.0`. No override,
+   forced audit fix, major upgrade, downgrade, or unrelated direct dependency
+   update was used.
 
-   - `next@16.2.12` → bundled `postcss@8.4.31` accounts for the high `postcss`
-     finding and contributes to the high `next` finding. The advisories cover
-     unescaped `</style>` output, attacker-controlled `sourceMappingURL` file
-     reads, and previous-source-map path traversal. PostCSS is exercised by
-     `npm run build`, but Coreframe currently gives it only repository-authored
-     CSS and reviewed package CSS (`tailwindcss`, `tw-animate-css`, and
-     `shadcn/tailwind.css`); no current code path accepts user- or CMS-supplied
-     CSS. The vulnerable package is therefore present and executed, while the
-     documented exploit inputs are not currently supplied by Coreframe.
-   - `next@16.2.12` → optional `sharp@0.34.5` accounts for the high `sharp`
-     finding and also contributes to the high `next` finding. Coreframe imports
-     neither `next/image` nor `sharp`, so its current application code does not
-     invoke the affected image-processing path. This is not a guarantee for a
-     downstream product: adding Next image optimization or a direct Sharp use
-     requires immediate reevaluation.
+   Final `npm audit` and `npm audit --omit=dev` both report **0 vulnerable
+   packages at every severity**, so there is no accepted residual npm advisory
+   risk in this lockfile. The pre-remediation reachability review found that
+   PostCSS was exercised only with repository/package-authored CSS; Coreframe
+   imported neither `next/image` nor Sharp; the application used Zod rather
+   than the AJV resolver path that installed `fast-uri`; lint received only
+   repository-owned glob patterns; and the shadcn/MCP server dependencies were
+   absent from application imports, package scripts, and CI. Those constraints
+   reduced demonstrated exposure but did not replace remediation.
 
-   The npm registry reports `next@16.2.12` as the latest stable release, still
-   depending on `postcss@8.4.31` and `sharp@^0.34.5`. No compatible Next patch
-   currently clears these advisories. `npm audit fix --force` proposes
-   `next@9.3.3`; that is an invalid framework downgrade and must not be used.
-   Revisit when a supported Next release carries PostCSS above `8.5.17` and
-   Sharp `0.35.0` or newer, then validate it as a separate dependency change.
+   `sharp@0.35.3` declares no `preinstall`, `install`, or `postinstall`, so the
+   obsolete `sharp@0.34.5` install-script approval was removed. The explicit
+   `fsevents` denial and `unrs-resolver@1.12.2` approval remain unchanged.
 
-   **Development dependency paths:**
-
-   - `shadcn@4.16.0` → `@modelcontextprotocol/sdk@1.29.0` →
-     `@hono/node-server@1.19.14` accounts for two moderate vulnerable-package
-     entries. The advisory is a Windows encoded-backslash path traversal in
-     Hono's static-file serving. These packages are dev-only; Coreframe source,
-     package scripts, and CI do not import them or start the shadcn MCP server.
-     The standard workflows therefore do not reach the affected server path.
-     Published `@modelcontextprotocol/sdk@1.30.0` accepts fixed
-     `@hono/node-server@^2.0.5` (latest observed `2.0.12`), and
-     `shadcn@4.16.1` is a compatible patch update admitted by the current
-     `^4.16.0` constraint. The merged shadcn update did not refresh this
-     transitive chain, so handle the SDK/Hono lockfile refresh in a focused
-     dependency-remediation change.
-   - Three installed `brace-expansion` paths account for one high
-     vulnerable-package entry: `eslint@9.39.5` → `minimatch@3.1.5` →
-     `brace-expansion@1.1.16`; `eslint-config-next@16.2.12` →
-     `typescript-eslint` → `minimatch@10.2.5` → `brace-expansion@5.0.7`; and
-     `shadcn@4.16.0` → `ts-morph` → `@ts-morph/common` → `minimatch@10.2.5`
-     → `brace-expansion@5.0.7`. Lint loads the first two tooling chains, but
-     Coreframe supplies fixed repository-owned glob patterns rather than
-     attacker-controlled brace expressions; the shadcn CLI chain is not part
-     of standard scripts or CI. Fixed `brace-expansion@1.1.17` and `5.0.8`
-     releases satisfy the existing parent ranges and should be adopted in the
-     same focused dependency-remediation change.
-
-   Re-run both audits and this reachability review whenever dependencies or the
+   Re-run both audits and the reachability review whenever dependencies or the
    lockfile change, or when a product adds image optimization, processes
    externally supplied CSS, adds build plugins, invokes shadcn's MCP server in
-   automation, or derives tooling glob patterns from untrusted input. These
-   conclusions describe current Coreframe paths, not every product cloned from
-   it.
+   automation, or derives tooling input from untrusted data. A zero-count npm
+   audit is a point-in-time registry result, not proof that every downstream
+   product or future code path is vulnerability-free.
 
 2. **No `browserslist` was added** (audit §2.3 suggested one). Argued against:
    `browserslist` governs JS **syntax** downleveling, not Web-API availability,
