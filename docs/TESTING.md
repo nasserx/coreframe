@@ -71,13 +71,21 @@ Spec discovery follows server ownership. `chromium-dev` matches only
 unless it is deliberately assigned to the development server.
 
 - `console-clean.spec.ts` — every route × {light, dark} × {ltr, rtl} must
-  produce zero console errors, warnings, uncaught exceptions, or failed
-  requests. Runs against `next dev` deliberately: React reports hydration
-  mismatches only in development builds — production silently ignores
-  attribute-level mismatches (verified by reintroducing the Pagination
-  defect: prod stayed green, dev failed with the exact diff). There is no
-  message allowlist; a benign message must be filtered by a reviewed code
-  change with a comment.
+  produce zero console errors, warnings, uncaught exceptions, or unexpected
+  failed requests. Runs against `next dev` deliberately: React reports
+  hydration mismatches only in development builds — production silently
+  ignores attribute-level mismatches (verified by reintroducing the Pagination
+  defect: prod stayed green, dev failed with the exact diff). Next.js 16.3
+  development hydration also replays passive effects under React Strict Mode;
+  for `/showcase/data`, the spec positively requires exactly two exact
+  `GET /api/showcase/records` starts, one caller-canceled `net::ERR_ABORTED`,
+  one completed HTTP 200, and the rendered records. Every other request
+  failure still fails the cell. There is no message allowlist; a benign
+  message must be filtered by a reviewed code change with a comment.
+- `data-network.spec.ts` — the production complement to that development-only
+  lifecycle contract: `/showcase/data` must make exactly one records request,
+  complete it with HTTP 200, render the records, and produce no request
+  failure in any theme/direction cell.
 - `fonts.spec.ts` — asserts Inter and all authored Tajawal weights are
   **loaded** (`document.fonts`) and **used**: Latin and Arabic samples measured
   through the shared page stack must match the intended family and differ from
@@ -252,31 +260,32 @@ The check is produced for every `pull_request` targeting `main` and every
 and remains a GitHub settings task. If a merge queue is enabled later, add the
 `merge_group` trigger before requiring this check for queued merges.
 
-**The full browser matrix runs on every PR — deliberately.** Current measured
-discovery (`npx playwright test --list`, 2026-08-01) is **235 Playwright tests
-in 12 spec files across 2 projects**, over the **13 app-page routes** that
-`tests/e2e/routes.ts` discovers:
+**The full browser matrix runs on every PR — deliberately.** Browser-test
+totals are a generated measurement, not a repository contract. Run
+`npx playwright test --list` to obtain the current total, spec-file count,
+project split, and per-suite inventory. The stable coverage shape is:
 
-- 52 `chromium-dev` console cells (13 routes × 2 themes × 2 directions);
-- 52 `chromium-prod` axe cells over the same matrix;
-- 26 `chromium-prod` overflow cells (13 routes × 2 directions);
-- 105 targeted `chromium-prod` tests for fonts, errors, shells, i18n,
-  geometry, the marketing route and its motion, the reference form, and the
-  shared controls.
+- four `chromium-dev` console cells per discovered route (2 themes × 2
+  directions);
+- four `chromium-prod` axe cells per discovered route over the same matrix;
+- two `chromium-prod` overflow cells per discovered route (2 directions);
+- targeted `chromium-prod` tests for fonts, errors, shells, i18n, geometry,
+  the marketing route and its motion, the reference form, the data network
+  lifecycle, and the shared controls.
 
-That route number counts `page.*` files under `src/app`. It is deliberately
-not the build's printed route table — which also lists the not-found page, the
-route handlers, and the generated icon — and not the count of statically
-generated pages; all three differ, and `npm run build` owns the latter two.
-Route handlers are not pages and never enter route discovery.
+Route discovery counts `page.*` files under `src/app`. It is deliberately not
+the build's printed route table — which also lists the not-found page, route
+handlers, and generated icon — or the count of statically generated pages;
+all three differ, and `npm run build` owns the latter two. Route handlers are
+not pages and never enter route discovery.
 
-These counts are separate from the Vitest unit/component layer, currently 261
-tests in 35 files. A representative-subset-on-PR scheme remains rejected
-because tokens, direction, fonts, and providers can affect every route at
-once. Growth is linear: each discovered page adds four development console
-cells, four production axe cells, and two production overflow cells. Revisit
-the policy when browser time passes roughly 10 minutes; `docs/ROADMAP.md` owns
-that trigger.
+Unit/component totals are equally volatile: run `npm test` and use Vitest's
+reported test-file and test totals as the current measurement. A
+representative-subset-on-PR scheme remains rejected because tokens, direction,
+fonts, and providers can affect every route at once. Growth is linear: each
+discovered page adds four development console cells, four production axe
+cells, and two production overflow cells. Revisit the policy when browser time
+passes roughly 10 minutes; `docs/ROADMAP.md` owns that trigger.
 
 Pre-commit stays lint-staged only — no tests. Rationale: pre-commit exists
 to keep diffs clean, not to prove correctness; even the fast unit run grows
