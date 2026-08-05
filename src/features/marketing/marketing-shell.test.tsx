@@ -102,7 +102,7 @@ describe("MarketingShell header navigation", () => {
     installBrowserStubs();
   });
 
-  it("keeps ordered fragment destinations and applies only the desktop interaction override", () => {
+  it("keeps ordered fragment destinations and inherits the shared responsive interaction contract", () => {
     renderMarketingShell();
 
     const links = within(headerNav()).getAllByRole("link");
