@@ -169,8 +169,9 @@ export type SiteShellFooterProps = ComponentProps<"footer">;
  * public marketing/content pages, AppShell for tool-like product surfaces —
  * docs/LAYOUT.md compares the two.
  *
- * Layout: a `min-h-dvh` column; the document itself scrolls. Below
- * `collapseBelow` the horizontal navigation collapses into a modal drawer
+ * Layout: a `min-h-dvh` column; the document itself scrolls. The header row
+ * owns the brand slot's logical-end margin (`me-4`, then `md:me-6`) while
+ * navigation items retain `gap-1`. Below `collapseBelow` the horizontal navigation collapses into a modal drawer
  * (the same Base UI Dialog mechanics as AppShell) opened by
  * SiteShellNavTrigger. The breakpoint is a prop, not a constant — see
  * SiteShellProps.
@@ -250,7 +251,10 @@ export function SiteShellHeader({ className, children, ...props }: SiteShellHead
       {/* The row is capped by Container — bar content must fit inside that
           cap at every width above the collapse line; the e2e overflow sweep
           checks this row against its own box. */}
-      <Container data-slot="site-shell-header-row" className="flex h-16 min-w-0 items-center gap-4">
+      <Container
+        data-slot="site-shell-header-row"
+        className="flex h-16 min-w-0 items-center gap-4 [&>:first-child]:me-4 md:[&>:first-child]:me-6"
+      >
         {children}
       </Container>
     </header>

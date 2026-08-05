@@ -68,6 +68,13 @@ Primitives should own only UI interaction state. Product state, server state, au
 
 Styling should be token-driven and consistent with the theme foundation. Components should avoid hardcoded product-specific styling and avoid exposing styling props that bypass the design system.
 
+Shared layout geometry belongs to the layout primitives and the contract in
+`docs/LAYOUT.md`, not feature-local overrides. In particular, `Container` owns
+the responsive page gutters while retaining its 1280px cap, and `SiteShell`
+owns the responsive logical spacing between its first, brand-slot child and
+the navigation group. Consumers provide content and visual identity without
+restating those defaults.
+
 ## Semantic HTML Expectations
 
 Use native HTML elements whenever they provide the correct semantics and behavior. Only replace native behavior when a custom primitive can preserve accessibility, keyboard behavior, and expected browser interactions.

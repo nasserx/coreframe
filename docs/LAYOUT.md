@@ -73,12 +73,13 @@ card grids, tables, and dashboards — can use the available width; prose
 inside a Container must still carry `max-w-prose`. The wider cap does not
 weaken the measure rule: uncapped running text remains a defect.
 
-Gutters are `px-4` (16px per side) below `sm`, `px-6` (24px) from `sm`, and
-`px-8` (32px) from `lg`. The 1280px cap includes that padding, matching the
-reference's authored `max-w-7xl px-4 sm:px-6 lg:px-8` contract exactly.
-Narrower marketing sections remain local compositions (`max-w-prose`,
-`max-w-form`, or a section-owned width); they do not create another global
-container.
+Gutters are `px-4` (16px per side) below `sm`, `px-6` (24px) from `sm` to
+below `md`, `px-4` (16px) from `md` to below `lg`, and `px-6` (24px) from
+`lg`. The 1280px cap includes that padding; the smaller desktop gutters let
+dense public and application surfaces use modestly more of the available
+width without changing the mobile contract or maximum width. Narrower
+marketing sections remain local compositions (`max-w-prose`, `max-w-form`,
+or a section-owned width); they do not create another container contract.
 
 Both utilities are `max-width` — a logical, direction-agnostic constraint;
 nothing direction-specific is needed for RTL.
@@ -269,9 +270,12 @@ application chrome.
 
 **Hierarchy: the brand dominates the bar.** Give the brand real presence
 as its own cluster — the demo runs `text-subheading` bold (two steps above
-the nav), a semantic-primary 32px mark (28px below `sm`, preserving narrow-
-mobile fit), and clear breathing room (`me-4`) before navigation begins. The
-mark stays `currentColor` and receives `text-primary` from the composition; its
+the nav) and a semantic-primary 32px mark (28px below `sm`, preserving narrow-
+mobile fit). `SiteShellHeader` owns the first, brand-slot child's logical-end
+margin: `me-4` (16px) below `md`, then `md:me-6` (24px). Combined with the
+row's unchanged `gap-4`, the desktop brand-to-navigation separation is 40px;
+the navigation group's own item spacing remains `gap-1` (4px). The mark stays
+`currentColor` and receives `text-primary` from the composition; its
 inset glyph makes that outer box read in balance with the 36px header CTA
 without resizing the CTA. Nav items are secondary wayfinding at `text-small`,
 semibold weight, on a three-step ladder that inverts the usual "light up on

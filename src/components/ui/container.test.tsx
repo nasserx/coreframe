@@ -12,7 +12,8 @@ describe("Container", () => {
       "max-w-7xl",
       "px-4",
       "sm:px-6",
-      "lg:px-8",
+      "md:px-4",
+      "lg:px-6",
     );
   });
 
@@ -20,7 +21,7 @@ describe("Container", () => {
     render(<Container dir={dir}>Directional content</Container>);
     const container = screen.getByText("Directional content");
     expect(container).toHaveAttribute("dir", dir);
-    expect(container).toHaveClass("px-4", "sm:px-6", "lg:px-8");
+    expect(container).toHaveClass("px-4", "sm:px-6", "md:px-4", "lg:px-6");
     expect(container.className).not.toMatch(/(?:^|:)(?:p[se]|m[se])-/);
   });
 });
