@@ -87,7 +87,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
       <SiteShellHeader>
         <Link
           href="/"
-          className="me-4 flex min-w-0 items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
+          className="flex min-w-0 items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
         >
           <BrandMark className="size-7 sm:size-8" />
           <span className="truncate">{t("brand")}</span>

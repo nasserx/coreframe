@@ -3,10 +3,19 @@ import { expect, type Locator, test } from "@playwright/test";
 const VIEWPORTS = [
   { width: 1440, height: 900 },
   { width: 1280, height: 900 },
+  { width: 1024, height: 900 },
   { width: 768, height: 1024 },
+  { width: 640, height: 900 },
   { width: 390, height: 844 },
   { width: 320, height: 800 },
 ] as const;
+
+function expectedContainerGutter(width: number) {
+  if (width >= 1024) return 24;
+  if (width >= 768) return 16;
+  if (width >= 640) return 24;
+  return 16;
+}
 
 async function geometry(locator: Locator) {
   return locator.evaluate((element) => {
@@ -52,7 +61,7 @@ test.describe("responsive container contract", () => {
         const main = await geometry(
           page.locator('[data-slot="site-shell-main"] > [data-slot="container"]'),
         );
-        const expectedGutter = viewport.width >= 1024 ? 32 : viewport.width >= 640 ? 24 : 16;
+        const expectedGutter = expectedContainerGutter(viewport.width);
         const expectedWidth = Math.min(viewport.width, 1280);
         const expectedInset = (viewport.width - expectedWidth) / 2;
 

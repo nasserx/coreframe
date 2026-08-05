@@ -137,6 +137,7 @@ test.describe("site shell — scroll-responsive header", () => {
       await gotoMatrixCell(page, "/showcase/site", theme, direction);
 
       const header = page.locator('[data-slot="site-shell-header"]');
+      const headerRow = page.locator('[data-slot="site-shell-header-row"]');
       const brandMark = header.locator('[data-slot="brand-mark"]');
       await expect(header).not.toHaveAttribute("data-scrolled", "");
 
@@ -151,6 +152,7 @@ test.describe("site shell — scroll-responsive header", () => {
       });
       expect(top.borderWidth).toBe("0px");
       expect(top.backdropFilter).toBe("none");
+      const topRow = await headerRow.boundingBox();
 
       await page.evaluate(() => window.scrollTo(0, 4));
       await expect(header).not.toHaveAttribute("data-scrolled", "");
@@ -171,6 +173,8 @@ test.describe("site shell — scroll-responsive header", () => {
       expect(scrolled.borderWidth).toBe("0px");
       expect(scrolled.backgroundColor).not.toBe(top.backgroundColor);
       expect(scrolled.backdropFilter).toContain("blur");
+      const scrolledRow = await headerRow.boundingBox();
+      expect(scrolledRow).toEqual(topRow);
 
       const markBox = await brandMark.boundingBox();
       expect(markBox?.width).toBe(viewport.width < 640 ? 28 : 32);
@@ -202,6 +206,119 @@ test.describe("site shell — scroll-responsive header", () => {
     await page.evaluate(() => window.scrollTo(0, 16));
     await expect(header).toHaveAttribute("data-scrolled", "");
     await expect(header).toHaveCSS("transition-property", "none");
+  });
+});
+
+test.describe("shared horizontal layout contracts", () => {
+  test("Container and SiteShell defaults hold across public and application consumers", async ({
+    page,
+  }) => {
+    const widths = [390, 700, 768, 1024, 1440] as const;
+    const consumers = [
+      { route: "/showcase/site", siteShell: true },
+      { route: "/showcase", siteShell: false },
+    ] as const;
+
+    for (const direction of ["ltr", "rtl"] as const) {
+      for (const { route, siteShell } of consumers) {
+        await page.goto(route);
+        await page.waitForLoadState("networkidle");
+        await page.evaluate(
+          (value) => document.documentElement.setAttribute("dir", value),
+          direction,
+        );
+
+        for (const width of widths) {
+          await page.setViewportSize({ width, height: 900 });
+          const measured = await page.evaluate(
+            ({ hasSiteShell }) => {
+              const root = document.documentElement;
+              const container = document.querySelector<HTMLElement>('main [data-slot="container"]');
+              if (container === null) {
+                throw new Error("The shared layout check requires a main Container consumer.");
+              }
+
+              const containerRect = container.getBoundingClientRect();
+              const containerStyle = getComputedStyle(container);
+              const availableWidth = container.parentElement?.getBoundingClientRect().width;
+              if (availableWidth === undefined) {
+                throw new Error("The shared layout check requires the Container's owner.");
+              }
+              if (!hasSiteShell) {
+                return {
+                  containerWidth: containerRect.width,
+                  availableWidth,
+                  containerPadding: Number.parseFloat(containerStyle.paddingInlineStart),
+                  pageOverflow: root.scrollWidth - root.clientWidth,
+                  headerOverflow: null,
+                  headerPadding: null,
+                  brandMargin: null,
+                  brandNavigationGap: null,
+                  navigationGap: null,
+                  navigationDisplay: null,
+                  navigationWrap: null,
+                };
+              }
+
+              const headerRow = document.querySelector<HTMLElement>(
+                '[data-slot="site-shell-header-row"]',
+              );
+              const navigation = document.querySelector<HTMLElement>(
+                '[data-slot="site-shell-nav"]',
+              );
+              const brand = headerRow?.firstElementChild;
+              if (headerRow === null || navigation === null || !(brand instanceof HTMLElement)) {
+                throw new Error("The shared layout check requires the complete SiteShell row.");
+              }
+
+              const headerStyle = getComputedStyle(headerRow);
+              const navigationStyle = getComputedStyle(navigation);
+              const brandRect = brand.getBoundingClientRect();
+              const navigationRect = navigation.getBoundingClientRect();
+              return {
+                containerWidth: containerRect.width,
+                availableWidth,
+                containerPadding: Number.parseFloat(containerStyle.paddingInlineStart),
+                pageOverflow: root.scrollWidth - root.clientWidth,
+                headerOverflow: headerRow.scrollWidth - headerRow.clientWidth,
+                headerPadding: Number.parseFloat(headerStyle.paddingInlineStart),
+                brandMargin: Number.parseFloat(getComputedStyle(brand).marginInlineEnd),
+                brandNavigationGap:
+                  document.documentElement.dir === "rtl"
+                    ? brandRect.left - navigationRect.right
+                    : navigationRect.left - brandRect.right,
+                navigationGap: Number.parseFloat(navigationStyle.columnGap),
+                navigationDisplay: navigationStyle.display,
+                navigationWrap: navigationStyle.flexWrap,
+              };
+            },
+            { hasSiteShell: siteShell },
+          );
+
+          const expectedPadding = width < 640 ? 16 : width < 768 ? 24 : width < 1024 ? 16 : 24;
+          expect(measured.containerWidth, `${route} [${direction}] at ${width}px`).toBe(
+            Math.min(measured.availableWidth, 1280),
+          );
+          expect(measured.containerPadding, `${route} [${direction}] at ${width}px`).toBe(
+            expectedPadding,
+          );
+          expect(
+            measured.pageOverflow,
+            `${route} [${direction}] at ${width}px`,
+          ).toBeLessThanOrEqual(1);
+
+          if (siteShell) {
+            expect(measured.headerOverflow, `${route} header [${direction}] at ${width}px`).toBe(0);
+            expect(measured.headerPadding).toBe(expectedPadding);
+            expect(measured.brandMargin).toBe(width < 768 ? 16 : 24);
+            expect(measured.navigationGap).toBe(4);
+            expect(measured.navigationWrap).toBe("nowrap");
+            expect(measured.navigationDisplay).toBe(width < 1024 ? "none" : "flex");
+            if (width >= 1024) expect(measured.brandNavigationGap).toBe(40);
+          }
+        }
+      }
+    }
   });
 });
 

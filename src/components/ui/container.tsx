@@ -17,8 +17,9 @@ export type ContainerProps = ComponentProps<"div">;
  * contract.
  *
  * Gutters follow one responsive contract: `px-4` (16px) below `sm`,
- * `px-6` (24px) from `sm`, and `px-8` (32px) from `lg`. Padding is
- * symmetric, so the same contract holds in LTR and RTL.
+ * `px-6` (24px) from `sm` to below `md`, `px-4` (16px) from `md` to
+ * below `lg`, and `px-6` (24px) from `lg`. Padding is symmetric, so the
+ * same contract holds in LTR and RTL.
  *
  * Accessibility: a generic container with no implicit role; it does not
  * affect the semantics of its content.
@@ -31,7 +32,7 @@ export function Container({ className, ...props }: ContainerProps) {
   return (
     <div
       data-slot="container"
-      className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", className)}
+      className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-4 lg:px-6", className)}
       {...props}
     />
   );

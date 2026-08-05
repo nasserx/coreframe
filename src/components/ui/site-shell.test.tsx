@@ -119,7 +119,8 @@ describe("SiteShell", () => {
       "transition-[background-color,backdrop-filter]",
       "motion-reduce:transition-none",
     );
-    expect(row).toHaveClass("h-16");
+    expect(row).toHaveClass("h-16", "gap-4", "[&>:first-child]:me-4", "md:[&>:first-child]:me-6");
+    expect(screen.getByRole("navigation", { name: "Site sections" })).toHaveClass("gap-1");
     expect(sentinel).toHaveClass("absolute", "h-2");
 
     act(() => setSentinelIntersecting(false));

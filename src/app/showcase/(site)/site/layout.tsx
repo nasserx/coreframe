@@ -63,13 +63,14 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
     <SiteShell collapseBelow="lg" skipLinkLabel={tShell("skipLink")}>
       <SiteShellHeader>
         {/* The brand anchors the bar as its own cluster: two type steps
-            above the nav items (text-subheading vs text-small) at bold,
-            with clear breathing room (me-4) before navigation begins. It
-            steps down to text-body below `sm`, where the bar is only brand
-            + trigger. Nav links are secondary wayfinding — 14px, medium. */}
+            above the nav items (text-subheading vs text-small) at bold.
+            SiteShell owns its responsive logical-end breathing room. The
+            brand steps down to text-body below `sm`, where the bar is only
+            brand + trigger. Nav links are secondary wayfinding — 14px,
+            medium. */}
         <Link
           href="/showcase"
-          className="me-4 flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
+          className="flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"
         >
           <BrandMark className="size-7 sm:size-8" />
           {t("brand")}

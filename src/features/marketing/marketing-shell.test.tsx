@@ -128,6 +128,18 @@ describe("MarketingShell header navigation", () => {
       );
     }
   });
+
+  it("delegates gutters and brand spacing to the shared layout contracts", () => {
+    renderMarketingShell();
+
+    const shell = document.querySelector('[data-slot="site-shell"]');
+    expect(shell?.className).not.toMatch(/data-slot=(?:container|site-shell-header-row)/);
+
+    const banner = screen.getByRole("banner");
+    const brand = within(banner).getByRole("link", { name: en.marketing.brand });
+    expect(brand.className).not.toMatch(/(?:^|:)me-/);
+    expect(headerNav()).toHaveClass("gap-1");
+  });
 });
 
 describe("MarketingShell footer", () => {

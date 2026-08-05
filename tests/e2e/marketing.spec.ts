@@ -158,6 +158,14 @@ const STATES = [
 
 const WIDTHS = [320, 390, 1024, 1440] as const;
 
+const MARKETING_RHYTHM_WIDTHS = [
+  { width: 390, containerPadding: 16, desktop: false },
+  { width: 700, containerPadding: 24, desktop: false },
+  { width: 768, containerPadding: 16, desktop: true },
+  { width: 1024, containerPadding: 24, desktop: true },
+  { width: 1440, containerPadding: 24, desktop: true },
+] as const;
+
 const FAQ_TECHNICAL_TERMS = [
   "API",
   "App Router",
@@ -381,6 +389,79 @@ async function getNavigationSemanticColors(page: Page) {
   });
 }
 
+async function getMarketingHorizontalRhythm(page: Page) {
+  return page.evaluate(() => {
+    const direction = document.documentElement.dir;
+    const viewportWidth = document.documentElement.clientWidth;
+    const containers = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-slot="container"]'),
+    );
+    const headerRow = document.querySelector<HTMLElement>('[data-slot="site-shell-header-row"]');
+    const header = document.querySelector<HTMLElement>('[data-slot="site-shell-header"]');
+    const navigation = header?.querySelector<HTMLElement>('[data-slot="site-shell-nav"]');
+    const brand = headerRow?.querySelector<HTMLElement>('a[href="/"]');
+    const controls = headerRow?.lastElementChild;
+    const links = navigation
+      ? Array.from(navigation.querySelectorAll<HTMLElement>('a[data-slot="site-shell-nav-item"]'))
+      : [];
+
+    if (
+      containers.length === 0 ||
+      headerRow === null ||
+      header === null ||
+      navigation === undefined ||
+      navigation === null ||
+      brand === undefined ||
+      brand === null ||
+      !(controls instanceof HTMLElement)
+    ) {
+      throw new Error("The marketing rhythm check requires the complete shell composition.");
+    }
+
+    const logicalEdges = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      const innerLeft = rect.left + Number.parseFloat(style.paddingLeft);
+      const innerRight = rect.right - Number.parseFloat(style.paddingRight);
+
+      return {
+        width: rect.width,
+        paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
+        paddingInlineEnd: Number.parseFloat(style.paddingInlineEnd),
+        inlineStart: direction === "rtl" ? viewportWidth - innerRight : innerLeft,
+        inlineEnd: direction === "rtl" ? innerLeft : viewportWidth - innerRight,
+      };
+    };
+
+    const brandRect = brand.getBoundingClientRect();
+    const navigationRect = navigation.getBoundingClientRect();
+    const controlsRect = controls.getBoundingClientRect();
+    const itemRects = links.map((link) => link.getBoundingClientRect());
+
+    return {
+      direction,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      headerOverflow: headerRow.scrollWidth - headerRow.clientWidth,
+      headerScrolled: header.hasAttribute("data-scrolled"),
+      containers: containers.map(logicalEdges),
+      headerRow: logicalEdges(headerRow),
+      brandMarginInlineEnd: Number.parseFloat(getComputedStyle(brand).marginInlineEnd),
+      brandNavigationGap:
+        direction === "rtl"
+          ? brandRect.left - navigationRect.right
+          : navigationRect.left - brandRect.right,
+      navigationDisplay: getComputedStyle(navigation).display,
+      navigationItemGaps: itemRects.slice(0, -1).map((rect, index) => {
+        const next = itemRects[index + 1];
+        if (next === undefined) return Number.NaN;
+        return direction === "rtl" ? rect.left - next.right : next.left - rect.right;
+      }),
+      controlsInlineEnd:
+        direction === "rtl" ? controlsRect.left : viewportWidth - controlsRect.right,
+    };
+  });
+}
+
 test("root marketing route owns one landmark set and a resolved primary action", async ({
   page,
 }) => {
@@ -581,6 +662,76 @@ test("marketing header navigation preserves responsive interaction states", asyn
       "color",
       colors.mutedForeground,
     );
+  }
+});
+
+test("marketing shell keeps a shared, direction-safe horizontal rhythm", async ({ page }) => {
+  for (const { theme, locale } of STATES) {
+    await gotoMarketingState(page, theme, locale);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await expect(page.getByRole("banner")).not.toHaveAttribute("data-scrolled");
+
+    for (const { width, containerPadding, desktop } of MARKETING_RHYTHM_WIDTHS) {
+      await page.setViewportSize({ width, height: 900 });
+      const rhythm = await getMarketingHorizontalRhythm(page);
+
+      expect(rhythm.direction, `${theme}/${locale} at ${width}px`).toBe(COPY[locale].direction);
+      expect(rhythm.pageOverflow, `${theme}/${locale} page at ${width}px`).toBeLessThanOrEqual(1);
+      expect(rhythm.headerOverflow, `${theme}/${locale} header at ${width}px`).toBeLessThanOrEqual(
+        1,
+      );
+
+      const expectedContainerWidth = Math.min(width, 1280);
+      for (const [index, container] of rhythm.containers.entries()) {
+        expect(container.width, `container ${index} width — ${theme}/${locale} at ${width}px`).toBe(
+          expectedContainerWidth,
+        );
+        expect(
+          container.paddingInlineStart,
+          `container ${index} start padding — ${theme}/${locale} at ${width}px`,
+        ).toBe(containerPadding);
+        expect(
+          container.paddingInlineEnd,
+          `container ${index} end padding — ${theme}/${locale} at ${width}px`,
+        ).toBe(containerPadding);
+        expect(
+          Math.abs(container.inlineStart - rhythm.headerRow.inlineStart),
+          `container ${index} start alignment — ${theme}/${locale} at ${width}px`,
+        ).toBeLessThanOrEqual(1);
+        expect(
+          Math.abs(container.inlineEnd - rhythm.headerRow.inlineEnd),
+          `container ${index} end alignment — ${theme}/${locale} at ${width}px`,
+        ).toBeLessThanOrEqual(1);
+      }
+
+      expect(
+        Math.abs(rhythm.controlsInlineEnd - rhythm.headerRow.inlineEnd),
+        `header controls alignment — ${theme}/${locale} at ${width}px`,
+      ).toBeLessThanOrEqual(1);
+
+      if (desktop) {
+        expect(rhythm.navigationDisplay, `${theme}/${locale} nav at ${width}px`).toBe("flex");
+        expect(rhythm.brandMarginInlineEnd, `${theme}/${locale} brand at ${width}px`).toBe(24);
+        expect(rhythm.brandNavigationGap, `${theme}/${locale} brand/nav at ${width}px`).toBe(40);
+        for (const [index, gap] of rhythm.navigationItemGaps.entries()) {
+          expect(gap, `${theme}/${locale} nav item gap ${index} at ${width}px`).toBeCloseTo(4, 1);
+        }
+      } else {
+        expect(rhythm.navigationDisplay, `${theme}/${locale} nav at ${width}px`).toBe("none");
+        expect(rhythm.brandMarginInlineEnd, `${theme}/${locale} brand at ${width}px`).toBe(16);
+      }
+    }
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.evaluate(() => window.scrollTo({ top: 800, behavior: "instant" }));
+    await expect(page.getByRole("banner")).toHaveAttribute("data-scrolled", "");
+    const scrolled = await getMarketingHorizontalRhythm(page);
+    expect(scrolled.headerScrolled, `${theme}/${locale} scrolled header`).toBe(true);
+    expect(scrolled.headerRow.width, `${theme}/${locale} scrolled header width`).toBe(1280);
+    expect(scrolled.headerRow.paddingInlineStart).toBe(24);
+    expect(scrolled.headerRow.paddingInlineEnd).toBe(24);
+    expect(scrolled.brandNavigationGap).toBe(40);
+    expect(scrolled.pageOverflow, `${theme}/${locale} scrolled page`).toBeLessThanOrEqual(1);
   }
 });
 
