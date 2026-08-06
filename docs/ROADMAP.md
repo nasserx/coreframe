@@ -169,12 +169,13 @@ Honest defects and frictions, none currently blocking:
    the button and composing their own `DialogClose`. Consistent with the
    shells' label props. (`ThemeControl` no longer takes label props: it has one
    accessible name per state and reads the `theme` catalogue itself.)
-3. **Production E2E spec discovery is automatic; three specs still
-   hard-reference showcase URLs.** `chromium-prod` owns every `*.spec.ts`
+3. **Production E2E spec discovery is automatic; direct Showcase dependencies
+   still require removal-time review.** `chromium-prod` owns every `*.spec.ts`
    except the development-only console suite, so new and renamed production
-   specs enter coverage without config changes. When the showcase is deleted,
-   `shell`, `fonts`, and `errors` still need URL retargeting; `docs/CLONING.md`
-   §3 lists those call sites precisely.
+   specs enter coverage without config changes. Direct route and endpoint
+   references do not adjust automatically; `docs/CLONING.md` §3 owns the
+   current retarget/delete checklist and the repository search that catches
+   future references, including the development-only data lifecycle contract.
 4. **The showcase gate requires a rebuild to flip.**
    `NEXT_PUBLIC_ENABLE_SHOWCASE` is inlined at build time — the price of
    keeping every Showcase page and its GET reference handler statically
@@ -182,8 +183,8 @@ Honest defects and frictions, none currently blocking:
    worth it. The reference form's POST handler remains request-time dynamic.
 5. **Browser-matrix CI grows linearly with routes** (~4 console cells + ~4
    axe scans per page). Currently cheap (see `docs/TESTING.md` § CI for the
-   measured numbers and the decision); revisit the full-matrix-on-PR policy
-   when browser time passes ~10 minutes.
+   authoritative discovery command and growth contract); revisit the
+   full-matrix-on-PR policy when browser time passes ~10 minutes.
 
 ## Deferred tooling upgrades
 

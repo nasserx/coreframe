@@ -85,7 +85,7 @@ test.describe("app shell — desktop", () => {
 });
 
 test.describe("site shell — mobile navigation", () => {
-  // The demo layout collapses below `md` (48rem = 768px).
+  // The demo layout collapses below `lg` (64rem = 1024px).
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("drawer opens, traps focus, closes on Escape with focus returned", async ({ page }) => {
