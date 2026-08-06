@@ -67,7 +67,7 @@ export default function ShowcaseSiteLayout({ children }: Readonly<{ children: Re
             SiteShell owns its responsive logical-end breathing room. The
             brand steps down to text-body below `sm`, where the bar is only
             brand + trigger. Nav links are secondary wayfinding — 14px,
-            medium. */}
+            semibold. */}
         <Link
           href="/showcase"
           className="flex items-center gap-2.5 rounded-md text-body font-bold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-subheading"

@@ -131,20 +131,32 @@ Three options, in order of product maturity:
      declaration), from `src/config/env-validation.ts` (its line in the Zod
      schema), and from `.env.example`.
    - **The e2e specs**: route discovery (`tests/e2e/routes.ts`) adjusts
-     automatically, but six specs reference showcase URLs directly and
-     need retargeting at your product's routes: `shell.spec.ts` (drives
-     `/showcase` for the AppShell and `/showcase/site` for the SiteShell —
-     point at your shell-wrapped routes, or remove until you mount a
-     shell), `geometry.spec.ts` and `i18n.spec.ts` (both drive
-     `/showcase/site` — point at a shell-wrapped route, Arabic-capable for
-     i18n), `fonts.spec.ts` (measures Arabic on `/showcase/direction` —
-     any page with Arabic text works), `errors.spec.ts` (exercises the
-     ErrorBoundary demo on `/showcase/feedback` — keep the 404 test,
-     retarget or drop the boundary test), and `forms.spec.ts` (drives the
-     reference form on `/showcase/forms` — delete it with the showcase, or
-     copy it as the shape of your own form's coverage). Production specs are
-     discovered automatically, so deleting or renaming one needs no
-     Playwright config change.
+     automatically, but direct Showcase routes and endpoints still need an
+     explicit review. The current checklist is:
+     - `shell.spec.ts`, `geometry.spec.ts`, `i18n.spec.ts`, and
+       `controls.spec.ts` — retarget their shell, layout, direction, and
+       control checks to representative product routes, or remove checks for
+       compositions the product has not mounted;
+     - `fonts.spec.ts` — move its Arabic sample to any page with Arabic text;
+     - `errors.spec.ts` — keep the generic 404 test, then retarget or remove
+       the Showcase ErrorBoundary demo case;
+     - `forms.spec.ts` and `data-network.spec.ts` — delete them with their
+       Showcase-owned pages and endpoints, or adapt them to equivalent product
+       flows;
+     - `marketing-motion.spec.ts` — replace its Showcase control routes with
+       representative non-marketing routes, or remove route-specific absence
+       checks that no longer have a consumer;
+     - `console-clean.spec.ts` — route discovery removes the deleted pages
+       automatically, but remove the `/showcase/data` development-only request
+       lifecycle contract with that page and endpoint.
+
+     Production spec discovery still needs no Playwright config change. Before
+     finishing, run
+     `rg -n -i 'showcase|/api/showcase' tests/e2e src README.md docs --glob '!docs/audit/**'`
+     and review every remaining match. This discovery command, rather than a
+     fixed spec count, catches future Showcase-coupled tests, product copy, and
+     living documentation.
+
    - **`src/features/README.md`**: its "Current contents" line describes
      `showcase/`; update it to describe your product's features (or "none
      yet").

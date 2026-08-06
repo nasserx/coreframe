@@ -233,7 +233,7 @@ export default async function TokensPage() {
       />
       <ShowcaseSection
         title="Theme behavior"
-        description="Three-state runtime: an explicit choice from the header control persists in localStorage and syncs across tabs; system tracks the OS live via matchMedia. A pre-paint inline script applies the stored choice with zero flash. Swatch values below follow the resolved theme."
+        description="Two concrete runtime themes: light and dark. When no explicit choice exists, initialization reads the operating-system preference once; later OS changes are not mirrored. An explicit header choice persists in localStorage and syncs across tabs. A pre-paint inline script applies the initial theme with zero flash, and the swatches below follow the applied theme."
       >
         <ThemeStatus />
       </ShowcaseSection>
