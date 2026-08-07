@@ -115,6 +115,7 @@ the stable required-check contract.
 | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)                 | Community participation and conduct reporting           |
 | [`docs/CLONING.md`](docs/CLONING.md)                       | Adapting, renaming, and configuring the foundation      |
 | [`docs/TESTING.md`](docs/TESTING.md)                       | Vitest, Playwright, CI, and test ownership              |
+| [`docs/RELEASING.md`](docs/RELEASING.md)                   | Semantic versioning and the maintainer release process  |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md)                       | Deliberate omissions, open issues, and revisit signals  |
 | [`docs/DESIGN_TOKENS.md`](docs/DESIGN_TOKENS.md)           | Tokens, typography, motion, contrast, and rebranding    |
 | [`docs/LAYOUT.md`](docs/LAYOUT.md)                         | Layout vocabulary and shell contracts                   |
