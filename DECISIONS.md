@@ -142,9 +142,9 @@ Alternatives considered: Radix-based shadcn styles (older runtime), a custom toa
 
 ## npm dependency lifecycle-script policy
 
-Decision (2026-07): The project `.npmrc` enables `strict-allow-scripts=true`, and `package.json#allowScripts` is the source of truth for dependency install-time lifecycle scripts. `sharp@0.34.5` and `unrs-resolver@1.12.2` are explicitly approved after review. `fsevents` is denied by package name because the locked `2.3.2` and `2.3.3` releases are optional, Darwin-only dependencies whose published packages already ship their native artifacts. Root lifecycle scripts remain enabled (`ignore-scripts=false`).
+Decision (2026-07, approvals revised 2026-08): The project `.npmrc` enables `strict-allow-scripts=true`, and `package.json#allowScripts` is the source of truth for dependency install-time lifecycle scripts. `unrs-resolver@1.12.2` is explicitly approved after review. `fsevents` is denied by package name because the locked `2.3.2` and `2.3.3` releases are optional, Darwin-only dependencies whose published packages already ship their native artifacts. The earlier `sharp@0.34.5` approval was removed once Sharp moved to `0.35.3`, which declares no `preinstall`, `install`, or `postinstall`; see `docs/ROADMAP.md` for that remediation record. Root lifecycle scripts remain enabled (`ignore-scripts=false`).
 
-Reason: Installs fail closed when a dependency introduces an unreviewed lifecycle script while preserving the root `prepare` script and the two reviewed native-package paths. Exact approvals must be reviewed whenever dependency versions change. The name-level `fsevents` denial also requires reassessment if its packaging changes; current behavior was not executed directly on macOS.
+Reason: Installs fail closed when a dependency introduces an unreviewed lifecycle script while preserving the root `prepare` script and the one reviewed native-package path. Exact approvals must be reviewed whenever dependency versions change. The name-level `fsevents` denial also requires reassessment if its packaging changes; current behavior was not executed directly on macOS.
 
 Scope: This policy governs dependency lifecycle execution only. It neither remediates nor accepts npm vulnerability advisories.
 
