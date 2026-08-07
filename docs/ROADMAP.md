@@ -295,6 +295,21 @@ output; archived counts inside `docs/audit/` remain unchanged.
    obsolete `sharp@0.34.5` install-script approval was removed. The explicit
    `fsevents` denial and `unrs-resolver@1.12.2` approval remain unchanged.
 
+   _Posture refreshed again 2026-08-07._ A newly published advisory,
+   `GHSA-5p4m-2wfm-xmqj` (high; quadratic CPU consumption in `js-yaml` `!!omap`
+   resolution; affected `>=4.0.0 <4.3.1`), matched the single deduplicated
+   `js-yaml@4.3.0` node. Every path to it was development-only —
+   `eslint` → `@eslint/eslintrc` (`js-yaml@^4.3.0`) and `shadcn`,
+   `@commitlint/cli` → `@commitlint/load` → `cosmiconfig` (`js-yaml@^4.1.0`) —
+   and `npm audit --omit=dev` already reported zero, so production scope was
+   never affected. Both parent ranges already admitted the fixed `4.3.1`, the
+   highest published `4.x`, so a lockfile-only refresh within existing ranges
+   remediated it; no direct dependency, override, forced audit fix, prerelease,
+   or major upgrade was used. `js-yaml@4.3.1` declares no `preinstall`,
+   `install`, or `postinstall`, so `allowScripts` did not change. Against the
+   resulting lockfile, `npm audit` and `npm audit --omit=dev` again report
+   **0 vulnerable packages at every severity**.
+
    Re-run both audits and the reachability review whenever dependencies or the
    lockfile change, or when a product adds image optimization, processes
    externally supplied CSS, adds build plugins, invokes shadcn's MCP server in
