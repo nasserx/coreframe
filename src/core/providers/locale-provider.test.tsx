@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { AppLocale } from "@/config";
 import type { Namespace, Translator } from "@/i18n";
 
 import type { LocaleContextValue } from "./locale-provider";
@@ -13,6 +14,9 @@ import type { LocaleContextValue } from "./locale-provider";
  * this also resets the session catalogue cache, so a switch re-loads the
  * code-split Arabic chunk each time. (Importing TYPES from the static path is
  * safe; types carry no module state.)
+ *
+ * That reload is a real async transition, so every assertion about translated
+ * text waits on `settleCatalogue` below rather than on a polling window.
  */
 
 function Probe({
@@ -43,11 +47,35 @@ function Probe({
 async function renderLocaleRuntime() {
   vi.resetModules();
   const { LocaleProvider, useLocale, useTranslations } = await import("./locale-provider");
+  const { loadCatalogue } = await import("@/i18n");
   render(
     <LocaleProvider>
       <Probe useLocale={useLocale} useTranslations={useTranslations} />
     </LocaleProvider>,
   );
+
+  return {
+    /*
+     * Wait for a non-default catalogue the way the provider does, instead of
+     * watching the DOM until it happens to appear. Selecting a non-default
+     * locale starts ONE code-split `import()` in the provider's locale effect
+     * and commits the translated text when it resolves; awaiting the same
+     * loader — from the same freshly reset registry, so it is the same module
+     * job — settles exactly when that load is done, and the surrounding `act`
+     * flushes the re-render it causes. Assertions afterwards are ordinary
+     * synchronous reads.
+     *
+     * This is the async contract itself, not a delay: the provider still
+     * performs its own load, still fills its own cache, and still re-renders on
+     * its own, so a provider that stopped committing the catalogue would fail
+     * here immediately rather than after a timeout.
+     */
+    async settleCatalogue(locale: AppLocale) {
+      await act(async () => {
+        await loadCatalogue(locale);
+      });
+    },
+  };
 }
 
 describe("locale runtime", () => {
@@ -75,12 +103,13 @@ describe("locale runtime", () => {
 
   it("switches language: translations, direction, lang/dir, and persistence all follow", async () => {
     const user = userEvent.setup();
-    await renderLocaleRuntime();
+    const { settleCatalogue } = await renderLocaleRuntime();
 
     await user.click(screen.getByRole("button", { name: "choose arabic" }));
 
     // The Arabic catalogue is code-split, so the label settles asynchronously.
-    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
+    await settleCatalogue("ar");
+    expect(screen.getByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
     expect(screen.getByTestId("locale")).toHaveTextContent("ar");
     // Direction is derived from the locale (not the catalogue), so it flips
     // immediately — it can never disagree with the language.
@@ -92,10 +121,11 @@ describe("locale runtime", () => {
 
   it("restores a stored locale on mount", async () => {
     window.localStorage.setItem("locale", "ar");
-    await renderLocaleRuntime();
+    const { settleCatalogue } = await renderLocaleRuntime();
     expect(screen.getByTestId("locale")).toHaveTextContent("ar");
     expect(screen.getByTestId("direction")).toHaveTextContent("rtl");
-    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
+    await settleCatalogue("ar");
+    expect(screen.getByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
   });
 
   it("ignores an unsupported stored locale and falls back to the default", async () => {
@@ -105,7 +135,7 @@ describe("locale runtime", () => {
   });
 
   it("adopts a locale stored by another tab via the storage event", async () => {
-    await renderLocaleRuntime();
+    const { settleCatalogue } = await renderLocaleRuntime();
     expect(screen.getByTestId("locale")).toHaveTextContent("en");
 
     act(() => {
@@ -114,7 +144,8 @@ describe("locale runtime", () => {
     });
 
     expect(screen.getByTestId("locale")).toHaveTextContent("ar");
-    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
+    await settleCatalogue("ar");
+    expect(screen.getByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
   });
 
   it("survives blocked storage: the choice still applies, only persistence is lost", async () => {
@@ -125,12 +156,13 @@ describe("locale runtime", () => {
       throw new Error("storage disabled");
     });
     const user = userEvent.setup();
-    await renderLocaleRuntime();
+    const { settleCatalogue } = await renderLocaleRuntime();
     expect(screen.getByTestId("locale")).toHaveTextContent("en");
 
     await user.click(screen.getByRole("button", { name: "choose arabic" }));
 
-    expect(await screen.findByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
+    await settleCatalogue("ar");
+    expect(screen.getByText("التبديل إلى الوضع الداكن")).toBeInTheDocument();
     expect(screen.getByTestId("direction")).toHaveTextContent("rtl");
   });
 
