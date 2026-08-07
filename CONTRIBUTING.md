@@ -122,6 +122,16 @@ Do not make an existing check pass by reducing coverage or weakening a
 contract unless the pull request explicitly justifies and documents that
 decision.
 
+## Repository maintenance and releases
+
+Release preparation is a maintainer-owned workflow separate from ordinary
+contribution. [`docs/RELEASING.md`](docs/RELEASING.md) is the authoritative
+contract for semantic-version selection, version-file ownership, release
+branches and commits, the complete release gate, tagging, GitHub Releases,
+rollback, and hotfixes. Contributors should not bump the project version or
+create release artifacts unless they are acting as the designated release
+owner under that process.
+
 ## Documentation and decisions
 
 Update the document that owns a changed contract. Add or revise a

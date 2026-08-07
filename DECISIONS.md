@@ -232,6 +232,34 @@ removing `"private": true` (rejected because publishing an npm package is not
 part of this decision); treating the owner-created visual reference as an
 external dependency (rejected because it was created by the same owner).
 
+## Repository-owned releases and semantic versioning
+
+Decision (2026-08): `docs/RELEASING.md` is the single owner of Coreframe's
+release process and semantic-versioning rules. `package.json#version` is the
+authoritative project version, `package-lock.json` is synchronized through
+npm, and releases are immutable annotated `vX.Y.Z` Git tags plus GitHub
+Releases from accepted commits on `main`. The private package has no npm
+publication path.
+
+Version selection is based on the aggregate downstream impact since the latest
+reachable release tag, not inferred mechanically from Conventional Commit
+types. Release preparation uses a focused `release/vX.Y.Z` branch, review, the
+complete repository validation gate, and an accepted
+`chore(release): vX.Y.Z` commit before tagging.
+
+Reason: version ownership, compatibility impact, validation, and immutable
+release identity are durable repository contracts. Keeping them in one living
+guide prevents package metadata, roadmap prose, tags, and release notes from
+becoming competing sources of truth while retaining human review for a
+template whose shared defaults affect downstream adopters.
+
+Alternatives considered: deriving versions directly from commit types
+(rejected because commit labels cannot express aggregate compatibility),
+duplicating the procedure across contributor and roadmap documents (rejected
+because it would drift), automated release tooling without a demonstrated need
+(rejected as new operational surface), and npm publication (rejected because
+Coreframe remains `"private": true` and distributes releases through GitHub).
+
 ## Private repository, no project license (superseded)
 
 Superseded decision (2026-07; superseded 2026-08): This repository stays **private** and carries **no license of its own**. `package.json` sets `"private": true` and has no `license` field; there is no `LICENSE` file. Under default copyright this means all rights reserved. The `LICENSE` (MIT) and `SECURITY.md` files added during the 2026-07 template-hardening pass were removed as artifacts that only serve a public, openly distributed repo.
