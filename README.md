@@ -141,7 +141,7 @@ users, integrations, and threat model.
 
 ## Support and maintenance
 
-Security fixes currently cover `main` and the `2.0.x` release line as defined
+Security fixes currently cover `main` and the `2.1.x` release line as defined
 in [`SECURITY.md`](SECURITY.md). General maintenance and community support are
 best-effort unless explicitly stated otherwise. A proposal or pull request may
 be declined when it does not fit the reusable foundation, maintenance capacity,

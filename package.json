@@ -1,6 +1,6 @@
 {
   "name": "coreframe",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "private": true,
   "license": "MIT",
   "description": "Reusable Next.js frontend architecture foundation with semantic design tokens, RTL support, accessible UI patterns, and layered testing.",
