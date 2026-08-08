@@ -2,13 +2,13 @@
 
 ## Supported versions
 
-Security fixes are provided for the current `2.0.x` release line and for
+Security fixes are provided for the current `2.1.x` release line and for
 unreleased work on `main`.
 
 | Version          | Supported |
 | ---------------- | --------- |
 | `main`           | Yes       |
-| `2.0.x`          | Yes       |
+| `2.1.x`          | Yes       |
 | Earlier versions | No        |
 
 Fixes normally land on `main` and are included in a release when warranted.
