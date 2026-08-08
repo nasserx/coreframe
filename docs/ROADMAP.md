@@ -310,6 +310,26 @@ output; archived counts inside `docs/audit/` remain unchanged.
    resulting lockfile, `npm audit` and `npm audit --omit=dev` again report
    **0 vulnerable packages at every severity**.
 
+   _Posture refreshed again 2026-08-08._ A newly published advisory,
+   `GHSA-2v37-7h3g-55p8` (high, CVSS 5.9; a custom generator can loop
+   indefinitely when `size` is zero; affected `<3.3.17`), matched the single
+   deduplicated `nanoid@3.3.16` node. Unlike the js-yaml finding, this one
+   **did affect production scope**: the node's only parent is `postcss@8.5.23`
+   (`nanoid@^3.3.16`), and `next@16.3.0` pins that exact PostCSS as a runtime
+   dependency, so `npm audit --omit=dev` reported it as well. `shadcn`,
+   `vite` (via `vitest`), and `@tailwindcss/postcss` reach the same
+   deduplicated PostCSS node and are development-only. The existing parent
+   range already admitted the fix, so a lockfile-only refresh
+   (`npm update nanoid --package-lock-only`) selected `3.3.18` — the highest
+   published `3.x` and the `legacy` dist-tag head — and the resulting diff was
+   confined to that single node's `version`, `resolved`, and `integrity`. No
+   direct dependency, override, forced audit fix, prerelease, downgrade, or
+   major upgrade was used, and `package.json` did not change. `nanoid@3.3.18`
+   declares no `preinstall`, `install`, or `postinstall`, so `allowScripts` did
+   not change. Against the resulting lockfile, `npm audit` and
+   `npm audit --omit=dev` again report **0 vulnerable packages at every
+   severity**.
+
    Re-run both audits and the reachability review whenever dependencies or the
    lockfile change, or when a product adds image optimization, processes
    externally supplied CSS, adds build plugins, invokes shadcn's MCP server in
